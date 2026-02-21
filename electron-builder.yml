@@ -1,0 +1,64 @@
+appId: com.repo-launcher
+productName: Repo Launcher
+copyright: Copyright © 2025 Repo Launcher
+
+directories:
+  buildResources: resources
+  output: dist
+
+files:
+  - out/**/*
+  - "!out/renderer/src/**"
+
+extraMetadata:
+  main: ./out/main/index.js
+
+# macOS
+mac:
+  target:
+    - target: dmg
+      arch:
+        - universal
+  category: public.app-category.developer-tools
+  icon: resources/icon.png
+  protocols:
+    - name: Repo Launcher
+      schemes:
+        - repo-launcher
+
+dmg:
+  artifactName: "${productName}-${version}-mac.${ext}"
+
+# Windows
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: resources/icon.png
+
+nsis:
+  oneClick: true
+  perMachine: false
+  allowToChangeInstallationDirectory: false
+  artifactName: "${productName}-${version}-win-setup.${ext}"
+
+# Linux
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+  category: Development
+  icon: resources/icon.png
+  mimeTypes:
+    - x-scheme-handler/repo-launcher
+
+appImage:
+  artifactName: "${productName}-${version}-linux.${ext}"
+
+# Protocol registration for Windows
+protocols:
+  - name: Repo Launcher
+    schemes:
+      - repo-launcher

@@ -1,0 +1,1899 @@
+/* ============================================================
+   Marketplace Standalone Window — Codex-inspired clean design
+   ============================================================ */
+.marketplace-standalone {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: clip; /* clip without creating a scroll container */
+  background: var(--mp-bg, #FAFAFA);
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', sans-serif;
+  color: var(--mp-text-primary, #0A0A0A);
+  /* Design tokens — no purple */
+  --mp-bg: #FAFAFA;
+  --mp-bg-card: #FFFFFF;
+  --mp-border: #E5E7EB;
+  --mp-border-subtle: #F0F0F0;
+  --mp-text-primary: #0A0A0A;
+  --mp-text-secondary: #6B7280;
+  --mp-text-tertiary: #9CA3AF;
+  --mp-btn-bg: #0A0A0A;
+  --mp-btn-text: #FFFFFF;
+  --mp-hover: #F5F5F5;
+  --mp-tag-bg: #F3F4F6;
+  --mp-tag-text: #374151;
+  --mp-toolbar-bg: rgba(250, 250, 250, 0.92);
+}
+
+[data-theme='dark'] .marketplace-standalone {
+  --mp-bg: #111111;
+  --mp-bg-card: #1A1A1A;
+  --mp-border: #2A2A2A;
+  --mp-border-subtle: #222222;
+  --mp-text-primary: #F5F5F5;
+  --mp-text-secondary: #9CA3AF;
+  --mp-text-tertiary: #6B7280;
+  --mp-btn-bg: #F5F5F5;
+  --mp-btn-text: #0A0A0A;
+  --mp-hover: #242424;
+  --mp-tag-bg: #2A2A2A;
+  --mp-tag-text: #9CA3AF;
+  --mp-toolbar-bg: rgba(17, 17, 17, 0.92);
+}
+
+/* Page header — left-aligned, large typography */
+.marketplace-standalone-header {
+  padding: 36px 32px 0;
+  flex-shrink: 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.marketplace-standalone-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Search row — below title */
+.marketplace-search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  row-gap: 8px;
+  padding-bottom: 20px;
+  flex-wrap: wrap; /* repo picker wraps to next line on narrow windows */
+}
+
+.marketplace-standalone-title {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--mp-text-primary);
+  margin: 0;
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+}
+
+.marketplace-standalone-subtitle {
+  font-size: 14px;
+  color: var(--mp-text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Repo picker — pushed to the right of search row */
+.marketplace-standalone-repo-picker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.marketplace-standalone-repo-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--mp-text-secondary);
+  white-space: nowrap;
+}
+
+.marketplace-standalone-repo-select {
+  padding: 7px 10px;
+  border: 1px solid var(--mp-border);
+  border-radius: 8px;
+  background: var(--mp-bg-card);
+  color: var(--mp-text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+  max-width: 240px;
+  min-width: 160px;
+}
+
+.marketplace-standalone-repo-select:focus {
+  border-color: var(--mp-text-tertiary);
+}
+
+/* Content area */
+.marketplace-standalone-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px 32px 32px;
+  background: var(--mp-bg);
+  min-width: 0;
+  scrollbar-width: thin; /* Firefox: thin scrollbar that doesn't take layout space */
+}
+
+/* Custom scrollbar — thin by default, wider on hover */
+.marketplace-standalone-content::-webkit-scrollbar {
+  width: 4px;
+}
+.marketplace-standalone-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.marketplace-standalone-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.16);
+  border-radius: 4px;
+}
+.marketplace-standalone-content:hover::-webkit-scrollbar {
+  width: 8px;
+}
+.marketplace-standalone-content:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: 6px;
+}
+
+[data-theme='dark'] .marketplace-standalone-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+}
+[data-theme='dark'] .marketplace-standalone-content:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.32);
+}
+
+/* My Skills cards — individual cards, same layout as marketplace cards */
+.marketplace-my-skill-card {
+  background: var(--mp-bg-card, #FFFFFF);
+  border: 1px solid var(--mp-border, #E5E7EB);
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 80px;
+  position: relative;
+}
+
+.marketplace-my-skills-empty {
+  padding: 20px 0;
+  font-size: 12px;
+  color: var(--mp-text-tertiary, #9CA3AF);
+}
+
+/* Remove button on My Skills cards */
+.marketplace-my-skill-remove {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid var(--mp-border, #E5E7EB);
+  background: transparent;
+  color: var(--mp-text-tertiary, #9CA3AF);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.marketplace-my-skill-remove:hover {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #EF4444;
+}
+
+/* Tooltip: black pill label on hover */
+.marketplace-my-skill-remove::after {
+  content: 'Remove';
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0A0A0A;
+  color: #FFFFFF;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  z-index: 300;
+}
+
+.marketplace-my-skill-remove:hover::after {
+  opacity: 1;
+}
+
+/* Tooltip on install buttons using data-tooltip attribute */
+.marketplace-install-main[data-tooltip]::after,
+.marketplace-install-chevron-btn[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0A0A0A;
+  color: #FFFFFF;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  z-index: 300;
+}
+
+.marketplace-install-main[data-tooltip]:hover::after,
+.marketplace-install-chevron-btn[data-tooltip]:hover::after {
+  opacity: 1;
+}
+
+/* Section */
+.marketplace-section {
+  margin-bottom: 32px;
+}
+
+.marketplace-section-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mp-text-secondary);
+  letter-spacing: 0.02em;
+  margin-bottom: 12px;
+  text-transform: none;
+}
+
+/* Responsive card grid — max 2 columns, 1 column when narrow */
+.marketplace-standalone-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(max(280px, calc(50% - 4px)), 1fr));
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Launch button on repo rows */
+/* Repo item split launch button */
+.repo-item-launch-split {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.repo-item:hover .repo-item-launch-split,
+.repo-item.selected .repo-item-launch-split {
+  opacity: 1;
+}
+
+.repo-item-launch-main {
+  padding: 4px 7px;
+  color: var(--color-text-secondary);
+  transition: background 0.1s ease, color 0.1s ease;
+  display: flex;
+  align-items: center;
+}
+
+.repo-item-launch-main:hover {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.repo-item-launch-chevron {
+  padding: 4px 5px;
+  color: var(--color-text-tertiary);
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.repo-item-launch-chevron:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+}
+
+/* Skills Panel */
+.skills-panel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.skills-panel-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.skills-panel-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.skills-panel-repo-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.skills-panel-close {
+  padding: 4px;
+  border-radius: 4px;
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.skills-panel-close:hover {
+  color: var(--color-text-primary);
+  background: var(--color-surface-hover);
+}
+
+.skills-panel-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.skills-panel-tab {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  transition: all 0.15s ease;
+}
+
+.skills-panel-tab:hover {
+  background: var(--color-surface-hover);
+}
+
+.skills-panel-tab.active {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.skills-panel-add {
+  margin-left: auto;
+  padding: 4px;
+  border-radius: 4px;
+  color: var(--color-text-tertiary);
+  transition: all 0.15s ease;
+}
+
+.skills-panel-add:hover {
+  color: var(--color-accent);
+  background: var(--color-surface-hover);
+}
+
+.skills-panel-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Repo Info View */
+.repo-info {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 16px;
+}
+
+.repo-info-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+}
+
+.repo-info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.repo-info-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--color-text-tertiary);
+}
+
+.repo-info-value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-text-primary);
+}
+
+.repo-info-path {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+  word-break: break-all;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  width: 100%;
+  transition: border-color 0.15s ease;
+}
+
+.repo-info-path:hover {
+  border-color: var(--color-accent);
+}
+
+.repo-info-copy-hint {
+  font-size: 10px;
+  color: var(--color-accent);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.repo-info-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.repo-info-tag {
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  background: var(--color-tag-bg);
+  color: var(--color-tag-text);
+}
+
+.repo-info-editors {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.repo-info-editor-btn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  transition: all 0.15s ease;
+}
+
+.repo-info-editor-btn:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.repo-info-ai-tools {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.repo-info-ai-tool {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  background: var(--color-branch-bg);
+  color: var(--color-branch-text);
+}
+
+/* Tool Icon */
+.tool-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Skills List */
+.skills-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.skills-tool-filter {
+  display: flex;
+  gap: 4px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--color-border);
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+.skills-tool-filter::-webkit-scrollbar {
+  display: none;
+}
+
+.skills-filter-pill {
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.skills-filter-pill:hover {
+  background: var(--color-surface-hover);
+}
+
+.skills-filter-pill.active {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.skills-groups {
+  padding: 4px 0;
+}
+
+.skills-group-header {
+  padding: 8px 16px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-tertiary);
+}
+
+.skills-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  gap: 8px;
+}
+
+.skills-empty-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.skills-empty-subtitle {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+/* Skill Card */
+.skill-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  transition: background 0.1s ease;
+}
+
+.skill-card:hover {
+  background: var(--color-surface-hover);
+}
+
+.skill-card.skill-disabled {
+  opacity: 0.5;
+}
+
+.skill-card-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.skill-card-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.skill-card-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.skill-card-path {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.skill-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.skill-card:hover .skill-card-actions {
+  opacity: 1;
+}
+
+.skill-action-btn {
+  padding: 4px;
+  border-radius: 4px;
+  color: var(--color-text-tertiary);
+  transition: all 0.15s ease;
+}
+
+.skill-action-btn:hover {
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+}
+
+.skill-delete-btn:hover {
+  color: #ef4444;
+}
+
+/* Toggle Switch */
+.skill-toggle {
+  position: relative;
+  display: inline-block;
+  width: 28px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.skill-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.skill-toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--color-surface);
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.skill-toggle-slider::before {
+  content: '';
+  position: absolute;
+  height: 12px;
+  width: 12px;
+  left: 2px;
+  bottom: 2px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+
+.skill-toggle input:checked + .skill-toggle-slider {
+  background: var(--color-accent);
+}
+
+.skill-toggle input:checked + .skill-toggle-slider::before {
+  transform: translateX(12px);
+}
+
+/* Skill Editor */
+.skill-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.skill-editor-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.skill-editor-back {
+  padding: 4px;
+  border-radius: 4px;
+  color: var(--color-text-tertiary);
+  transition: all 0.15s ease;
+}
+
+.skill-editor-back:hover {
+  color: var(--color-text-primary);
+  background: var(--color-surface-hover);
+}
+
+.skill-editor-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.skill-editor-path {
+  padding: 0 16px;
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  margin-top: 4px;
+}
+
+.skill-editor-textarea {
+  flex: 1;
+  margin: 8px 16px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+}
+
+.skill-editor-textarea:focus {
+  border-color: var(--color-accent);
+}
+
+.skill-editor-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.skill-editor-cancel {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  transition: background 0.15s ease;
+}
+
+.skill-editor-cancel:hover {
+  background: var(--color-surface-hover);
+}
+
+.skill-editor-save {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--color-accent);
+  color: #fff;
+  transition: background 0.15s ease;
+}
+
+.skill-editor-save:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.skill-editor-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Create Dialog */
+.skill-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.skill-dialog {
+  background: var(--color-bg-solid);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+  width: 360px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 40px var(--color-shadow);
+}
+
+.skill-dialog-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 16px;
+}
+
+.skill-dialog-field {
+  margin-bottom: 12px;
+}
+
+.skill-dialog-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: 6px;
+}
+
+.skill-dialog-tools {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.skill-dialog-tool-btn {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  transition: all 0.15s ease;
+}
+
+.skill-dialog-tool-btn:hover {
+  background: var(--color-surface-hover);
+}
+
+.skill-dialog-tool-btn.active {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.skill-dialog-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  outline: none;
+}
+
+.skill-dialog-input:focus {
+  border-color: var(--color-accent);
+}
+
+.skill-dialog-textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+}
+
+.skill-dialog-textarea:focus {
+  border-color: var(--color-accent);
+}
+
+.skill-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.skill-dialog-cancel {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  transition: background 0.15s ease;
+}
+
+.skill-dialog-cancel:hover {
+  background: var(--color-surface-hover);
+}
+
+.skill-dialog-create {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--color-accent);
+  color: #fff;
+  transition: background 0.15s ease;
+}
+
+.skill-dialog-create:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.skill-dialog-create:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Marketplace View (embedded panel, not used in standalone) */
+.marketplace-view {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Search — in toolbar */
+.marketplace-search {
+  display: contents; /* merged into toolbar */
+}
+
+.marketplace-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  max-width: 460px;
+}
+
+.marketplace-search-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--mp-text-tertiary, #9CA3AF);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.marketplace-search-input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px 8px 34px;
+  border: 1px solid var(--mp-border, #E5E7EB);
+  border-radius: 8px;
+  background: var(--mp-bg-card, #FFFFFF);
+  color: var(--mp-text-primary, #0A0A0A);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.marketplace-search-input:focus {
+  border-color: var(--mp-text-tertiary, #9CA3AF);
+}
+
+.marketplace-search-input::placeholder {
+  color: var(--mp-text-tertiary, #9CA3AF);
+}
+
+/* Black pill search button (like Codex "+ New skill") */
+.marketplace-search-btn {
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--mp-btn-bg, #0A0A0A);
+  color: var(--mp-btn-text, #FFFFFF);
+  border: none;
+  flex-shrink: 0;
+  transition: opacity 0.15s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.marketplace-search-btn:hover {
+  opacity: 0.82;
+}
+
+.marketplace-loading,
+.marketplace-empty {
+  padding: 80px 20px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--mp-text-secondary, #6B7280);
+}
+
+.marketplace-grid {
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ============================================================
+   Marketplace Card — individual bordered card
+   ============================================================ */
+.marketplace-card {
+  background: var(--mp-bg-card, #FFFFFF);
+  border: 1px solid var(--mp-border, #E5E7EB);
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: background 0.12s ease, box-shadow 0.12s ease;
+  min-height: 80px;
+  position: relative;
+}
+
+.marketplace-card:hover {
+  background: var(--mp-hover, #F5F5F5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Colored letter icon — deterministic color from skill name */
+.marketplace-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  letter-spacing: -0.5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Card text content */
+.marketplace-card-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.marketplace-card-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 0;
+}
+
+.marketplace-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mp-text-primary, #0A0A0A);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.marketplace-card-author {
+  font-size: 11px;
+  color: var(--mp-text-tertiary, #9CA3AF);
+  font-weight: 400;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.marketplace-card-desc {
+  font-size: 12px;
+  color: var(--mp-text-secondary, #6B7280);
+  line-height: 1.45;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0;
+}
+
+.marketplace-card-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  padding: 0;
+  margin-top: 2px;
+}
+
+.marketplace-card-tag {
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 500;
+  background: var(--mp-tag-bg, #F3F4F6);
+  color: var(--mp-tag-text, #374151);
+}
+
+/* Card actions — compact icon-only install button on right */
+.marketplace-card-actions {
+  flex-shrink: 0;
+  margin-top: 0;
+  padding: 0;
+  border-top: none;
+}
+
+/* ============================================================
+   Split install button — two variants:
+   card: compact icon-only  |  detail: full text
+   ============================================================ */
+.marketplace-install-split {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--mp-border, #E5E7EB);
+  border-radius: 8px;
+  overflow: visible;
+  background: var(--mp-bg-card, #FFFFFF);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+}
+
+.marketplace-install-split:hover {
+  border-color: var(--mp-text-tertiary, #9CA3AF);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Compact variant (card view) — icon only */
+.marketplace-install-split.compact {
+  border-radius: 7px;
+}
+
+.marketplace-install-main {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--mp-text-primary, #0A0A0A);
+  text-align: left;
+  transition: background 0.1s ease;
+  border-radius: 7px 0 0 7px;
+  cursor: pointer;
+  flex: 1;
+  position: relative;
+}
+
+/* Compact: smaller, icon only */
+.marketplace-install-split.compact .marketplace-install-main {
+  padding: 6px 9px;
+  flex: none;
+}
+
+.marketplace-install-main:hover:not(:disabled) {
+  background: var(--mp-hover, #F5F5F5);
+}
+
+.marketplace-install-main:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.marketplace-install-divider {
+  width: 1px;
+  background: var(--mp-border, #E5E7EB);
+  flex-shrink: 0;
+  align-self: stretch;
+}
+
+.marketplace-install-chevron-btn {
+  width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--mp-text-secondary, #6B7280);
+  transition: background 0.1s ease, color 0.1s ease;
+  border-radius: 0 7px 7px 0;
+  cursor: pointer;
+  position: relative;
+}
+
+.marketplace-install-split.compact .marketplace-install-chevron-btn {
+  width: 26px;
+}
+
+.marketplace-install-chevron-btn:hover {
+  background: var(--mp-hover, #F5F5F5);
+  color: var(--mp-text-primary, #0A0A0A);
+}
+
+.marketplace-install-chevron-icon {
+  transition: transform 0.15s ease;
+}
+
+.marketplace-install-chevron-icon.open {
+  transform: rotate(180deg);
+}
+
+.marketplace-install-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: auto;
+  min-width: 180px;
+  background: var(--mp-bg-card, #FFFFFF);
+  border: 1px solid var(--mp-border, #E5E7EB);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  z-index: 100;
+}
+
+[data-theme='dark'] .marketplace-install-menu {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.marketplace-install-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--mp-text-primary, #0A0A0A);
+  text-align: left;
+  transition: background 0.1s ease;
+  cursor: pointer;
+}
+
+.marketplace-install-menu-item:hover {
+  background: var(--mp-hover, #F5F5F5);
+}
+
+.marketplace-install-menu-item.active {
+  color: var(--mp-text-primary, #0A0A0A);
+  font-weight: 600;
+}
+
+.marketplace-install-menu-sep {
+  height: 1px;
+  background: var(--mp-border, #E5E7EB);
+  margin: 2px 0;
+}
+
+/* Skill detail view — Codex clean style */
+.skill-detail {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--mp-bg, #FAFAFA);
+}
+
+.skill-detail-header {
+  background: var(--mp-bg-card, #FFFFFF);
+  border-bottom: 1px solid var(--mp-border, #E5E7EB);
+  padding: 14px 24px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.skill-detail-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  min-width: 240px;
+}
+
+.skill-detail-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--mp-text-secondary, #6B7280);
+  padding: 6px 10px;
+  border-radius: 7px;
+  background: transparent;
+  border: 1px solid var(--mp-border, #E5E7EB);
+  transition: background 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+}
+
+.skill-detail-back:hover {
+  background: var(--mp-hover, #F5F5F5);
+  color: var(--mp-text-primary, #0A0A0A);
+}
+
+.skill-detail-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: var(--mp-bg, #FAFAFA);
+}
+
+.skill-detail-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skill-detail-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--mp-text-primary, #0A0A0A);
+  margin: 0;
+  letter-spacing: -0.8px;
+  line-height: 1.2;
+}
+
+.skill-detail-author {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--mp-text-secondary, #6B7280);
+  display: inline-block;
+}
+
+.skill-detail-tags {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.skill-detail-desc {
+  font-size: 14px;
+  color: var(--mp-text-secondary, #6B7280);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.skill-detail-content-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skill-detail-content-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--mp-text-tertiary, #9CA3AF);
+}
+
+.skill-detail-content {
+  background: var(--mp-bg-card, #FFFFFF);
+  border: 1px solid var(--mp-border, #E5E7EB);
+  border-radius: 10px;
+  padding: 20px 24px;
+  font-size: 13px;
+  font-family: 'SF Mono', 'Menlo', 'JetBrains Mono', monospace;
+  line-height: 1.7;
+  color: var(--mp-text-primary, #0A0A0A);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-x: auto;
+}
+
+/* Presets View */
+.presets-view {
+  display: flex;
+  flex-direction: column;
+}
+
+.presets-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.presets-save-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  transition: all 0.15s ease;
+  width: 100%;
+  justify-content: center;
+}
+
+.presets-save-btn:hover {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.presets-loading {
+  padding: 40px 20px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+}
+
+.presets-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  gap: 8px;
+}
+
+.presets-empty-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.presets-empty-subtitle {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+.presets-list {
+  padding: 8px 0;
+}
+
+.preset-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  transition: background 0.1s ease;
+}
+
+.preset-card:hover {
+  background: var(--color-surface-hover);
+}
+
+.preset-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.preset-card-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.preset-card-desc {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.preset-card-meta {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+.preset-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.preset-apply-btn {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--color-accent);
+  color: #fff;
+  transition: background 0.15s ease;
+}
+
+.preset-apply-btn:hover {
+  background: var(--color-accent-hover);
+}
+
+.preset-delete-btn {
+  padding: 4px;
+  border-radius: 4px;
+  color: var(--color-text-tertiary);
+  transition: all 0.15s ease;
+}
+
+.preset-delete-btn:hover {
+  color: #ef4444;
+  background: var(--color-surface-hover);
+}
+
+/* Instructions View */
+.instructions-view {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.instructions-view-hint {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+.instructions-loading {
+  padding: 40px 20px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+}
+
+.instructions-file-card {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 12px;
+  transition: border-color 0.15s ease;
+}
+
+.instructions-file-card:hover {
+  border-color: var(--color-text-tertiary);
+}
+
+.instructions-file-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.instructions-file-tool {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.instructions-file-tool-icon {
+  color: var(--color-text-tertiary);
+  display: flex;
+  align-items: center;
+}
+
+.instructions-file-tool-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.instructions-file-status {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+
+.instructions-file-status.exists {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+}
+
+.instructions-file-status.missing {
+  background: var(--color-surface);
+  color: var(--color-text-tertiary);
+}
+
+.instructions-file-path {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+  margin-bottom: 10px;
+}
+
+.instructions-file-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.instructions-file-btn {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  transition: all 0.15s ease;
+}
+
+.instructions-file-btn:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+}
+
+.instructions-file-btn.primary {
+  background: var(--color-accent);
+  color: #fff;
+  border-color: transparent;
+}
+
+.instructions-file-btn.primary:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.instructions-file-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Instructions Editor */
+.instructions-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.instructions-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.instructions-editor-path {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.instructions-editor-tool-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.instructions-editor-file-path {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+}
+
+.instructions-editor-template-toggle {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.instructions-editor-template-toggle:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.instructions-template-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--color-border);
+  max-height: 180px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.instructions-template-item {
+  text-align: left;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.instructions-template-item:hover {
+  background: var(--color-surface-hover);
+}
+
+.instructions-template-item.selected {
+  border-color: var(--color-accent);
+  background: var(--color-surface);
+}
+
+.instructions-template-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.instructions-template-desc {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  margin-top: 1px;
+}
+
+.instructions-editor-textarea {
+  flex: 1;
+  margin: 8px 16px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+}
+
+.instructions-editor-textarea:focus {
+  border-color: var(--color-accent);
+}
+
+.instructions-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.instructions-editor-cancel {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  transition: background 0.15s ease;
+}
+
+.instructions-editor-cancel:hover {
+  background: var(--color-surface-hover);
+}
+
+.instructions-editor-save {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--color-accent);
+  color: #fff;
+  transition: background 0.15s ease;
+}
+
+.instructions-editor-save:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.instructions-editor-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   Marketplace Filter Pills
+   ============================================================ */
+.marketplace-filter-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding-bottom: 16px;
+  row-gap: 6px;
+}
+
+.marketplace-filter-pill {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid var(--mp-border, #E5E7EB);
+  background: var(--mp-bg-card, #FFFFFF);
+  color: var(--mp-text-secondary, #6B7280);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.marketplace-filter-pill:hover {
+  border-color: var(--mp-text-tertiary, #9CA3AF);
+}
+
+.marketplace-filter-pill.active {
+  background: var(--mp-btn-bg, #111827);
+  color: var(--mp-btn-text, #FFFFFF);
+  border-color: var(--mp-btn-bg, #111827);
+}
+
+.marketplace-filter-count {
+  opacity: 0.55;
+}
+
+.marketplace-filter-clear {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--mp-text-tertiary, #9CA3AF);
+  cursor: pointer;
+  transition: color 0.12s ease;
+}
+
+.marketplace-filter-clear:hover {
+  color: var(--mp-text-secondary, #6B7280);
+}
+
+/* ============================================================
+   Marketplace Pagination
+   ============================================================ */
+.marketplace-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px 0 4px;
+}
+
+.marketplace-pagination button {
+  padding: 6px 14px;
+  border: 1px solid var(--mp-border, #E5E7EB);
+  border-radius: 7px;
+  background: var(--mp-bg-card, #FFFFFF);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--mp-text-primary, #111827);
+  transition: background 0.1s ease;
+}
+
+.marketplace-pagination button:hover:not(:disabled) {
+  background: var(--mp-hover, rgba(0, 0, 0, 0.04));
+}
+
+.marketplace-pagination button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.marketplace-pagination span {
+  font-size: 13px;
+  color: var(--mp-text-secondary, #6B7280);
+  min-width: 64px;
+  text-align: center;
+}

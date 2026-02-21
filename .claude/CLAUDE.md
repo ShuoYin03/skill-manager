@@ -1,0 +1,1 @@
+After each implementation, write a handover documentation, including what have been done and what has not, what should be the next step, etc
