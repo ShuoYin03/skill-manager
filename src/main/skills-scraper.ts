@@ -1,32 +1,13 @@
-import { app } from 'electron'
-import path from 'path'
-import fs from 'fs/promises'
+import TurndownService from 'turndown'
+import { gfm } from 'turndown-plugin-gfm'
+import { upsertSkill, getSkillsWithoutContent, updateSkillContent, setMetadata } from './skills-db'
 
-export interface SkillIndexEntry {
+interface SkillIndexEntry {
   slug: string    // "owner/repo/skillId"
   owner: string
   repo: string
   skillId: string
   name: string
-}
-
-export interface SkillsCache {
-  lastScraped: string
-  count: number
-  skills: SkillIndexEntry[]
-}
-
-function getCachePath(): string {
-  return path.join(app.getPath('userData'), 'marketplace-cache.json')
-}
-
-export async function getSkillsCache(): Promise<SkillsCache | null> {
-  try {
-    const raw = await fs.readFile(getCachePath(), 'utf-8')
-    return JSON.parse(raw) as SkillsCache
-  } catch {
-    return null
-  }
 }
 
 function extractLocs(xml: string): string[] {
@@ -63,9 +44,9 @@ async function fetchSitemapUrls(url: string): Promise<string[]> {
   }
 }
 
-export async function scrapeSkillsToCache(
+export async function scrapeSkillsToDb(
   onProgress?: (done: number, total: number, phase: string) => void
-): Promise<SkillsCache> {
+): Promise<{ count: number }> {
   onProgress?.(0, 1, 'Fetching sitemap...')
 
   const rootRes = await fetch('https://skills.sh/sitemap.xml', {
@@ -104,37 +85,97 @@ export async function scrapeSkillsToCache(
     return true
   })
 
-  const cache: SkillsCache = {
-    lastScraped: new Date().toISOString(),
-    count: unique.length,
-    skills: unique
+  // Insert into database
+  for (const skill of unique) {
+    upsertSkill(skill)
   }
 
-  await fs.writeFile(getCachePath(), JSON.stringify(cache), 'utf-8')
+  // Update metadata
+  setMetadata('lastScraped', new Date().toISOString())
+  setMetadata('count', String(unique.length))
 
-  return cache
+  return { count: unique.length }
 }
 
-function decodeHtmlEntities(str: string): string {
-  return str
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&amp;/g, '&')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&nbsp;/g, ' ')
-}
+export async function batchFetchSkillContent(
+  onProgress?: (current: number, total: number, slug: string) => void
+): Promise<{ successful: number; failed: number }> {
+  const CONCURRENCY = 5
+  const BATCH_DELAY_MS = 200
 
-function extractSkillContentFromHtml(html: string): string | null {
-  // Try to find a <pre> block with skill content
-  const preMatch = html.match(/<pre[^>]*>([\s\S]+?)<\/pre>/i)
-  if (preMatch) {
-    // Strip inner tags (e.g. <code>)
-    const stripped = preMatch[1].replace(/<[^>]+>/g, '')
-    const decoded = decodeHtmlEntities(stripped).trim()
-    if (decoded.length > 20) return decoded
+  const skillsToFetch = getSkillsWithoutContent()
+  const total = skillsToFetch.length
+
+  let successful = 0
+  let failed = 0
+
+  for (let i = 0; i < skillsToFetch.length; i += CONCURRENCY) {
+    const batch = skillsToFetch.slice(i, i + CONCURRENCY)
+
+    // Fetch 5 skills in parallel
+    await Promise.all(
+      batch.map(async (skill) => {
+        try {
+          const content = await fetchSkillContent(skill.slug)
+          updateSkillContent(skill.slug, content, null)
+          successful++
+          onProgress?.(i + batch.indexOf(skill), total, skill.slug)
+        } catch (err) {
+          updateSkillContent(skill.slug, null, String(err))
+          failed++
+        }
+      })
+    )
+
+    // Rate limit delay
+    if (i + CONCURRENCY < skillsToFetch.length) {
+      await new Promise((r) => setTimeout(r, BATCH_DELAY_MS))
+    }
   }
-  return null
+
+  setMetadata('contentFetchedAt', new Date().toISOString())
+
+  return { successful, failed }
+}
+
+/**
+ * Convert HTML to GitHub Flavored Markdown
+ */
+function htmlToMarkdown(html: string): string {
+  const turndown = new TurndownService({
+    headingStyle: 'atx',
+    codeBlockStyle: 'fenced',
+    bulletListMarker: '-',
+    emDelimiter: '*',
+    strongDelimiter: '**'
+  })
+
+  // Add GitHub Flavored Markdown support (tables, strikethrough, etc.)
+  turndown.use(gfm)
+
+  // Custom rule for code blocks with syntax highlighting
+  turndown.addRule('codeHighlight', {
+    filter: (node) => {
+      const el = node as unknown as { className?: string }
+      return Boolean(
+        node.nodeName === 'CODE' &&
+        node.parentNode?.nodeName === 'PRE' &&
+        el.className?.includes('language-')
+      )
+    },
+    replacement: (content, node) => {
+      const element = node as unknown as { className?: string }
+      const language =
+        element.className
+          ?.split(' ')
+          .find((cls: string) => cls.startsWith('language-'))
+          ?.replace('language-', '') || ''
+
+      return '\n```' + language + '\n' + content + '\n```\n'
+    }
+  })
+
+  return turndown.turndown(html)
 }
 
 export async function fetchSkillContent(slug: string): Promise<string | null> {
@@ -142,49 +183,12 @@ export async function fetchSkillContent(slug: string): Promise<string | null> {
   if (parts.length < 3) return null
   const [owner, repo, skillId] = parts
 
-  // 1. Try skills.sh page HTML
-  try {
-    const res = await fetch(`https://skills.sh/${owner}/${repo}/${skillId}`, {
-      signal: AbortSignal.timeout(10000),
-      headers: { Accept: 'text/html' }
-    })
-    if (res.ok) {
-      const html = await res.text()
-      const htmlContent = extractSkillContentFromHtml(html)
-      if (htmlContent) {
-        if (htmlContent.startsWith('http')) {
-          // The <pre> block contains a URL reference — fetch the actual content
-          try {
-            const contentRes = await fetch(htmlContent, { signal: AbortSignal.timeout(10000) })
-            if (contentRes.ok) {
-              const text = await contentRes.text()
-              if (text.length > 20 && !text.startsWith('<!DOCTYPE') && !text.startsWith('<html')) return text
-            }
-          } catch { /* fall through */ }
-        } else {
-          return htmlContent
-        }
-      }
-      // Also try to extract a raw GitHub URL directly from the page HTML
-      const rawUrlMatch = html.match(/https:\/\/raw\.githubusercontent\.com\/[^\s"'<>]+\.md/)
-      if (rawUrlMatch) {
-        try {
-          const contentRes = await fetch(rawUrlMatch[0], { signal: AbortSignal.timeout(10000) })
-          if (contentRes.ok) {
-            const text = await contentRes.text()
-            if (text.length > 20 && !text.startsWith('<!DOCTYPE') && !text.startsWith('<html')) return text
-          }
-        } catch { /* fall through */ }
-      }
-    }
-  } catch { /* fall through */ }
-
-  // 2. Try GitHub raw (common patterns)
+  // STRATEGY 1: Direct GitHub raw URL (most reliable)
   const githubPatterns = [
     `https://raw.githubusercontent.com/${owner}/${repo}/main/${skillId}/SKILL.md`,
     `https://raw.githubusercontent.com/${owner}/${repo}/main/SKILL.md`,
     `https://raw.githubusercontent.com/${owner}/${repo}/master/${skillId}/SKILL.md`,
-    `https://raw.githubusercontent.com/${owner}/${repo}/main/${skillId}.md`,
+    `https://raw.githubusercontent.com/${owner}/${repo}/main/${skillId}.md`
   ]
 
   for (const url of githubPatterns) {
@@ -196,10 +200,47 @@ export async function fetchSkillContent(slug: string): Promise<string | null> {
           return text
         }
       }
-    } catch { /* continue */ }
+    } catch {
+      /* continue */
+    }
   }
 
-  // 3. Return a minimal placeholder
+  // STRATEGY 2: Extract from skills.sh HTML
+  try {
+    const res = await fetch(`https://skills.sh/${owner}/${repo}/${skillId}`, {
+      signal: AbortSignal.timeout(10000),
+      headers: { Accept: 'text/html', 'User-Agent': 'DesktopTool/1.0' }
+    })
+
+    if (res.ok) {
+      const html = await res.text()
+
+      // Look for prose wrapper containing all content
+      const proseMatch = html.match(/<div[^>]*class="[^"]*prose[^"]*"[^>]*>([\s\S]+?)<\/div>\s*<\/div>/)
+
+      if (proseMatch) {
+        // Convert HTML to markdown using turndown
+        const markdown = htmlToMarkdown(proseMatch[1])
+        if (markdown.length > 50) return markdown.trim()
+      }
+
+      // Fallback: Look for raw GitHub URL in HTML
+      const rawUrlMatch = html.match(/https:\/\/raw\.githubusercontent\.com\/[^\s"'<>]+\.md/)
+      if (rawUrlMatch) {
+        const contentRes = await fetch(rawUrlMatch[0], { signal: AbortSignal.timeout(10000) })
+        if (contentRes.ok) {
+          const text = await contentRes.text()
+          if (text.length > 20 && !text.startsWith('<!DOCTYPE') && !text.startsWith('<html')) {
+            return text
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn(`Failed to fetch from skills.sh: ${err}`)
+  }
+
+  // STRATEGY 3: Return placeholder
   const name = skillId.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
   return `# ${name}\n\nInstalled from skills.sh — ${slug}\n`
 }

@@ -1,5 +1,5 @@
 import type { MarketplaceSkill, SkillSearchParams, SkillSearchResult, SkillFilterStats } from '../shared/types'
-import { getSkillsCache, fetchSkillContent, type SkillIndexEntry } from './skills-scraper'
+import { getSkillBySlug, searchSkills, getFilterStats, getMetadata, type SkillRow } from './skills-db'
 
 const BUNDLED_SKILLS: MarketplaceSkill[] = [
   {
@@ -68,52 +68,45 @@ const BUNDLED_SKILLS: MarketplaceSkill[] = [
   }
 ]
 
-function entryToMarketplaceSkill(entry: SkillIndexEntry): MarketplaceSkill {
+function skillRowToMarketplaceSkill(row: SkillRow): MarketplaceSkill {
   return {
-    slug: entry.slug,
-    title: entry.name,
-    description: `${entry.owner}/${entry.repo}`,
-    author: entry.owner,
-    tags: [entry.repo],
-    content: ''
+    slug: row.slug,
+    title: row.name,
+    description: `${row.owner}/${row.repo}`,
+    author: row.owner,
+    tags: [row.repo],
+    content: row.content || ''
   }
 }
 
 export async function searchMarketplaceSkills(params: SkillSearchParams): Promise<SkillSearchResult> {
   const { query = '', tag, author, page = 1, pageSize = 24 } = params
-  const cache = await getSkillsCache()
 
-  if (cache && cache.skills.length > 0) {
-    let entries: SkillIndexEntry[] = cache.skills
+  try {
+    // Query database with pagination
+    const offset = (page - 1) * pageSize
+    const { skills, total } = searchSkills({
+      query: query || undefined,
+      tag,
+      author,
+      limit: pageSize,
+      offset
+    })
 
-    // 1. Text filter
-    if (query.trim()) {
-      const q = query.toLowerCase()
-      entries = entries.filter(
-        (s) =>
-          s.name.toLowerCase().includes(q) ||
-          s.skillId.toLowerCase().includes(q) ||
-          s.owner.toLowerCase().includes(q) ||
-          s.repo.toLowerCase().includes(q)
-      )
+    if (skills.length > 0 || total > 0) {
+      const totalPages = Math.max(1, Math.ceil(total / pageSize))
+      return {
+        skills: skills.map(skillRowToMarketplaceSkill),
+        total,
+        page,
+        totalPages
+      }
     }
-
-    // 2. Tag filter (repo name = collection)
-    if (tag) entries = entries.filter((s) => s.repo === tag)
-
-    // 3. Author filter (owner)
-    if (author) entries = entries.filter((s) => s.owner === author)
-
-    // Order = cache order = skills.sh rank (no sort needed)
-    const total = entries.length
-    const totalPages = Math.max(1, Math.ceil(total / pageSize))
-    const safePage = Math.min(Math.max(1, page), totalPages)
-    const slice = entries.slice((safePage - 1) * pageSize, safePage * pageSize)
-
-    return { skills: slice.map(entryToMarketplaceSkill), total, page: safePage, totalPages }
+  } catch (err) {
+    console.error('Database search failed:', err)
   }
 
-  // Fall back to bundled skills
+  // Fall back to bundled skills if database is empty or fails
   let bundled = BUNDLED_SKILLS
   if (query.trim()) {
     const q = query.toLowerCase()
@@ -132,20 +125,12 @@ export async function searchMarketplaceSkills(params: SkillSearchParams): Promis
 }
 
 export async function getMarketplaceFilterStats(): Promise<SkillFilterStats> {
-  const cache = await getSkillsCache()
-  if (!cache || cache.skills.length === 0) return { tags: [], authors: [] }
-
-  const tagCount = new Map<string, number>()
-  const authorCount = new Map<string, number>()
-  for (const s of cache.skills) {
-    tagCount.set(s.repo, (tagCount.get(s.repo) ?? 0) + 1)
-    authorCount.set(s.owner, (authorCount.get(s.owner) ?? 0) + 1)
+  try {
+    return getFilterStats()
+  } catch (err) {
+    console.error('Failed to get filter stats from database:', err)
+    return { tags: [], authors: [] }
   }
-
-  const sortDesc = (m: Map<string, number>): { name: string; count: number }[] =>
-    [...m.entries()].sort((a, b) => b[1] - a[1]).map(([name, count]) => ({ name, count }))
-
-  return { tags: sortDesc(tagCount).slice(0, 20), authors: sortDesc(authorCount).slice(0, 15) }
 }
 
 export async function getMarketplaceSkillContent(slug: string): Promise<string | null> {
@@ -153,6 +138,37 @@ export async function getMarketplaceSkillContent(slug: string): Promise<string |
   const bundled = BUNDLED_SKILLS.find((s) => s.slug === slug)
   if (bundled) return bundled.content
 
-  // Fetch from skills.sh / GitHub
-  return await fetchSkillContent(slug)
+  // Query database for content
+  try {
+    const skill = getSkillBySlug(slug)
+    if (skill) {
+      if (skill.content) {
+        return skill.content
+      }
+      // If content is missing but no error
+      if (!skill.contentError) {
+        return '# Content Not Available\n\nThis skill has not been fetched yet. Please run the marketplace scraper.'
+      }
+      // If there was an error fetching
+      if (skill.contentError) {
+        return `# Content Fetch Failed\n\nError: ${skill.contentError}`
+      }
+    }
+  } catch (err) {
+    console.error('Failed to get skill content from database:', err)
+  }
+
+  return null
+}
+
+export async function getMarketplaceCacheStatus(): Promise<{ lastScraped: string | null; count: number }> {
+  try {
+    const lastScraped = getMetadata('lastScraped')
+    const countStr = getMetadata('count')
+    const count = countStr ? parseInt(countStr, 10) : 0
+    return { lastScraped, count }
+  } catch (err) {
+    console.error('Failed to get cache status from database:', err)
+    return { lastScraped: null, count: 0 }
+  }
 }
