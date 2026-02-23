@@ -5,4 +5,4 @@ dist/
 *.log
 .agents/*
 .next/*
-marketplace.db
+data/
