@@ -1,4 +1,4 @@
-import { upsertSkill, setMetadata, getMetadata } from './skills-db'
+import { upsertSkill, setMetadata, getMetadata, getSkillCount, getAllSlugs } from './skills-db'
 
 interface APISearchResponse {
   query: string
@@ -148,7 +148,7 @@ export async function scrapeAllSkillsViaAPI(
     phase: string,
     stats: { discovered: number; newInBatch: number }
   ) => void
-): Promise<{ totalDiscovered: number; queries: number }> {
+): Promise<{ dbTotal: number; newThisRun: number; queries: number; skipped: boolean }> {
   const queries = generateQueries()
   const discoveredSlugs = new Set<string>()
 
@@ -157,18 +157,36 @@ export async function scrapeAllSkillsViaAPI(
   let noNewSkillsCount = 0
 
   if (savedProgress) {
-    console.log(`Resuming from previous scrape (${savedProgress.totalDiscovered} skills discovered)`)
     // Filter out completed queries
     const remaining = queries.filter((q) => !savedProgress.completedQueries.includes(q))
+
+    // If all queries already completed, skip entirely
+    if (remaining.length === 0) {
+      const dbTotal = getSkillCount()
+      console.log(`All ${queries.length} queries already completed. Database has ${dbTotal} skills.`)
+      setMetadata('apiLastScraped', new Date().toISOString())
+      setMetadata('apiTotalDiscovered', String(dbTotal))
+      return { dbTotal, newThisRun: 0, queries: queries.length, skipped: true }
+    }
+
+    console.log(`Resuming: ${remaining.length} queries remaining (${savedProgress.completedQueries.length} already done)`)
+
+    // Pre-populate discoveredSlugs from database so deduplication works correctly
+    const existingSlugs = getAllSlugs()
+    for (const slug of existingSlugs) {
+      discoveredSlugs.add(slug)
+    }
+    const preloadedCount = discoveredSlugs.size
+    console.log(`Pre-loaded ${preloadedCount} existing slugs from database`)
+
     queries.length = 0
     queries.push(...remaining)
-
-    // Pre-populate discovered set (approximate)
     noNewSkillsCount = savedProgress.noNewSkillsCount || 0
   }
 
   const totalQueries = queries.length
   let completedQueries: string[] = savedProgress?.completedQueries || []
+  const startingDbCount = discoveredSlugs.size
 
   onProgress?.(0, totalQueries, 'Starting API scrape...', { discovered: 0, newInBatch: 0 })
 
@@ -207,8 +225,9 @@ export async function scrapeAllSkillsViaAPI(
 
     // Report progress
     const current = i + batch.length
+    const newThisRun = discoveredSlugs.size - startingDbCount
     onProgress?.(current, totalQueries, `Query: "${batch[batch.length - 1]}"`, {
-      discovered: discoveredSlugs.size,
+      discovered: newThisRun,
       newInBatch: batchNewSkills
     })
 
@@ -226,12 +245,16 @@ export async function scrapeAllSkillsViaAPI(
     }
   }
 
+  const dbTotal = getSkillCount()
+
   // Update final metadata
   setMetadata('apiLastScraped', new Date().toISOString())
-  setMetadata('apiTotalDiscovered', String(discoveredSlugs.size))
+  setMetadata('apiTotalDiscovered', String(dbTotal))
 
   return {
-    totalDiscovered: discoveredSlugs.size,
-    queries: completedQueries.length
+    dbTotal,
+    newThisRun: discoveredSlugs.size - startingDbCount,
+    queries: completedQueries.length,
+    skipped: false
   }
 }

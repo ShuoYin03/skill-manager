@@ -29,17 +29,22 @@ async function main() {
   console.log('Step 1/2: Enumerating ALL skills via search API...')
 
   let lastUpdate = Date.now()
-  const { totalDiscovered, queries } = await scrapeAllSkillsViaAPI((current, total, phase, stats) => {
+  const { dbTotal, newThisRun, queries, skipped } = await scrapeAllSkillsViaAPI((current, total, phase, stats) => {
     // Throttle progress updates to every 2 seconds
     if (Date.now() - lastUpdate > 2000) {
-      console.log(`  [${current}/${total}] ${phase} — Discovered: ${stats.discovered} (+${stats.newInBatch} new)`)
+      console.log(`  [${current}/${total}] ${phase} — New this run: ${stats.discovered} (+${stats.newInBatch})`)
       lastUpdate = Date.now()
     }
   })
 
-  console.log(`\n✓ API Scrape Complete!`)
-  console.log(`  ${totalDiscovered} total skills discovered`)
-  console.log(`  ${queries} queries executed`)
+  if (skipped) {
+    console.log(`\n✓ All queries already completed — no new scraping needed.`)
+  } else {
+    console.log(`\n✓ API Scrape Complete!`)
+    console.log(`  +${newThisRun} new skills found this run`)
+  }
+  console.log(`  ${dbTotal} total skills in database`)
+  console.log(`  ${queries} queries executed (total)`)
 
   console.log('\nStep 2/2: Fetching content for new skills...')
 

@@ -124,6 +124,19 @@ export function getAllSkills(): SkillRow[] {
   return db.prepare('SELECT * FROM skills ORDER BY rowid').all() as SkillRow[]
 }
 
+// Get total skill count
+export function getSkillCount(): number {
+  const db = getDb()
+  const row = db.prepare('SELECT COUNT(*) as count FROM skills').get() as { count: number }
+  return row.count
+}
+
+// Get all slugs (for deduplication on resume)
+export function getAllSlugs(): string[] {
+  const db = getDb()
+  return (db.prepare('SELECT slug FROM skills').all() as { slug: string }[]).map((r) => r.slug)
+}
+
 // Get skills without content
 export function getSkillsWithoutContent(): SkillRow[] {
   const db = getDb()
