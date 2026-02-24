@@ -105,3 +105,8 @@ export function removeSkillPreset(id: string): void {
   const presets = getSkillPresets().filter((p) => p.id !== id)
   store.set('skillPresets', presets)
 }
+
+export function updateSkillPreset(preset: SkillPreset): void {
+  const presets = getSkillPresets().map((p) => (p.id === preset.id ? preset : p))
+  store.set('skillPresets', presets)
+}

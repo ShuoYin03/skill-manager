@@ -80,14 +80,14 @@ function skillRowToMarketplaceSkill(row: SkillRow): MarketplaceSkill {
 }
 
 export async function searchMarketplaceSkills(params: SkillSearchParams): Promise<SkillSearchResult> {
-  const { query = '', tag, author, page = 1, pageSize = 24 } = params
+  const { query = '', tags, author, page = 1, pageSize = 24 } = params
 
   try {
     // Query database with pagination
     const offset = (page - 1) * pageSize
     const { skills, total } = searchSkills({
       query: query || undefined,
-      tag,
+      tags,
       author,
       limit: pageSize,
       offset

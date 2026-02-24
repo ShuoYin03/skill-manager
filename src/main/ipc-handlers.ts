@@ -2,7 +2,7 @@ import { ipcMain, dialog } from 'electron'
 import { v4 as uuidv4 } from 'uuid'
 import { IPC } from '../shared/constants'
 import type { EditorId, RepoEntry, AITool, SkillFile, SkillPreset, SkillSearchParams } from '../shared/types'
-import { getRepos, addRepo, removeRepo, updateRepo, getSettings, updateSettings, getSkillPresets, addSkillPreset, removeSkillPreset } from './store'
+import { getRepos, addRepo, removeRepo, updateRepo, getSettings, updateSettings, getSkillPresets, addSkillPreset, removeSkillPreset, updateSkillPreset } from './store'
 import { getGitBranch, isGitRepo, refreshAllBranches } from './git-service'
 import { openInEditor, getAvailableEditors } from './editor-launcher'
 import { hideLauncher, openMarketplaceWindow } from './window'
@@ -188,6 +188,10 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle(IPC.SKILLS_PRESETS_SAVE, (_event, preset: SkillPreset) => {
     addSkillPreset(preset)
+  })
+
+  ipcMain.handle(IPC.SKILLS_PRESETS_UPDATE, (_event, preset: SkillPreset) => {
+    updateSkillPreset(preset)
   })
 
   ipcMain.handle(IPC.SKILLS_PRESETS_DELETE, (_event, id: string) => {

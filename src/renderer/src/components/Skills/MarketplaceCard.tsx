@@ -1,17 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import type { MarketplaceSkill } from '../../../../shared/types'
 
-export type InstallTarget = 'claude' | 'cursor' | 'windsurf' | 'codex' | 'copilot' | 'global'
-
-const INSTALL_OPTIONS: { value: InstallTarget; label: string }[] = [
-  { value: 'claude', label: 'Claude' },
-  { value: 'cursor', label: 'Cursor' },
-  { value: 'windsurf', label: 'Windsurf' },
-  { value: 'codex', label: 'Codex' },
-  { value: 'copilot', label: 'Copilot' },
-  { value: 'global', label: 'Global (~/.agent/skills)' },
-]
-
 // Deterministic colors for skill letter icons (no purple)
 const ICON_COLORS = [
   '#FF6B35', // orange
@@ -35,24 +24,26 @@ export function getIconColor(title: string): string {
 
 interface MarketplaceCardProps {
   skill: MarketplaceSkill
-  onInstall: (target: InstallTarget) => Promise<void> | void
+  onInstall: () => Promise<void> | void
   onView: (skill: MarketplaceSkill) => void
+  onSaveToPreset?: (skill: MarketplaceSkill) => void
+  installLabel?: string
 }
 
 interface SplitInstallButtonProps {
-  selected: InstallTarget
   installing: boolean
   onInstallNow: () => void
-  onSelect: (target: InstallTarget) => void
+  onSaveToPreset?: () => void
   compact?: boolean
+  installLabel?: string
 }
 
 export function SplitInstallButton({
-  selected,
   installing,
   onInstallNow,
-  onSelect,
-  compact = false
+  onSaveToPreset,
+  compact = false,
+  installLabel
 }: SplitInstallButtonProps): JSX.Element {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -68,15 +59,13 @@ export function SplitInstallButton({
     return () => document.removeEventListener('mousedown', handler)
   }, [dropdownOpen])
 
-  const selectedLabel = INSTALL_OPTIONS.find((o) => o.value === selected)?.label ?? 'Claude'
-
   return (
     <div className={`marketplace-install-split${compact ? ' compact' : ''}`} ref={ref}>
       <button
         className="marketplace-install-main"
         onClick={onInstallNow}
         disabled={installing}
-        data-tooltip={installing ? undefined : `Install to ${selectedLabel}`}
+        data-tooltip={installing ? undefined : (installLabel ?? 'Install')}
       >
         {installing ? (
           compact ? (
@@ -91,7 +80,7 @@ export function SplitInstallButton({
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 5v14M5 12l7 7 7-7" />
             </svg>
-            {!compact && <span>Install to: {selectedLabel}</span>}
+            {!compact && <span>Install</span>}
           </>
         )}
       </button>
@@ -100,7 +89,7 @@ export function SplitInstallButton({
         className="marketplace-install-chevron-btn"
         onClick={() => setDropdownOpen((v) => !v)}
         disabled={installing}
-        data-tooltip="Change target"
+        data-tooltip="More options"
       >
         <svg
           className={`marketplace-install-chevron-icon ${dropdownOpen ? 'open' : ''}`}
@@ -118,43 +107,34 @@ export function SplitInstallButton({
       </button>
       {dropdownOpen && (
         <div className="marketplace-install-menu">
-          {INSTALL_OPTIONS.map((opt, i) => (
-            <>
-              {i === INSTALL_OPTIONS.length - 1 && (
-                <div key="sep" className="marketplace-install-menu-sep" />
-              )}
-              <button
-                key={opt.value}
-                className={`marketplace-install-menu-item ${opt.value === selected ? 'active' : ''}`}
-                onClick={() => {
-                  onSelect(opt.value)
-                  setDropdownOpen(false)
-                }}
-              >
-                {opt.value === selected && (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 6L9 17l-5-5" />
-                  </svg>
-                )}
-                <span>{opt.label}</span>
-              </button>
-            </>
-          ))}
+          {onSaveToPreset && (
+            <button
+              className="marketplace-install-menu-item"
+              onClick={() => {
+                onSaveToPreset()
+                setDropdownOpen(false)
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+              </svg>
+              <span>Save to Preset…</span>
+            </button>
+          )}
         </div>
       )}
     </div>
   )
 }
 
-export function MarketplaceCard({ skill, onInstall, onView }: MarketplaceCardProps): JSX.Element {
-  const [selected, setSelected] = useState<InstallTarget>('claude')
+export function MarketplaceCard({ skill, onInstall, onView, onSaveToPreset, installLabel }: MarketplaceCardProps): JSX.Element {
   const [installing, setInstalling] = useState(false)
   const iconColor = getIconColor(skill.title)
 
-  const handleInstall = async (target: InstallTarget): Promise<void> => {
+  const handleInstall = async (): Promise<void> => {
     setInstalling(true)
     try {
-      await onInstall(target)
+      await onInstall()
     } finally {
       setInstalling(false)
     }
@@ -185,14 +165,14 @@ export function MarketplaceCard({ skill, onInstall, onView }: MarketplaceCardPro
         )}
       </div>
 
-      {/* Compact install button on right */}
+      {/* Actions on right */}
       <div className="marketplace-card-actions" onClick={(e) => e.stopPropagation()}>
         <SplitInstallButton
-          selected={selected}
           installing={installing}
-          onInstallNow={() => handleInstall(selected)}
-          onSelect={(target) => setSelected(target)}
+          onInstallNow={handleInstall}
+          onSaveToPreset={onSaveToPreset ? () => onSaveToPreset(skill) : undefined}
           compact={true}
+          installLabel={installLabel}
         />
       </div>
     </div>

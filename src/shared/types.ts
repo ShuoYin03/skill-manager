@@ -104,6 +104,8 @@ export interface SkillPreset {
     name: string
     content: string
   }>
+  // Future: instruction files (CLAUDE.md, .cursorrules, etc.) to optionally include in this preset
+  instructions?: Array<{ tool: InstructionTool; content: string }>
 }
 
 export interface MarketplaceSkill {
@@ -118,7 +120,7 @@ export interface MarketplaceSkill {
 
 export interface SkillSearchParams {
   query?: string
-  tag?: string       // filter by repo name (collection)
+  tags?: string[]    // filter by repo name (collection), multi-select
   author?: string    // filter by owner
   page: number       // 1-indexed
   pageSize: number   // default 24

@@ -71,6 +71,74 @@ function getBaseName(filename: string): string {
   return filename
 }
 
+/**
+ * Scans .agents/skills (or similar shared dirs) which may contain either:
+ * - Flat .md files directly in the directory
+ * - Subdirectories where each folder has a SKILL.md entry file (skills.sh convention)
+ * Returns all found skills attributed to 'claude' tool.
+ */
+function scanSharedSkillsDir(repoPath: string, dir: string): SkillFile[] {
+  const fullDir = path.join(repoPath, dir)
+  if (!fs.existsSync(fullDir)) return []
+
+  const skills: SkillFile[] = []
+  let entries: fs.Dirent[]
+  try {
+    entries = fs.readdirSync(fullDir, { withFileTypes: true })
+  } catch {
+    return []
+  }
+
+  for (const entry of entries) {
+    if (entry.isFile()) {
+      // Flat .md file directly in the shared dir
+      const ext = path.extname(entry.name).toLowerCase()
+      if (ext !== '.md') continue
+
+      const relativePath = path.join(dir, entry.name)
+      const fullPath = path.join(repoPath, relativePath)
+      let content: string
+      try {
+        content = fs.readFileSync(fullPath, 'utf-8')
+      } catch {
+        continue
+      }
+      skills.push({
+        id: makeSkillId('claude', repoPath, relativePath),
+        tool: 'claude',
+        name: path.basename(entry.name, ext),
+        relativePath,
+        content,
+        enabled: true,
+        frontmatter: parseFrontmatter(content)
+      })
+    } else if (entry.isDirectory()) {
+      // skills.sh convention: subdirectory with SKILL.md as the entry point
+      const skillMdPath = path.join(fullDir, entry.name, 'SKILL.md')
+      if (!fs.existsSync(skillMdPath)) continue
+
+      const relativePath = path.join(dir, entry.name, 'SKILL.md')
+      let content: string
+      try {
+        content = fs.readFileSync(skillMdPath, 'utf-8')
+      } catch {
+        continue
+      }
+      skills.push({
+        id: makeSkillId('claude', repoPath, relativePath),
+        tool: 'claude',
+        name: entry.name, // use directory name as skill name
+        relativePath,
+        content,
+        enabled: true,
+        frontmatter: parseFrontmatter(content)
+      })
+    }
+  }
+
+  return skills
+}
+
 function scanDirectory(repoPath: string, tool: AITool, dir: string, extensions: string[]): SkillFile[] {
   const fullDir = path.join(repoPath, dir)
   if (!fs.existsSync(fullDir)) return []
@@ -174,12 +242,11 @@ export async function scanRepoSkills(
     if (config.singleFile) {
       skills.push(...scanSingleFile(repoPath, config.tool, config.singleFile))
     }
-
-    // Always scan .agents/skills for multi-file tools (shared directory)
-    if (config.tool !== 'codex' && config.tool !== 'copilot') {
-      skills.push(...scanDirectory(repoPath, config.tool, '.agents/skills', config.extensions))
-    }
   }
+
+  // Scan shared .agents/skills once (not per-tool) — handles both flat files and
+  // skills.sh-style subdirectories (each folder has a SKILL.md entry file)
+  skills.push(...scanSharedSkillsDir(repoPath, '.agents/skills'))
 
   return {
     repoId,

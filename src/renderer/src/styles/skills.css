@@ -117,6 +117,29 @@
   border-color: var(--mp-text-tertiary);
 }
 
+.marketplace-standalone-ai-select {
+  padding: 7px 10px;
+  border: 1px solid var(--mp-border);
+  border-radius: 8px;
+  background: var(--mp-bg-card);
+  color: var(--mp-text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+  min-width: 100px;
+}
+
+.marketplace-standalone-ai-select:focus {
+  border-color: var(--mp-text-tertiary);
+}
+
+.marketplace-standalone-ai-select:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 /* Content area */
 .marketplace-standalone-content {
   flex: 1;
@@ -984,7 +1007,7 @@
 .marketplace-search-input {
   flex: 1;
   min-width: 0;
-  padding: 8px 12px 8px 34px;
+  padding: 12px 12px 12px 38px;
   border: 1px solid var(--mp-border, #E5E7EB);
   border-radius: 8px;
   background: var(--mp-bg-card, #FFFFFF);
@@ -1004,7 +1027,7 @@
 
 /* Black pill search button (like Codex "+ New skill") */
 .marketplace-search-btn {
-  padding: 7px 14px;
+  padding: 12px 18px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 500;
@@ -1404,30 +1427,44 @@
   overflow-x: auto;
 }
 
-/* Presets View */
+/* ═══════════════════════════════════════════════════════════════
+   Presets View — base styles (narrow repo panel, ~260-340px wide)
+   ═══════════════════════════════════════════════════════════════ */
 .presets-view {
   display: flex;
   flex-direction: column;
 }
 
 .presets-header {
-  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px 10px;
   border-bottom: 1px solid var(--color-border);
+  gap: 8px;
+}
+
+.presets-header-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .presets-save-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
+  gap: 5px;
+  padding: 5px 10px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 500;
   color: var(--color-accent);
   border: 1px solid var(--color-accent);
   transition: all 0.15s ease;
-  width: 100%;
-  justify-content: center;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .presets-save-btn:hover {
@@ -1447,13 +1484,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
+  padding: 40px 16px;
   text-align: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .presets-empty-title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -1461,17 +1498,21 @@
 .presets-empty-subtitle {
   font-size: 12px;
   color: var(--color-text-tertiary);
+  line-height: 1.5;
 }
 
 .presets-list {
-  padding: 8px 0;
+  padding: 6px 0;
+  display: flex;
+  flex-direction: column;
 }
 
+/* ── Preset card (base: flat row in narrow panel) ── */
 .preset-card {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 10px 16px;
+  gap: 10px;
+  padding: 9px 16px;
   transition: background 0.1s ease;
 }
 
@@ -1479,22 +1520,43 @@
   background: var(--color-surface-hover);
 }
 
+.preset-card-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
 .preset-card-info {
   display: flex;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+  flex: 1;
 }
 
 .preset-card-name {
   font-size: 13px;
   font-weight: 500;
   color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .preset-card-desc {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .preset-card-meta {
@@ -1505,7 +1567,7 @@
 .preset-card-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
@@ -1523,6 +1585,18 @@
   background: var(--color-accent-hover);
 }
 
+.preset-edit-btn {
+  padding: 4px;
+  border-radius: 4px;
+  color: var(--color-text-tertiary);
+  transition: all 0.15s ease;
+}
+
+.preset-edit-btn:hover {
+  color: var(--color-accent);
+  background: var(--color-surface-hover);
+}
+
 .preset-delete-btn {
   padding: 4px;
   border-radius: 4px;
@@ -1533,6 +1607,465 @@
 .preset-delete-btn:hover {
   color: #ef4444;
   background: var(--color-surface-hover);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Marketplace Presets Container — full-width layout overrides
+   Uses --mp-* design tokens to match marketplace visual language
+   ═══════════════════════════════════════════════════════════════ */
+.marketplace-presets-container {
+  width: 100%;
+}
+
+.marketplace-presets-container .presets-view {
+  gap: 0;
+}
+
+.marketplace-presets-container .presets-header {
+  padding: 0 0 20px;
+  border-bottom: 1px solid var(--mp-border);
+  margin-bottom: 24px;
+}
+
+.marketplace-presets-container .presets-header-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--mp-text-primary);
+  text-transform: none;
+  letter-spacing: -0.5px;
+}
+
+.marketplace-presets-container .presets-save-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--mp-btn-bg);
+  color: var(--mp-btn-text);
+  border: 1px solid var(--mp-btn-bg);
+}
+
+.marketplace-presets-container .presets-save-btn:hover {
+  opacity: 0.85;
+  background: var(--mp-btn-bg);
+  color: var(--mp-btn-text);
+}
+
+.marketplace-presets-container .presets-loading {
+  padding: 80px 20px;
+  color: var(--mp-text-secondary);
+}
+
+.marketplace-presets-container .presets-empty {
+  padding: 96px 32px;
+  gap: 12px;
+}
+
+.marketplace-presets-container .presets-empty-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--mp-text-primary);
+  letter-spacing: -0.5px;
+}
+
+.marketplace-presets-container .presets-empty-subtitle {
+  font-size: 14px;
+  color: var(--mp-text-secondary);
+  max-width: 340px;
+  line-height: 1.6;
+}
+
+.marketplace-presets-container .presets-list {
+  padding: 0;
+  gap: 10px;
+}
+
+/* Full card style for marketplace context */
+.marketplace-presets-container .preset-card {
+  padding: 16px 20px;
+  background: var(--mp-bg-card);
+  border: 1px solid var(--mp-border);
+  border-radius: 10px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.marketplace-presets-container .preset-card:hover {
+  background: var(--mp-bg-card);
+  border-color: var(--mp-text-tertiary);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.marketplace-presets-container .preset-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.marketplace-presets-container .preset-card-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--mp-text-primary);
+}
+
+.marketplace-presets-container .preset-card-desc {
+  font-size: 13px;
+  color: var(--mp-text-secondary);
+}
+
+.marketplace-presets-container .preset-card-meta {
+  font-size: 12px;
+  color: var(--mp-text-tertiary);
+}
+
+.marketplace-presets-container .preset-apply-btn {
+  padding: 6px 14px;
+  border-radius: 7px;
+  font-size: 13px;
+  background: var(--mp-btn-bg);
+  color: var(--mp-btn-text);
+}
+
+.marketplace-presets-container .preset-apply-btn:hover {
+  opacity: 0.85;
+  background: var(--mp-btn-bg);
+}
+
+.marketplace-presets-container .preset-edit-btn,
+.marketplace-presets-container .preset-delete-btn {
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.marketplace-presets-container .preset-edit-btn:hover {
+  background: var(--mp-hover);
+  color: var(--mp-text-primary);
+}
+
+.marketplace-presets-container .preset-delete-btn:hover {
+  background: var(--mp-hover);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Preset Editor Dialog — create / edit with skill picker
+   ═══════════════════════════════════════════════════════════════ */
+.preset-editor-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+}
+
+.preset-editor-dialog {
+  background: var(--mp-bg-card, var(--color-bg-solid));
+  border: 1px solid var(--mp-border, var(--color-border));
+  border-radius: 14px;
+  width: 580px;
+  max-width: calc(100vw - 40px);
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.preset-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--mp-border, var(--color-border));
+  flex-shrink: 0;
+}
+
+.preset-editor-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--mp-text-primary, var(--color-text-primary));
+}
+
+.preset-editor-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: var(--mp-text-secondary, var(--color-text-secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s ease;
+}
+
+.preset-editor-close:hover {
+  background: var(--mp-hover, var(--color-surface-hover));
+  color: var(--mp-text-primary, var(--color-text-primary));
+}
+
+.preset-editor-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+}
+
+.preset-editor-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.preset-editor-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.preset-editor-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--mp-text-secondary, var(--color-text-secondary));
+}
+
+.preset-editor-optional {
+  font-weight: 400;
+  opacity: 0.6;
+}
+
+.preset-editor-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--mp-border, var(--color-border));
+  border-radius: 7px;
+  font-size: 13px;
+  color: var(--mp-text-primary, var(--color-text-primary));
+  background: var(--mp-bg, var(--color-bg));
+  outline: none;
+  transition: border-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.preset-editor-input:focus {
+  border-color: var(--mp-btn-bg, var(--color-accent));
+}
+
+/* Skills section (single-column in edit dialog) */
+.preset-editor-skills-section {
+  display: flex;
+  gap: 0;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid var(--mp-border, var(--color-border));
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Single-column override */
+.preset-editor-skills-section--single {
+  display: block;
+}
+
+.preset-editor-skills-section--single .preset-editor-skills-col {
+  width: 100%;
+}
+
+.preset-editor-skills-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.preset-editor-col-divider {
+  width: 1px;
+  background: var(--mp-border, var(--color-border));
+  flex-shrink: 0;
+}
+
+.preset-editor-col-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--mp-border, var(--color-border));
+  background: var(--mp-bg, var(--color-bg));
+  flex-shrink: 0;
+}
+
+.preset-editor-col-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--mp-text-secondary, var(--color-text-secondary));
+}
+
+.preset-editor-col-count {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--mp-text-tertiary, var(--color-text-tertiary));
+  background: var(--mp-hover, var(--color-surface-hover));
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+.preset-editor-skills-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+  min-height: 140px;
+  max-height: 220px;
+}
+
+.preset-editor-skills-empty {
+  padding: 24px 12px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--mp-text-tertiary, var(--color-text-tertiary));
+}
+
+.preset-editor-skill-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 12px;
+  transition: background 0.1s ease;
+}
+
+.preset-editor-skill-row:hover {
+  background: var(--mp-hover, var(--color-surface-hover));
+}
+
+.preset-editor-skill-tool {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--mp-text-tertiary, var(--color-text-tertiary));
+  flex-shrink: 0;
+  width: 46px;
+}
+
+.preset-editor-skill-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--mp-text-primary, var(--color-text-primary));
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preset-editor-skill-btn {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s ease, color 0.12s ease;
+  opacity: 0;
+}
+
+.preset-editor-skill-row:hover .preset-editor-skill-btn {
+  opacity: 1;
+}
+
+.preset-editor-skill-btn--remove {
+  color: var(--mp-text-tertiary, var(--color-text-tertiary));
+}
+
+.preset-editor-skill-btn--remove:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+.preset-editor-skill-btn--add {
+  color: var(--mp-text-tertiary, var(--color-text-tertiary));
+}
+
+.preset-editor-skill-btn--add:hover {
+  background: var(--mp-hover, var(--color-surface-hover));
+  color: var(--mp-btn-bg, var(--color-accent));
+}
+
+.preset-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 20px 16px;
+  border-top: 1px solid var(--mp-border, var(--color-border));
+  flex-shrink: 0;
+}
+
+.preset-editor-cancel {
+  padding: 7px 16px;
+  border-radius: 7px;
+  font-size: 13px;
+  color: var(--mp-text-secondary, var(--color-text-secondary));
+  background: transparent;
+  border: 1px solid var(--mp-border, var(--color-border));
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.preset-editor-cancel:hover {
+  background: var(--mp-hover, var(--color-surface-hover));
+}
+
+.preset-editor-save {
+  padding: 7px 18px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--mp-btn-bg, var(--color-accent));
+  color: var(--mp-btn-text, #fff);
+  cursor: pointer;
+  transition: opacity 0.12s ease;
+}
+
+.preset-editor-save:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.preset-editor-save:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Marketplace section tabs */
+.marketplace-tabs {
+  display: flex;
+  gap: 4px;
+  padding-bottom: 16px;
+}
+
+.marketplace-tab {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--mp-text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.marketplace-tab:hover {
+  background: var(--mp-hover);
+  color: var(--mp-text-primary);
+}
+
+.marketplace-tab.active {
+  background: var(--mp-btn-bg);
+  color: var(--mp-btn-text);
 }
 
 /* Instructions View */
@@ -1896,4 +2429,319 @@
   color: var(--mp-text-secondary, #6B7280);
   min-width: 64px;
   text-align: center;
+}
+
+/* Add to Preset button on marketplace cards */
+.marketplace-card-preset-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mp-text-tertiary);
+  background: transparent;
+  transition: background 0.12s ease, color 0.12s ease;
+  flex-shrink: 0;
+}
+
+.marketplace-card-preset-btn:hover {
+  background: var(--mp-hover);
+  color: var(--mp-btn-bg);
+}
+
+/* Add to Preset button in skill detail header */
+.skill-detail-add-preset-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--mp-text-secondary);
+  border: 1px solid var(--mp-border);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.skill-detail-add-preset-btn:hover {
+  background: var(--mp-hover);
+  color: var(--mp-text-primary);
+  border-color: var(--mp-text-tertiary);
+}
+
+/* Add to Preset dialog */
+.add-preset-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+}
+
+.add-preset-dialog {
+  background: var(--mp-bg-card, var(--color-bg-solid));
+  border: 1px solid var(--mp-border, var(--color-border));
+  border-radius: 12px;
+  width: 360px;
+  max-width: calc(100vw - 40px);
+  max-height: 480px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.add-preset-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--mp-border, var(--color-border));
+  flex-shrink: 0;
+}
+
+.add-preset-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mp-text-primary, var(--color-text-primary));
+}
+
+.add-preset-close {
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mp-text-secondary, var(--color-text-secondary));
+  transition: background 0.12s ease;
+}
+
+.add-preset-close:hover {
+  background: var(--mp-hover, var(--color-surface-hover));
+}
+
+.add-preset-skill-name {
+  padding: 10px 16px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--mp-text-secondary, var(--color-text-secondary));
+  border-bottom: 1px solid var(--mp-border, var(--color-border));
+  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.add-preset-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.add-preset-empty {
+  padding: 32px 20px;
+  text-align: center;
+}
+
+.add-preset-empty-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--mp-text-primary, var(--color-text-primary));
+  margin-bottom: 4px;
+}
+
+.add-preset-empty-sub {
+  font-size: 12px;
+  color: var(--mp-text-tertiary, var(--color-text-tertiary));
+}
+
+.add-preset-list {
+  padding: 6px 0;
+}
+
+.add-preset-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 14px;
+  transition: background 0.1s ease;
+}
+
+.add-preset-row:hover {
+  background: var(--mp-hover, var(--color-surface-hover));
+}
+
+.add-preset-row-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.add-preset-row-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--mp-text-primary, var(--color-text-primary));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.add-preset-row-meta {
+  font-size: 11px;
+  color: var(--mp-text-tertiary, var(--color-text-tertiary));
+}
+
+.add-preset-row-btn {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--mp-btn-bg, var(--color-accent));
+  color: var(--mp-btn-text, #fff);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity 0.12s ease;
+}
+
+.add-preset-row-btn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.add-preset-row-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Skill Detail — Rendered Markdown (Change 13)
+   ═══════════════════════════════════════════════════════════════ */
+.skill-detail-content--rendered {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--mp-text-primary, #0A0A0A);
+  font-family: inherit;
+  white-space: normal;
+  overflow-x: hidden;
+}
+.skill-detail-content--rendered h1,
+.skill-detail-content--rendered h2,
+.skill-detail-content--rendered h3 {
+  font-weight: 600;
+  margin: 16px 0 8px;
+  line-height: 1.3;
+  color: var(--mp-text-primary, #0A0A0A);
+}
+.skill-detail-content--rendered h1 { font-size: 18px; }
+.skill-detail-content--rendered h2 { font-size: 15px; }
+.skill-detail-content--rendered h3 { font-size: 13px; }
+.skill-detail-content--rendered p  { margin: 8px 0; }
+.skill-detail-content--rendered ul,
+.skill-detail-content--rendered ol { padding-left: 20px; margin: 8px 0; }
+.skill-detail-content--rendered li { margin: 3px 0; }
+.skill-detail-content--rendered code {
+  background: var(--mp-border, #E5E7EB);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 12px;
+  font-family: 'SF Mono', 'Menlo', 'JetBrains Mono', monospace;
+}
+.skill-detail-content--rendered pre {
+  background: var(--mp-bg, #F9FAFB);
+  border: 1px solid var(--mp-border, #E5E7EB);
+  border-radius: 8px;
+  padding: 12px;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+.skill-detail-content--rendered pre code {
+  background: none;
+  padding: 0;
+  font-size: 12px;
+}
+.skill-detail-content--rendered a {
+  color: var(--mp-btn-bg, #0A0A0A);
+  text-decoration: underline;
+}
+.skill-detail-content--rendered blockquote {
+  border-left: 3px solid var(--mp-border, #E5E7EB);
+  margin: 8px 0;
+  padding: 6px 12px;
+  color: var(--mp-text-secondary, #6B7280);
+}
+.skill-detail-content--rendered hr {
+  border: none;
+  border-top: 1px solid var(--mp-border, #E5E7EB);
+  margin: 16px 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   My Skills Editor — Textarea + Save/Delete Buttons (Change 13)
+   ═══════════════════════════════════════════════════════════════ */
+.skill-detail-editor-textarea {
+  width: 100%;
+  flex: 1;
+  min-height: 300px;
+  padding: 14px;
+  font-family: 'SF Mono', 'Menlo', 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 12.5px;
+  line-height: 1.6;
+  border: 1px solid var(--mp-border, #E5E7EB);
+  border-radius: 10px;
+  background: var(--mp-bg, #F9FAFB);
+  color: var(--mp-text-primary, #0A0A0A);
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+.skill-detail-editor-textarea:focus {
+  border-color: var(--mp-text-tertiary, #9CA3AF);
+}
+
+.skill-detail-delete-btn {
+  padding: 7px 14px;
+  font-size: 12px;
+  border: 1px solid #EF4444;
+  border-radius: 7px;
+  background: transparent;
+  color: #EF4444;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  flex-shrink: 0;
+}
+.skill-detail-delete-btn:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.08);
+}
+.skill-detail-delete-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.skill-detail-save-btn {
+  padding: 7px 14px;
+  font-size: 12px;
+  border-radius: 7px;
+  background: var(--mp-btn-bg, #0A0A0A);
+  color: var(--mp-btn-text, #FFFFFF);
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  flex-shrink: 0;
+  transition: opacity 0.12s ease;
+}
+.skill-detail-save-btn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+.skill-detail-save-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
 }

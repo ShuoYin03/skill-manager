@@ -4,13 +4,13 @@ import { IPC } from '../shared/constants'
 
 let launcherWindow: BrowserWindow | null = null
 let marketplaceWindow: BrowserWindow | null = null
-const BASE_WIDTH = 680
-const BASE_HEIGHT = 480
+const BASE_WIDTH = 900
+const BASE_HEIGHT = 600
 
 export function createLauncherWindow(): BrowserWindow {
   const win = new BrowserWindow({
-    width: 680,
-    height: 480,
+    width: 900,
+    height: 600,
     frame: false,
     transparent: true,
     resizable: false,

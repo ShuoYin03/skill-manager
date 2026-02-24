@@ -37,6 +37,7 @@ export const IPC = {
   // Presets
   SKILLS_PRESETS_GET: 'skills:presets:get',
   SKILLS_PRESETS_SAVE: 'skills:presets:save',
+  SKILLS_PRESETS_UPDATE: 'skills:presets:update',
   SKILLS_PRESETS_DELETE: 'skills:presets:delete',
   SKILLS_PRESETS_APPLY: 'skills:presets:apply',
 

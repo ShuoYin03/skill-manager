@@ -5,9 +5,9 @@
   padding: 0;
 }
 
-/* Drag handle */
+/* ── Drag handle (inside titlebar) ── */
 .drag-handle {
-  height: 22px;
+  height: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -17,11 +17,52 @@
 }
 
 .drag-handle-indicator {
-  width: 36px;
-  height: 4px;
+  width: 28px;
+  height: 3px;
   border-radius: 2px;
   background: var(--color-border);
-  opacity: 0.6;
+  opacity: 0.5;
+}
+
+/* ── Titlebar ── */
+.launcher-titlebar {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: 4px;
+}
+
+.launcher-titlebar-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px 14px;
+  -webkit-app-region: drag;
+}
+
+.launcher-titlebar-body button,
+.launcher-titlebar-body input {
+  -webkit-app-region: no-drag;
+}
+
+.launcher-app-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.launcher-titlebar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Search section wrapper ── */
+.launcher-search-section {
+  padding: 0 20px 12px;
+  flex-shrink: 0;
 }
 
 /* Split-view layout */
@@ -42,7 +83,7 @@
 }
 
 .launcher-split.split-open .launcher-list-pane {
-  width: 260px;
+  width: 340px;
 }
 
 .launcher-detail-pane {
@@ -64,12 +105,13 @@
   width: 100%;
   height: 100%;
   background: var(--color-bg);
-  border-radius: 12px;
-  box-shadow: 0 8px 40px var(--color-shadow), 0 0 0 1px var(--color-border);
+  border-radius: 14px;
+  box-shadow: 0 12px 48px var(--color-shadow), 0 0 0 1px var(--color-border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   animation: fadeIn 0.12s ease-out;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', sans-serif;
 }
 
 @keyframes fadeIn {
@@ -83,39 +125,53 @@
   }
 }
 
+/* ── Search bar — marketplace style ── */
 .search-bar {
+  position: relative;
   display: flex;
   align-items: center;
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--color-border);
-  gap: 10px;
 }
 
-.search-bar svg {
+.search-bar-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--color-text-tertiary);
+  pointer-events: none;
   flex-shrink: 0;
-  color: var(--color-text-tertiary);
 }
 
-.search-bar input {
-  flex: 1;
-  border: none;
-  outline: none;
-  background: transparent;
+.search-bar-input {
+  width: 100%;
+  padding: 10px 14px 10px 36px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-solid);
   color: var(--color-text-primary);
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.4;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.search-bar input::placeholder {
+.search-bar-input:focus {
+  border-color: var(--color-text-secondary);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+.search-bar-input::placeholder {
   color: var(--color-text-tertiary);
 }
 
+[data-theme='dark'] .search-bar-input:focus {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
+}
+
+/* ── Tag filter pills — marketplace style ── */
 .tag-filter {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
-  border-bottom: 1px solid var(--color-border);
+  padding: 0 20px 14px;
   overflow-x: auto;
   flex-shrink: 0;
 }
@@ -125,48 +181,68 @@
 }
 
 .tag-filter-pill {
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 12px;
+  padding: 4px 11px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
   color: var(--color-text-secondary);
-  background: var(--color-surface);
-  border: 1px solid transparent;
+  background: var(--color-bg-solid);
+  border: 1px solid var(--color-border);
   white-space: nowrap;
-  transition: all 0.15s ease;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
 }
 
 .tag-filter-pill:hover {
-  background: var(--color-surface-hover);
+  border-color: var(--color-text-tertiary);
 }
 
 .tag-filter-pill.active {
-  background: var(--color-tag-bg);
-  color: var(--color-tag-text);
-  border-color: var(--color-tag-text);
+  background: var(--color-text-primary);
+  color: var(--color-bg-solid);
+  border-color: var(--color-text-primary);
 }
 
+/* ── Repo list — card grid ── */
 .repo-list {
   flex: 1;
   overflow-y: auto;
-  padding: 4px 0;
+  padding: 0 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  scrollbar-width: thin;
 }
 
+.repo-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.repo-list::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+/* ── Repo card ── */
 .repo-item {
   display: flex;
   flex-direction: column;
-  padding: 10px 16px;
+  padding: 13px 16px;
   cursor: pointer;
-  border-left: 3px solid transparent;
-  transition: all 0.1s ease;
+  background: var(--color-bg-solid);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  transition: background 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
 }
 
 .repo-item:hover {
-  background: var(--color-surface-hover);
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px var(--color-shadow);
 }
 
 .repo-item.selected {
+  border-color: var(--color-accent);
   background: var(--color-selected);
-  border-left-color: var(--color-accent);
+  box-shadow: 0 2px 8px var(--color-shadow);
 }
 
 .repo-item-header {
@@ -176,6 +252,7 @@
 }
 
 .repo-item-name {
+  font-size: 13px;
   font-weight: 600;
   color: var(--color-text-primary);
   flex-shrink: 0;
@@ -183,7 +260,7 @@
 
 .repo-item-path {
   color: var(--color-text-tertiary);
-  font-size: 12px;
+  font-size: 11px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -193,8 +270,8 @@
 .repo-item-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 4px;
+  gap: 6px;
+  margin-top: 6px;
 }
 
 .repo-item-time {
@@ -229,72 +306,85 @@
   align-items: center;
   justify-content: center;
   flex: 1;
-  gap: 12px;
-  color: var(--color-text-secondary);
-  padding: 40px;
+  gap: 10px;
+  padding: 48px 32px;
   text-align: center;
 }
 
 .empty-state-title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--color-text-primary);
 }
 
 .empty-state-subtitle {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--color-text-tertiary);
+  line-height: 1.5;
 }
 
 .empty-state button {
-  margin-top: 8px;
-  padding: 8px 16px;
+  margin-top: 10px;
+  padding: 8px 18px;
   border-radius: 8px;
-  background: var(--color-accent);
-  color: #fff;
+  background: var(--color-text-primary);
+  color: var(--color-bg-solid);
+  font-size: 13px;
   font-weight: 500;
-  transition: background 0.15s ease;
+  transition: opacity 0.15s ease;
 }
 
 .empty-state button:hover {
-  background: var(--color-accent-hover);
+  opacity: 0.8;
 }
 
 .launcher-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 16px;
+  padding: 8px 20px 10px;
   border-top: 1px solid var(--color-border);
-  font-size: 11px;
-  color: var(--color-text-tertiary);
 }
 
 .launcher-footer-hints {
   display: flex;
-  gap: 12px;
+  gap: 14px;
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+.launcher-footer-hint {
+  display: flex;
+  align-items: center;
+  gap: 3px;
 }
 
 .launcher-footer-hint kbd {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 1px 5px;
-  border-radius: 3px;
+  border-radius: 4px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   font-size: 10px;
   font-family: inherit;
-  margin-right: 3px;
+  color: var(--color-text-secondary);
+  min-width: 18px;
 }
 
 .gear-button {
   color: var(--color-text-tertiary);
-  padding: 4px;
-  border-radius: 4px;
-  transition: color 0.15s ease;
+  padding: 6px;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .gear-button:hover {
   color: var(--color-text-primary);
+  background: var(--color-surface-hover);
 }
 
 .editor-picker-overlay {

@@ -83,6 +83,8 @@ const api = {
   getSkillPresets: () => ipcRenderer.invoke(IPC.SKILLS_PRESETS_GET),
   saveSkillPreset: (preset: Record<string, unknown>) =>
     ipcRenderer.invoke(IPC.SKILLS_PRESETS_SAVE, preset),
+  updateSkillPreset: (preset: Record<string, unknown>) =>
+    ipcRenderer.invoke(IPC.SKILLS_PRESETS_UPDATE, preset),
   deleteSkillPreset: (id: string) =>
     ipcRenderer.invoke(IPC.SKILLS_PRESETS_DELETE, id),
   applySkillPreset: (presetId: string, repoPath: string) =>

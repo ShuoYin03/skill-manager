@@ -152,7 +152,7 @@ export function getSkillBySlug(slug: string): SkillRow | null {
 // Search skills
 export function searchSkills(params: {
   query?: string
-  tag?: string
+  tags?: string[]
   author?: string
   limit: number
   offset: number
@@ -167,9 +167,10 @@ export function searchSkills(params: {
     queryParams.push(pattern, pattern, pattern, pattern)
   }
 
-  if (params.tag) {
-    conditions.push('repo = ?')
-    queryParams.push(params.tag)
+  if (params.tags && params.tags.length > 0) {
+    const placeholders = params.tags.map(() => '?').join(', ')
+    conditions.push(`repo IN (${placeholders})`)
+    queryParams.push(...params.tags)
   }
 
   if (params.author) {
