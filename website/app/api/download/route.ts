@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
   }
 
   const repo = process.env.NEXT_PUBLIC_GITHUB_REPO
-  if (!repo || repo === 'YOUR_GITHUB_USERNAME/repo-launcher') {
+  if (!repo || repo === 'YOUR_GITHUB_USERNAME/skilly') {
     return NextResponse.json(
       { error: 'GitHub repo not configured. Set NEXT_PUBLIC_GITHUB_REPO in .env.local' },
       { status: 503 }

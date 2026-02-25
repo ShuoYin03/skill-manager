@@ -5,13 +5,12 @@ import { SkillEditor } from './SkillEditor'
 import { SkillCreateDialog } from './SkillCreateDialog'
 import { PresetsView } from './PresetsView'
 import { RepoInfoView } from './RepoInfoView'
-import { InstructionsView } from './InstructionsView'
+
 import type { SkillsPanelView } from '../../../../shared/types'
 
 const TABS: { id: SkillsPanelView; label: string }[] = [
   { id: 'info', label: 'Info' },
   { id: 'list', label: 'Skills' },
-  { id: 'instructions', label: 'Instructions' },
   { id: 'presets', label: 'Presets' }
 ]
 
@@ -101,8 +100,7 @@ export function SkillsPanel(): JSX.Element {
         {panelView === 'info' && <RepoInfoView />}
         {panelView === 'list' && <SkillsList />}
         {panelView === 'editor' && <SkillEditor />}
-        {panelView === 'instructions' && <InstructionsView />}
-        {panelView === 'presets' && <PresetsView />}
+{panelView === 'presets' && <PresetsView />}
       </div>
 
       {showCreate && <SkillCreateDialog onClose={() => setShowCreate(false)} />}

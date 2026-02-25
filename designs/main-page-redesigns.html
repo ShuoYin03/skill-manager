@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Main Page Redesigns — 5 Concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── Reset ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-family: 'DM Sans', -apple-system, sans-serif; }
+
+/* ─── Wrapper Page ─── */
+body {
+  background: #EDEAE3;
+  min-height: 100vh;
+  padding: 48px 32px 80px;
+}
+
+.page-header {
+  max-width: 1100px;
+  margin: 0 auto 40px;
+}
+.page-header h1 {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-style: italic;
+  font-size: 42px;
+  color: #0A0A0A;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+.page-header p {
+  font-size: 14px;
+  color: #6B7280;
+  font-weight: 400;
+}
+
+/* ─── Tab Nav ─── */
+.tab-nav {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  padding: 7px 16px;
+  border-radius: 20px;
+  font-size: 12.5px;
+  font-weight: 500;
+  border: 1px solid #D1CCC3;
+  background: transparent;
+  color: #6B7280;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.14s ease;
+  letter-spacing: 0.01em;
+}
+.tab-btn:hover { border-color: #0A0A0A; color: #0A0A0A; }
+.tab-btn.active { background: #0A0A0A; color: #fff; border-color: #0A0A0A; }
+
+/* ─── Concept Layout ─── */
+.concept-section { display: none; }
+.concept-section.active { display: flex; gap: 40px; align-items: flex-start; max-width: 1100px; margin: 0 auto; }
+
+.mockup-frame {
+  width: 680px;
+  height: 520px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08), 0 20px 60px rgba(0,0,0,0.10);
+  position: relative;
+}
+
+.concept-meta {
+  flex: 1;
+  padding-top: 8px;
+}
+.concept-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #9CA3AF;
+  margin-bottom: 10px;
+  letter-spacing: 0.08em;
+}
+.concept-meta h2 {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-style: italic;
+  font-size: 28px;
+  color: #0A0A0A;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+.concept-meta p {
+  font-size: 13px;
+  color: #6B7280;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.concept-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.concept-tag {
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 12px;
+  background: #0A0A0A;
+  color: #fff;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Shared mockup primitives ─── */
+.traffic { display: flex; gap: 5px; align-items: center; }
+.traffic span { width: 11px; height: 11px; border-radius: 50%; display: block; }
+.traffic .r { background: #FF5F56; }
+.traffic .y { background: #FFBD2E; }
+.traffic .g { background: #27C93F; }
+
+.branch-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #F3F4F6; border-radius: 10px;
+  padding: 2px 8px; font-size: 10.5px; color: #6B7280;
+  font-family: 'JetBrains Mono', monospace; font-weight: 500;
+}
+.branch-chip svg { opacity: 0.5; }
+
+.tool-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  border-radius: 10px; padding: 2px 8px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.03em;
+}
+.badge-claude { background: #FFF0E5; color: #C04A00; }
+.badge-cursor { background: #F0F0F0; color: #555; }
+.badge-codex  { background: #E6F7EE; color: #1A7A3A; }
+.badge-wind   { background: #E5F0FF; color: #1A50A0; }
+
+.icon-dot {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #fff;
+  flex-shrink: 0; letter-spacing: -0.02em;
+}
+.icon-orange { background: #FF6B35; }
+.icon-sky    { background: #0EA5E9; }
+.icon-emerald{ background: #10B981; }
+.icon-amber  { background: #F59E0B; }
+.icon-indigo { background: #6366F1; }
+
+.mp-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #0A0A0A; color: #fff;
+  border: none; border-radius: 8px;
+  padding: 7px 14px; font-size: 12px; font-weight: 500;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+}
+.mp-btn-ghost {
+  background: transparent; color: #6B7280;
+  border: 1px solid #E5E7EB; border-radius: 8px;
+  padding: 6px 12px; font-size: 12px; font-weight: 500;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+}
+.gear-icon { color: #9CA3AF; cursor: pointer; flex-shrink: 0; }
+
+/* ══════════════════════════════════════════════════════════════════
+   CONCEPT 1 — EDITORIAL
+   ══════════════════════════════════════════════════════════════════ */
+#c1 {
+  width: 100%; height: 100%;
+  background: #FAFAFA;
+  display: flex; flex-direction: column;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* Titlebar */
+#c1 .titlebar {
+  height: 44px; display: flex; align-items: center;
+  padding: 0 16px; gap: 10px;
+  -webkit-app-region: drag;
+  background: #FAFAFA;
+  border-bottom: 1px solid transparent;
+}
+#c1 .titlebar-title {
+  flex: 1; text-align: center; font-size: 12px; font-weight: 500; color: #9CA3AF;
+}
+#c1 .titlebar-right { display: flex; align-items: center; gap: 8px; }
+
+/* Hero */
+#c1 .hero {
+  padding: 28px 24px 16px;
+  border-bottom: 1px solid #E5E7EB;
+}
+#c1 .hero-row {
+  display: flex; align-items: flex-end; justify-content: space-between;
+}
+#c1 .hero h1 {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-style: italic;
+  font-size: 36px; font-weight: 400; color: #0A0A0A;
+  letter-spacing: -0.03em; line-height: 1;
+}
+#c1 .hero-count {
+  font-size: 11px; color: #9CA3AF; margin-bottom: 3px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Search strip */
+#c1 .search-strip {
+  padding: 10px 24px;
+  border-bottom: 1px solid #E5E7EB;
+}
+#c1 .search-input-wrap {
+  display: flex; align-items: center; gap: 8px;
+  border: 1px solid #E5E7EB; border-radius: 8px;
+  padding: 7px 12px; background: #fff;
+}
+#c1 .search-input-wrap svg { color: #D1D5DB; flex-shrink: 0; }
+#c1 .search-placeholder { font-size: 12px; color: #C4C9D4; }
+
+/* Repo list */
+#c1 .repo-list { flex: 1; overflow: hidden; }
+#c1 .repo-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 24px;
+  border-bottom: 1px solid #F3F4F6;
+  position: relative;
+  transition: background 0.1s ease;
+}
+#c1 .repo-row:hover { background: #F9FAFB; }
+#c1 .repo-stripe {
+  width: 3px; height: 28px; border-radius: 2px;
+  flex-shrink: 0;
+}
+#c1 .repo-name { font-size: 13px; font-weight: 600; color: #0A0A0A; flex: 1; }
+#c1 .repo-meta { display: flex; align-items: center; gap: 6px; }
+#c1 .repo-row-open {
+  font-size: 11px; font-weight: 500; color: #6B7280;
+  opacity: 0; transition: opacity 0.1s ease;
+  border: 1px solid #E5E7EB; border-radius: 6px;
+  padding: 3px 8px;
+}
+#c1 .repo-row:hover .repo-row-open { opacity: 1; }
+
+/* Footer */
+#c1 .footer {
+  height: 32px; border-top: 1px solid #F3F4F6;
+  display: flex; align-items: center; padding: 0 24px; gap: 12px;
+}
+#c1 .kbd-hint { display: flex; align-items: center; gap: 4px; }
+#c1 .kbd {
+  background: #F3F4F6; border: 1px solid #E5E7EB;
+  border-radius: 4px; padding: 1px 5px;
+  font-family: 'JetBrains Mono', monospace; font-size: 9.5px; color: #6B7280;
+}
+#c1 .kbd-label { font-size: 10px; color: #9CA3AF; }
+
+
+/* ══════════════════════════════════════════════════════════════════
+   CONCEPT 2 — COMMAND (DARK)
+   ══════════════════════════════════════════════════════════════════ */
+#c2-wrap {
+  width: 100%; height: 100%;
+  background: #111111;
+  display: flex; flex-direction: column;
+  font-family: 'DM Sans', sans-serif;
+  position: relative;
+}
+
+#c2-wrap .titlebar {
+  height: 40px; display: flex; align-items: center;
+  padding: 0 16px; gap: 10px;
+}
+#c2-wrap .titlebar-title {
+  flex: 1; text-align: center; font-size: 12px; font-weight: 500; color: #555;
+}
+
+#c2-wrap .palette-area {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start;
+  padding: 24px 32px 20px;
+}
+
+/* floating card */
+#c2-wrap .palette-card {
+  width: 100%; max-width: 520px;
+  background: #1C1C1C;
+  border: 1px solid #2A2A2A;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+}
+
+#c2-wrap .palette-search {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid #2A2A2A;
+}
+#c2-wrap .palette-search svg { color: #555; flex-shrink: 0; }
+#c2-wrap .palette-search-text {
+  font-size: 14px; color: #888; flex: 1;
+}
+#c2-wrap .palette-search-esc {
+  font-size: 10px; color: #444;
+  border: 1px solid #333; border-radius: 4px;
+  padding: 2px 6px; font-family: 'JetBrains Mono', monospace;
+}
+
+/* list */
+#c2-wrap .palette-list { padding: 6px 0; }
+#c2-wrap .palette-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 18px;
+  cursor: pointer;
+  transition: background 0.08s ease;
+}
+#c2-wrap .palette-item:hover, #c2-wrap .palette-item.sel {
+  background: #242424;
+}
+#c2-wrap .palette-item.sel { background: #1F2937; }
+#c2-wrap .palette-name { font-size: 13px; color: #E5E7EB; flex: 1; font-weight: 500; }
+#c2-wrap .palette-sub  { font-size: 11px; color: #555; }
+
+/* selected detail strip */
+#c2-wrap .palette-detail {
+  border-top: 1px solid #2A2A2A;
+  padding: 12px 18px;
+  display: flex; align-items: center; gap: 12px;
+}
+#c2-wrap .palette-detail-label { font-size: 11px; color: #555; flex: 1; }
+#c2-wrap .palette-action {
+  display: flex; align-items: center; gap: 6px;
+}
+#c2-wrap .palette-action-btn {
+  background: #fff; color: #0A0A0A;
+  border: none; border-radius: 7px;
+  padding: 6px 14px; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+}
+
+/* footer */
+#c2-wrap .dark-footer {
+  height: 36px; border-top: 1px solid #1E1E1E;
+  display: flex; align-items: center; padding: 0 24px; gap: 16px;
+}
+#c2-wrap .dark-hint { display: flex; align-items: center; gap: 5px; }
+#c2-wrap .dark-kbd {
+  background: #222; border: 1px solid #333; border-radius: 4px;
+  padding: 1px 5px; font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; color: #666;
+}
+#c2-wrap .dark-label { font-size: 10px; color: #444; }
+
+/* branch + badge dark theme */
+#c2-wrap .branch-chip { background: #242424; color: #666; border: none; }
+#c2-wrap .badge-claude { background: #2A1500; color: #E07040; }
+#c2-wrap .badge-cursor { background: #222; color: #888; }
+#c2-wrap .badge-codex  { background: #0A2010; color: #40A060; }
+
+
+/* ══════════════════════════════════════════════════════════════════
+   CONCEPT 3 — DASHBOARD (VERCEL-STYLE)
+   ══════════════════════════════════════════════════════════════════ */
+#c3 {
+  width: 100%; height: 100%;
+  background: #FFFFFF;
+  display: flex; flex-direction: column;
+  font-family: 'DM Sans', sans-serif;
+}
+
+#c3 .titlebar {
+  height: 44px; background: #fff;
+  border-bottom: 1px solid #F3F4F6;
+  display: flex; align-items: center; padding: 0 20px; gap: 10px;
+}
+#c3 .titlebar-left { display: flex; align-items: center; gap: 8px; flex: 1; }
+#c3 .app-mark {
+  width: 20px; height: 20px; border-radius: 5px;
+  background: #0A0A0A; flex-shrink: 0;
+}
+#c3 .titlebar-name { font-size: 12px; font-weight: 600; color: #0A0A0A; }
+
+#c3 .toolbar {
+  padding: 14px 20px 10px;
+  display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid #F3F4F6;
+}
+#c3 .toolbar-title { font-size: 14px; font-weight: 700; color: #0A0A0A; flex: 1; letter-spacing: -0.02em; }
+#c3 .search-pill {
+  display: flex; align-items: center; gap: 6px;
+  border: 1px solid #E5E7EB; border-radius: 8px;
+  padding: 6px 10px; font-size: 11.5px; color: #9CA3AF;
+  background: #FAFAFA;
+}
+
+/* filter pills */
+#c3 .filter-row {
+  padding: 8px 20px;
+  display: flex; gap: 6px;
+  border-bottom: 1px solid #F3F4F6;
+}
+#c3 .filter-pill {
+  padding: 4px 10px; border-radius: 16px;
+  font-size: 11px; font-weight: 500;
+  border: 1px solid #E5E7EB;
+  background: #FAFAFA; color: #6B7280; cursor: pointer;
+}
+#c3 .filter-pill.active {
+  background: #0A0A0A; color: #fff; border-color: #0A0A0A;
+}
+
+/* grid */
+#c3 .grid {
+  flex: 1; padding: 14px 20px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  overflow: hidden;
+}
+#c3 .proj-card {
+  border: 1px solid #E5E7EB; border-radius: 10px;
+  padding: 14px; background: #fff;
+  display: flex; flex-direction: column; gap: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  transition: box-shadow 0.15s ease;
+}
+#c3 .proj-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+#c3 .proj-card-top { display: flex; align-items: center; gap: 9px; }
+#c3 .proj-card-name { font-size: 13px; font-weight: 600; color: #0A0A0A; flex: 1; }
+#c3 .proj-card-meta { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+#c3 .proj-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
+#c3 .proj-ts { font-size: 10px; color: #D1D5DB; font-family: 'JetBrains Mono', monospace; }
+#c3 .proj-open {
+  font-size: 11px; font-weight: 500; color: #6B7280;
+  border: 1px solid #E5E7EB; border-radius: 6px; padding: 3px 8px;
+  background: transparent; cursor: pointer; opacity: 0;
+  transition: opacity 0.1s ease;
+}
+#c3 .proj-card:hover .proj-open { opacity: 1; }
+
+/* ══════════════════════════════════════════════════════════════════
+   CONCEPT 4 — LINEAR (DENSE TABLE)
+   ══════════════════════════════════════════════════════════════════ */
+#c4 {
+  width: 100%; height: 100%;
+  background: #FFFFFF;
+  display: flex; flex-direction: column;
+  font-family: 'DM Sans', sans-serif;
+}
+
+#c4 .titlebar {
+  height: 44px; background: #fff;
+  border-bottom: 1px solid #F3F4F6;
+  display: flex; align-items: center; padding: 0 20px; gap: 12px;
+}
+#c4 .titlebar-search {
+  flex: 1; display: flex; align-items: center; gap: 6px;
+  border: 1px solid #F3F4F6; border-radius: 6px;
+  padding: 5px 10px; background: #FAFAFA;
+}
+#c4 .titlebar-search span { font-size: 11.5px; color: #C4C9D4; }
+
+/* col header */
+#c4 .col-header {
+  display: flex; align-items: center;
+  padding: 8px 20px;
+  border-bottom: 1px solid #F3F4F6;
+}
+#c4 .col-name  { flex: 1; font-size: 10.5px; font-weight: 600; color: #9CA3AF; letter-spacing: 0.06em; text-transform: uppercase; }
+#c4 .col-branch{ width: 100px; font-size: 10.5px; font-weight: 600; color: #9CA3AF; letter-spacing: 0.06em; text-transform: uppercase; }
+#c4 .col-tools { width: 100px; font-size: 10.5px; font-weight: 600; color: #9CA3AF; letter-spacing: 0.06em; text-transform: uppercase; }
+#c4 .col-action{ width: 36px; }
+
+/* rows */
+#c4 .row-list { flex: 1; overflow: hidden; }
+#c4 .repo-row {
+  display: flex; align-items: center;
+  padding: 10px 20px;
+  border-bottom: 1px solid #F9FAFB;
+  cursor: pointer; transition: background 0.08s ease;
+}
+#c4 .repo-row:hover { background: #FAFAFA; }
+#c4 .repo-row.selected { background: #F9FAFB; }
+#c4 .row-name-col {
+  flex: 1; display: flex; align-items: center; gap: 8px;
+}
+#c4 .row-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+#c4 .row-name { font-size: 13px; font-weight: 500; color: #0A0A0A; }
+#c4 .row-branch-col { width: 100px; }
+#c4 .row-tools-col { width: 100px; display: flex; gap: 4px; }
+#c4 .row-action-col { width: 36px; display: flex; align-items: center; justify-content: flex-end; }
+#c4 .row-chevron { color: #D1D5DB; }
+
+/* inline expand */
+#c4 .expand-strip {
+  background: #FAFAFA;
+  border-bottom: 1px solid #F3F4F6;
+  padding: 12px 20px 12px 56px;
+  display: flex; align-items: center; gap: 8px;
+}
+#c4 .expand-path { font-size: 11px; color: #9CA3AF; font-family: 'JetBrains Mono', monospace; flex: 1; }
+
+/* ══════════════════════════════════════════════════════════════════
+   CONCEPT 5 — APP SHELL
+   ══════════════════════════════════════════════════════════════════ */
+#c5 {
+  width: 100%; height: 100%;
+  background: #FAFAFA;
+  display: flex; flex-direction: row;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* sidebar */
+#c5 .sidebar {
+  width: 52px; height: 100%;
+  background: #FFFFFF;
+  border-right: 1px solid #E5E7EB;
+  display: flex; flex-direction: column;
+  align-items: center;
+  padding: 12px 0;
+  gap: 4px;
+  flex-shrink: 0;
+}
+#c5 .sidebar-logo {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: #0A0A0A; margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+#c5 .sidebar-logo span { color: #fff; font-size: 12px; font-weight: 700; }
+#c5 .sidebar-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #9CA3AF;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+#c5 .sidebar-icon:hover { background: #F3F4F6; color: #374151; }
+#c5 .sidebar-icon.active { background: #F3F4F6; color: #0A0A0A; }
+#c5 .sidebar-spacer { flex: 1; }
+#c5 .sidebar-bottom { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+/* main area */
+#c5 .main {
+  flex: 1; display: flex; flex-direction: column; min-width: 0;
+}
+
+/* top bar */
+#c5 .topbar {
+  height: 48px; background: #fff;
+  border-bottom: 1px solid #E5E7EB;
+  display: flex; align-items: center; padding: 0 16px; gap: 10px;
+  -webkit-app-region: drag;
+}
+#c5 .traffic-c { -webkit-app-region: no-drag; }
+#c5 .topbar-search {
+  flex: 1; -webkit-app-region: no-drag;
+  display: flex; align-items: center; gap: 6px;
+  border: 1px solid #F3F4F6; border-radius: 8px;
+  padding: 6px 12px; background: #FAFAFA; max-width: 300px;
+}
+#c5 .topbar-search span { font-size: 12px; color: #C4C9D4; }
+#c5 .topbar-right { -webkit-app-region: no-drag; display: flex; gap: 6px; align-items: center; }
+
+/* section label */
+#c5 .section-label {
+  padding: 10px 16px 6px;
+  font-size: 10.5px; font-weight: 600; color: #9CA3AF;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  display: flex; align-items: center; justify-content: space-between;
+}
+#c5 .section-add {
+  width: 20px; height: 20px; border-radius: 5px;
+  background: transparent; border: 1px solid #E5E7EB;
+  color: #9CA3AF; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 14px; line-height: 1;
+}
+
+/* grid */
+#c5 .shell-grid {
+  flex: 1; padding: 6px 16px 16px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; overflow: hidden;
+}
+#c5 .shell-card {
+  border: 1px solid #E5E7EB; border-radius: 10px;
+  padding: 12px; background: #fff;
+  display: flex; flex-direction: column; gap: 7px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  transition: box-shadow 0.12s ease;
+  cursor: pointer;
+}
+#c5 .shell-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.08); }
+#c5 .shell-card-top { display: flex; align-items: center; gap: 8px; }
+#c5 .shell-card-name { font-size: 12.5px; font-weight: 600; color: #0A0A0A; flex: 1; }
+#c5 .shell-card-meta { display: flex; align-items: center; gap: 4px; }
+#c5 .shell-card-footer { display: flex; align-items: center; justify-content: space-between; }
+#c5 .shell-ts { font-size: 9.5px; color: #D1D5DB; font-family: 'JetBrains Mono', monospace; }
+#c5 .shell-launch {
+  background: #0A0A0A; color: #fff;
+  border: none; border-radius: 6px; padding: 4px 9px;
+  font-size: 10.5px; font-weight: 500; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  opacity: 0; transition: opacity 0.1s ease;
+}
+#c5 .shell-card:hover .shell-launch { opacity: 1; }
+
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Main Page Redesigns.</h1>
+  <p>5 distinct concepts — all matched to the marketplace's monochromatic aesthetic</p>
+</div>
+
+<!-- Tab Nav -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchConcept(0)">01 Editorial</button>
+  <button class="tab-btn" onclick="switchConcept(1)">02 Command</button>
+  <button class="tab-btn" onclick="switchConcept(2)">03 Dashboard</button>
+  <button class="tab-btn" onclick="switchConcept(3)">04 Linear</button>
+  <button class="tab-btn" onclick="switchConcept(4)">05 App Shell</button>
+</div>
+
+<!-- ══════════════════════════════════
+     CONCEPT 1: EDITORIAL
+     ══════════════════════════════════ -->
+<div class="concept-section active" id="sec-0">
+  <div class="mockup-frame">
+    <div id="c1">
+      <!-- Titlebar -->
+      <div class="titlebar">
+        <div class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+        <div class="titlebar-title">Projects</div>
+        <div class="titlebar-right">
+          <svg class="gear-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </div>
+      </div>
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero-row">
+          <h1>Projects.</h1>
+          <span class="hero-count">5 repos</span>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="search-strip">
+        <div class="search-input-wrap">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <span class="search-placeholder">Filter projects…</span>
+        </div>
+      </div>
+
+      <!-- Repo list -->
+      <div class="repo-list">
+        <div class="repo-row">
+          <div class="repo-stripe" style="background:#FF6B35"></div>
+          <div class="icon-dot icon-orange">D</div>
+          <span class="repo-name">desktop-tool</span>
+          <div class="repo-meta">
+            <span class="branch-chip">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 009 9"/></svg>
+              main
+            </span>
+            <span class="tool-badge badge-claude">Claude</span>
+          </div>
+          <span class="repo-row-open">Open ↗</span>
+        </div>
+        <div class="repo-row">
+          <div class="repo-stripe" style="background:#0EA5E9"></div>
+          <div class="icon-dot icon-sky">M</div>
+          <span class="repo-name">my-website</span>
+          <div class="repo-meta">
+            <span class="branch-chip">main</span>
+            <span class="tool-badge badge-cursor">Cursor</span>
+          </div>
+          <span class="repo-row-open">Open ↗</span>
+        </div>
+        <div class="repo-row">
+          <div class="repo-stripe" style="background:#10B981"></div>
+          <div class="icon-dot icon-emerald">A</div>
+          <span class="repo-name">api-server</span>
+          <div class="repo-meta">
+            <span class="branch-chip">develop</span>
+            <span class="tool-badge badge-codex">Codex</span>
+          </div>
+          <span class="repo-row-open">Open ↗</span>
+        </div>
+        <div class="repo-row">
+          <div class="repo-stripe" style="background:#F59E0B"></div>
+          <div class="icon-dot icon-amber">M</div>
+          <span class="repo-name">mobile-app</span>
+          <div class="repo-meta">
+            <span class="branch-chip">feat/auth</span>
+            <span class="tool-badge badge-claude">Claude</span>
+          </div>
+          <span class="repo-row-open">Open ↗</span>
+        </div>
+        <div class="repo-row">
+          <div class="repo-stripe" style="background:#6366F1"></div>
+          <div class="icon-dot icon-indigo">D</div>
+          <span class="repo-name">data-viz</span>
+          <div class="repo-meta">
+            <span class="branch-chip">main</span>
+            <span class="tool-badge badge-wind">Windsurf</span>
+          </div>
+          <span class="repo-row-open">Open ↗</span>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <div class="kbd-hint"><span class="kbd">↑↓</span><span class="kbd-label">navigate</span></div>
+        <div class="kbd-hint"><span class="kbd">↵</span><span class="kbd-label">open</span></div>
+        <div class="kbd-hint"><span class="kbd">⌘K</span><span class="kbd-label">command</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="concept-meta">
+    <div class="concept-number">CONCEPT 01</div>
+    <h2>Editorial</h2>
+    <p>Large italic hero typography dominates the top. Each repo row has a 3px colored left-stripe that maps to its icon color — creating a visual rhythm without color noise. Hover reveals a ghost "Open ↗" button. Feels like a Notion or Linear document.</p>
+    <div class="concept-tags">
+      <span class="concept-tag">Typographic hierarchy</span>
+      <span class="concept-tag">Colored stripes</span>
+      <span class="concept-tag">Generous whitespace</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     CONCEPT 2: COMMAND (DARK)
+     ══════════════════════════════════ -->
+<div class="concept-section" id="sec-1">
+  <div class="mockup-frame">
+    <div id="c2-wrap">
+      <!-- Titlebar -->
+      <div class="titlebar">
+        <div class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+        <div class="titlebar-title" style="color:#444">Launcher</div>
+        <svg class="gear-icon" style="color:#444" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </div>
+
+      <!-- Palette area -->
+      <div class="palette-area">
+        <div class="palette-card">
+          <!-- Search -->
+          <div class="palette-search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <span class="palette-search-text">Search projects…</span>
+            <span class="palette-search-esc">esc</span>
+          </div>
+
+          <!-- List -->
+          <div class="palette-list">
+            <div class="palette-item sel">
+              <div class="icon-dot icon-orange" style="width:26px;height:26px;border-radius:6px;font-size:12px">D</div>
+              <span class="palette-name">desktop-tool</span>
+              <span class="branch-chip">main</span>
+              <span class="tool-badge badge-claude">Claude</span>
+            </div>
+            <div class="palette-item">
+              <div class="icon-dot icon-sky" style="width:26px;height:26px;border-radius:6px;font-size:12px">M</div>
+              <span class="palette-name">my-website</span>
+              <span class="branch-chip">main</span>
+              <span class="tool-badge badge-cursor">Cursor</span>
+            </div>
+            <div class="palette-item">
+              <div class="icon-dot icon-emerald" style="width:26px;height:26px;border-radius:6px;font-size:12px">A</div>
+              <span class="palette-name">api-server</span>
+              <span class="branch-chip">develop</span>
+              <span class="tool-badge badge-codex">Codex</span>
+            </div>
+            <div class="palette-item">
+              <div class="icon-dot icon-amber" style="width:26px;height:26px;border-radius:6px;font-size:12px">M</div>
+              <span class="palette-name">mobile-app</span>
+              <span class="branch-chip">feat/auth</span>
+              <span class="tool-badge badge-claude">Claude</span>
+            </div>
+            <div class="palette-item">
+              <div class="icon-dot icon-indigo" style="width:26px;height:26px;border-radius:6px;font-size:12px">D</div>
+              <span class="palette-name">data-viz</span>
+              <span class="branch-chip">main</span>
+              <span class="tool-badge badge-wind">Windsurf</span>
+            </div>
+          </div>
+
+          <!-- Selected detail -->
+          <div class="palette-detail">
+            <span class="palette-detail-label">~/Personal/desktop-tool · Claude · main</span>
+            <div class="palette-action">
+              <button class="palette-action-btn">Open ↗</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="dark-footer">
+        <div class="dark-hint"><span class="dark-kbd">↑↓</span><span class="dark-label">navigate</span></div>
+        <div class="dark-hint"><span class="dark-kbd">↵</span><span class="dark-label">open</span></div>
+        <div class="dark-hint"><span class="dark-kbd">⌘,</span><span class="dark-label">settings</span></div>
+        <div class="dark-hint"><span class="dark-kbd">⌘K</span><span class="dark-label">skills</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="concept-meta">
+    <div class="concept-number">CONCEPT 02</div>
+    <h2>Command</h2>
+    <p>Full dark background (#111111) with a centered floating command-palette card. Inspired by Raycast and Linear. The search bar dominates — the window IS the search. Selected row expands to show path and an "Open ↗" button. Extreme keyboard-focused UX.</p>
+    <div class="concept-tags">
+      <span class="concept-tag">Dark mode</span>
+      <span class="concept-tag">Command palette</span>
+      <span class="concept-tag">Keyboard-first</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     CONCEPT 3: DASHBOARD
+     ══════════════════════════════════ -->
+<div class="concept-section" id="sec-2">
+  <div class="mockup-frame">
+    <div id="c3">
+      <!-- Titlebar -->
+      <div class="titlebar">
+        <div class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+        <div class="titlebar-left">
+          <div class="app-mark"></div>
+          <span class="titlebar-name">Launcher</span>
+        </div>
+        <svg class="gear-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <span class="toolbar-title">Projects <span style="color:#9CA3AF;font-weight:400">(5)</span></span>
+        <div class="search-pill">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Search…
+        </div>
+        <button class="mp-btn" style="padding:6px 12px;font-size:12px">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Add
+        </button>
+      </div>
+
+      <!-- Filter pills -->
+      <div class="filter-row">
+        <button class="filter-pill active">All</button>
+        <button class="filter-pill">Claude</button>
+        <button class="filter-pill">Cursor</button>
+        <button class="filter-pill">Codex</button>
+        <button class="filter-pill">Windsurf</button>
+      </div>
+
+      <!-- Grid -->
+      <div class="grid">
+        <div class="proj-card">
+          <div class="proj-card-top">
+            <div class="icon-dot icon-orange" style="width:28px;height:28px;border-radius:7px;font-size:13px">D</div>
+            <span class="proj-card-name">desktop-tool</span>
+          </div>
+          <div class="proj-card-meta">
+            <span class="branch-chip">main</span>
+            <span class="tool-badge badge-claude">Claude</span>
+          </div>
+          <div class="proj-card-footer">
+            <span class="proj-ts">2h ago</span>
+            <button class="proj-open">Open ↗</button>
+          </div>
+        </div>
+        <div class="proj-card">
+          <div class="proj-card-top">
+            <div class="icon-dot icon-sky" style="width:28px;height:28px;border-radius:7px;font-size:13px">M</div>
+            <span class="proj-card-name">my-website</span>
+          </div>
+          <div class="proj-card-meta">
+            <span class="branch-chip">main</span>
+            <span class="tool-badge badge-cursor">Cursor</span>
+          </div>
+          <div class="proj-card-footer">
+            <span class="proj-ts">1d ago</span>
+            <button class="proj-open">Open ↗</button>
+          </div>
+        </div>
+        <div class="proj-card">
+          <div class="proj-card-top">
+            <div class="icon-dot icon-emerald" style="width:28px;height:28px;border-radius:7px;font-size:13px">A</div>
+            <span class="proj-card-name">api-server</span>
+          </div>
+          <div class="proj-card-meta">
+            <span class="branch-chip">develop</span>
+            <span class="tool-badge badge-codex">Codex</span>
+          </div>
+          <div class="proj-card-footer">
+            <span class="proj-ts">3d ago</span>
+            <button class="proj-open">Open ↗</button>
+          </div>
+        </div>
+        <div class="proj-card">
+          <div class="proj-card-top">
+            <div class="icon-dot icon-amber" style="width:28px;height:28px;border-radius:7px;font-size:13px">M</div>
+            <span class="proj-card-name">mobile-app</span>
+          </div>
+          <div class="proj-card-meta">
+            <span class="branch-chip">feat/auth</span>
+            <span class="tool-badge badge-claude">Claude</span>
+          </div>
+          <div class="proj-card-footer">
+            <span class="proj-ts">5d ago</span>
+            <button class="proj-open">Open ↗</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="concept-meta">
+    <div class="concept-number">CONCEPT 03</div>
+    <h2>Dashboard</h2>
+    <p>Vercel/Netlify-style project grid. 2-column card layout with a clear toolbar: project count, search, and Add button. Filter pills let users narrow by AI tool. Each card shows last-modified timestamp. An "Open ↗" button appears on hover — clean and familiar.</p>
+    <div class="concept-tags">
+      <span class="concept-tag">Card grid</span>
+      <span class="concept-tag">Filter pills</span>
+      <span class="concept-tag">Vercel aesthetic</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     CONCEPT 4: LINEAR (TABLE)
+     ══════════════════════════════════ -->
+<div class="concept-section" id="sec-3">
+  <div class="mockup-frame">
+    <div id="c4">
+      <!-- Titlebar -->
+      <div class="titlebar">
+        <div class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+        <div class="titlebar-search">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#C4C9D4" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <span>Filter projects…</span>
+        </div>
+        <svg class="gear-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </div>
+
+      <!-- Column header -->
+      <div class="col-header">
+        <span class="col-name">Name</span>
+        <span class="col-branch">Branch</span>
+        <span class="col-tools">AI Tool</span>
+        <span class="col-action"></span>
+      </div>
+
+      <!-- Rows -->
+      <div class="row-list">
+        <!-- Row 1 — selected with expand -->
+        <div class="repo-row selected">
+          <div class="row-name-col">
+            <div class="row-dot" style="background:#FF6B35"></div>
+            <span class="row-name">desktop-tool</span>
+          </div>
+          <div class="row-branch-col">
+            <span class="branch-chip">main</span>
+          </div>
+          <div class="row-tools-col">
+            <span class="tool-badge badge-claude">Claude</span>
+          </div>
+          <div class="row-action-col">
+            <svg class="row-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+        </div>
+        <!-- Expanded strip -->
+        <div class="expand-strip">
+          <span class="expand-path">~/Personal/desktop-tool</span>
+          <button class="mp-btn" style="padding:5px 12px;font-size:11px">Open in Claude ↗</button>
+          <button class="mp-btn-ghost" style="padding:4px 10px;font-size:11px">Skills</button>
+        </div>
+
+        <div class="repo-row">
+          <div class="row-name-col">
+            <div class="row-dot" style="background:#0EA5E9"></div>
+            <span class="row-name">my-website</span>
+          </div>
+          <div class="row-branch-col"><span class="branch-chip">main</span></div>
+          <div class="row-tools-col"><span class="tool-badge badge-cursor">Cursor</span></div>
+          <div class="row-action-col"><svg class="row-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+        </div>
+        <div class="repo-row">
+          <div class="row-name-col">
+            <div class="row-dot" style="background:#10B981"></div>
+            <span class="row-name">api-server</span>
+          </div>
+          <div class="row-branch-col"><span class="branch-chip">develop</span></div>
+          <div class="row-tools-col"><span class="tool-badge badge-codex">Codex</span></div>
+          <div class="row-action-col"><svg class="row-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+        </div>
+        <div class="repo-row">
+          <div class="row-name-col">
+            <div class="row-dot" style="background:#F59E0B"></div>
+            <span class="row-name">mobile-app</span>
+          </div>
+          <div class="row-branch-col"><span class="branch-chip">feat/auth</span></div>
+          <div class="row-tools-col"><span class="tool-badge badge-claude">Claude</span></div>
+          <div class="row-action-col"><svg class="row-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+        </div>
+        <div class="repo-row">
+          <div class="row-name-col">
+            <div class="row-dot" style="background:#6366F1"></div>
+            <span class="row-name">data-viz</span>
+          </div>
+          <div class="row-branch-col"><span class="branch-chip">main</span></div>
+          <div class="row-tools-col"><span class="tool-badge badge-wind">Windsurf</span></div>
+          <div class="row-action-col"><svg class="row-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="concept-meta">
+    <div class="concept-number">CONCEPT 04</div>
+    <h2>Linear</h2>
+    <p>Ultra-minimal table layout inspired by Linear.app. Column headers for Name / Branch / AI Tool. Zero card borders — only horizontal dividers separate rows. Clicking a row expands an inline strip showing the path and quick-action buttons. Dense but uncluttered.</p>
+    <div class="concept-tags">
+      <span class="concept-tag">Table layout</span>
+      <span class="concept-tag">Inline expand</span>
+      <span class="concept-tag">Linear aesthetic</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     CONCEPT 5: APP SHELL
+     ══════════════════════════════════ -->
+<div class="concept-section" id="sec-4">
+  <div class="mockup-frame">
+    <div id="c5">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="sidebar-logo"><span>L</span></div>
+
+        <div class="sidebar-icon active" title="Projects">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="7" height="7"/><rect x="15" y="3" width="7" height="7"/><rect x="2" y="14" width="7" height="7"/><rect x="15" y="14" width="7" height="7"/></svg>
+        </div>
+        <div class="sidebar-icon" title="Skills">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <div class="sidebar-icon" title="Presets">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+        </div>
+
+        <div class="sidebar-spacer"></div>
+        <div class="sidebar-bottom">
+          <div class="sidebar-icon" title="Settings">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main -->
+      <div class="main">
+        <!-- Topbar -->
+        <div class="topbar">
+          <div class="traffic traffic-c"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+          <div class="topbar-search">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#C4C9D4" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <span>Search projects…</span>
+          </div>
+          <div class="topbar-right">
+            <button class="mp-btn" style="padding:5px 10px;font-size:11px">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              New
+            </button>
+          </div>
+        </div>
+
+        <!-- Section label -->
+        <div class="section-label">
+          Projects
+          <span style="color:#9CA3AF;font-weight:400;font-size:10px;letter-spacing:0;text-transform:none">5 repos</span>
+        </div>
+
+        <!-- Grid -->
+        <div class="shell-grid">
+          <div class="shell-card">
+            <div class="shell-card-top">
+              <div class="icon-dot icon-orange" style="width:26px;height:26px;border-radius:6px;font-size:12px">D</div>
+              <span class="shell-card-name">desktop-tool</span>
+            </div>
+            <div class="shell-card-meta">
+              <span class="branch-chip">main</span>
+              <span class="tool-badge badge-claude">Claude</span>
+            </div>
+            <div class="shell-card-footer">
+              <span class="shell-ts">2h ago</span>
+              <button class="shell-launch">Open ↗</button>
+            </div>
+          </div>
+          <div class="shell-card">
+            <div class="shell-card-top">
+              <div class="icon-dot icon-sky" style="width:26px;height:26px;border-radius:6px;font-size:12px">M</div>
+              <span class="shell-card-name">my-website</span>
+            </div>
+            <div class="shell-card-meta">
+              <span class="branch-chip">main</span>
+              <span class="tool-badge badge-cursor">Cursor</span>
+            </div>
+            <div class="shell-card-footer">
+              <span class="shell-ts">1d ago</span>
+              <button class="shell-launch">Open ↗</button>
+            </div>
+          </div>
+          <div class="shell-card">
+            <div class="shell-card-top">
+              <div class="icon-dot icon-emerald" style="width:26px;height:26px;border-radius:6px;font-size:12px">A</div>
+              <span class="shell-card-name">api-server</span>
+            </div>
+            <div class="shell-card-meta">
+              <span class="branch-chip">develop</span>
+              <span class="tool-badge badge-codex">Codex</span>
+            </div>
+            <div class="shell-card-footer">
+              <span class="shell-ts">3d ago</span>
+              <button class="shell-launch">Open ↗</button>
+            </div>
+          </div>
+          <div class="shell-card">
+            <div class="shell-card-top">
+              <div class="icon-dot icon-amber" style="width:26px;height:26px;border-radius:6px;font-size:12px">M</div>
+              <span class="shell-card-name">mobile-app</span>
+            </div>
+            <div class="shell-card-meta">
+              <span class="branch-chip">feat/auth</span>
+              <span class="tool-badge badge-claude">Claude</span>
+            </div>
+            <div class="shell-card-footer">
+              <span class="shell-ts">5d ago</span>
+              <button class="shell-launch">Open ↗</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="concept-meta">
+    <div class="concept-number">CONCEPT 05</div>
+    <h2>App Shell</h2>
+    <p>A full app-shell layout: 52px icon sidebar on the left (Projects, Skills, Presets, Settings) with a top bar housing search and a "New" button. The main area is a 2-col card grid, identical vocabulary to the marketplace. Feels like a proper desktop app — familiar to Notion, Linear, or Figma users.</p>
+    <div class="concept-tags">
+      <span class="concept-tag">Icon sidebar</span>
+      <span class="concept-tag">App shell</span>
+      <span class="concept-tag">Marketplace vocabulary</span>
+    </div>
+  </div>
+</div>
+
+
+<script>
+function switchConcept(idx) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+  document.querySelectorAll('.concept-section').forEach((s, i) => s.classList.toggle('active', i === idx));
+}
+</script>
+</body>
+</html>

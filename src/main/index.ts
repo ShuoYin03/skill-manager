@@ -18,7 +18,7 @@ if (!gotTheLock) {
 }
 
 app.whenReady().then(async () => {
-  app.setAppUserModelId('com.repo-launcher')
+  app.setAppUserModelId('com.skilly')
 
   // Initialize services
   initSupabase()

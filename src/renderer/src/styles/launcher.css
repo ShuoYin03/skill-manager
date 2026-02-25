@@ -83,7 +83,7 @@
 }
 
 .launcher-split.split-open .launcher-list-pane {
-  width: 340px;
+  width: 300px;
 }
 
 .launcher-detail-pane {
@@ -106,12 +106,120 @@
   height: 100%;
   background: var(--color-bg);
   border-radius: 14px;
-  box-shadow: 0 12px 48px var(--color-shadow), 0 0 0 1px var(--color-border);
+  box-shadow: 0 8px 32px var(--color-shadow), 0 0 0 1px var(--color-border);
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  animation: fadeIn 0.12s ease-out;
+}
+
+/* ── App Shell Sidebar ── */
+.app-sidebar {
+  width: 52px;
+  flex-shrink: 0;
+  background: var(--color-bg-solid);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 0 10px;
+  gap: 2px;
+  -webkit-app-region: drag;
+}
+
+.app-sidebar-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+  transition: color 0.15s ease, background 0.15s ease;
+  -webkit-app-region: no-drag;
+  flex-shrink: 0;
+}
+
+.app-sidebar-icon:hover {
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+}
+
+.app-sidebar-icon.active {
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+}
+
+.app-sidebar-spacer {
+  flex: 1;
+}
+
+/* ── App Main (right of sidebar) ── */
+.app-main {
+  flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: fadeIn 0.12s ease-out;
-  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', sans-serif;
+  min-width: 0;
+}
+
+/* ── App Topbar ── */
+.app-topbar {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 8px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+}
+
+.app-topbar > * {
+  -webkit-app-region: no-drag;
+}
+
+.app-topbar-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  flex-shrink: 0;
+  letter-spacing: -0.2px;
+}
+
+.app-topbar-search {
+  flex: 1;
+  min-width: 0;
+}
+
+.app-topbar-search .search-bar-input {
+  height: 30px;
+  padding: 0 12px 0 32px;
+  font-size: 13px;
+  border-radius: 7px;
+}
+
+.app-topbar-search .search-bar-icon {
+  top: 50%;
+  transform: translateY(-50%);
+  left: 10px;
+}
+
+.app-topbar-action {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+  transition: color 0.15s ease, background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.app-topbar-action:hover {
+  color: var(--color-text-primary);
+  background: var(--color-surface);
 }
 
 @keyframes fadeIn {
@@ -202,15 +310,21 @@
   border-color: var(--color-text-primary);
 }
 
-/* ── Repo list — card grid ── */
+/* ── Repo list — 2-col card grid ── */
 .repo-list {
   flex: 1;
   overflow-y: auto;
-  padding: 0 16px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  align-content: start;
   scrollbar-width: thin;
+}
+
+/* 1-col when detail panel is open */
+.split-open .repo-list {
+  grid-template-columns: 1fr;
 }
 
 .repo-list::-webkit-scrollbar {
@@ -222,40 +336,59 @@
   border-radius: 4px;
 }
 
-/* ── Repo card ── */
+/* ── Repo card (grid style) ── */
 .repo-item {
   display: flex;
   flex-direction: column;
-  padding: 13px 16px;
+  gap: 8px;
+  padding: 12px 14px;
   cursor: pointer;
   background: var(--color-bg-solid);
   border: 1px solid var(--color-border);
   border-radius: 10px;
   transition: background 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+  position: relative;
 }
 
 .repo-item:hover {
-  background: var(--color-surface);
+  background: var(--color-surface-hover);
   box-shadow: 0 2px 8px var(--color-shadow);
 }
 
 .repo-item.selected {
-  border-color: var(--color-accent);
+  border-color: var(--color-selected-border);
   background: var(--color-selected);
   box-shadow: 0 2px 8px var(--color-shadow);
 }
 
-.repo-item-header {
+/* Top row: icon + launch button */
+.repo-item-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+/* Colored initial circle */
+.repo-item-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+  letter-spacing: -0.5px;
 }
 
 .repo-item-name {
   font-size: 13px;
   font-weight: 600;
   color: var(--color-text-primary);
-  flex-shrink: 0;
+  letter-spacing: -0.1px;
+  line-height: 1.3;
 }
 
 .repo-item-path {
@@ -264,14 +397,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  flex: 1;
 }
 
 .repo-item-meta {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 6px;
+  gap: 5px;
+  flex-wrap: wrap;
 }
 
 .repo-item-time {

@@ -1,6 +1,6 @@
-appId: com.repo-launcher
-productName: Repo Launcher
-copyright: Copyright © 2025 Repo Launcher
+appId: com.skilly
+productName: Skilly
+copyright: Copyright © 2026 Skilly
 
 directories:
   buildResources: resources
@@ -22,9 +22,9 @@ mac:
   category: public.app-category.developer-tools
   icon: resources/icon.png
   protocols:
-    - name: Repo Launcher
+    - name: Skilly
       schemes:
-        - repo-launcher
+        - skilly
 
 dmg:
   artifactName: "${productName}-${version}-mac.${ext}"
@@ -52,13 +52,13 @@ linux:
   category: Development
   icon: resources/icon.png
   mimeTypes:
-    - x-scheme-handler/repo-launcher
+    - x-scheme-handler/skilly
 
 appImage:
   artifactName: "${productName}-${version}-linux.${ext}"
 
 # Protocol registration for Windows
 protocols:
-  - name: Repo Launcher
+  - name: Skilly
     schemes:
-      - repo-launcher
+      - skilly

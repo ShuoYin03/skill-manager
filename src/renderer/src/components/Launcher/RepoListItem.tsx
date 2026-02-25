@@ -3,6 +3,21 @@ import type { RepoEntry } from '../../../../shared/types'
 import { BranchIndicator } from '../shared/BranchIndicator'
 import { TagBadge } from '../shared/TagBadge'
 
+// Deterministic color per repo name
+const REPO_COLORS = [
+  '#FF6B35', '#0EA5E9', '#10B981', '#F59E0B',
+  '#6366F1', '#EC4899', '#8B5CF6', '#14B8A6',
+  '#F97316', '#06B6D4',
+]
+
+function getRepoColor(name: string): string {
+  let hash = 0
+  for (let i = 0; i < name.length; i++) {
+    hash = (hash * 31 + name.charCodeAt(i)) | 0
+  }
+  return REPO_COLORS[Math.abs(hash) % REPO_COLORS.length]
+}
+
 interface RepoListItemProps {
   repo: RepoEntry
   isSelected: boolean
@@ -10,21 +25,6 @@ interface RepoListItemProps {
   onContextMenu: (e: React.MouseEvent) => void
   onLaunch: (e: React.MouseEvent) => void
   onPickEditor: (e: React.MouseEvent) => void
-}
-
-function formatRelativeTime(timestamp: number | null): string | null {
-  if (!timestamp) return null
-  const diff = Date.now() - timestamp
-  const seconds = Math.floor(diff / 1000)
-  if (seconds < 60) return 'just now'
-  const minutes = Math.floor(seconds / 60)
-  if (minutes < 60) return `${minutes}m ago`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
-  const days = Math.floor(hours / 24)
-  if (days < 30) return `${days}d ago`
-  const months = Math.floor(days / 30)
-  return `${months}mo ago`
 }
 
 export function RepoListItem({
@@ -43,6 +43,9 @@ export function RepoListItem({
     }
   }, [isSelected])
 
+  const iconColor = getRepoColor(repo.name)
+  const initial = repo.name.charAt(0).toUpperCase()
+
   return (
     <div
       ref={ref}
@@ -50,9 +53,11 @@ export function RepoListItem({
       onClick={onClick}
       onContextMenu={onContextMenu}
     >
-      <div className="repo-item-header">
-        <span className="repo-item-name">{repo.name}</span>
-        <span className="repo-item-path">{repo.path}</span>
+      {/* Top row: colored icon + launch buttons */}
+      <div className="repo-item-top">
+        <div className="repo-item-icon" style={{ background: iconColor }}>
+          {initial}
+        </div>
         <div className="repo-item-launch-split">
           <button
             className="repo-item-launch-main"
@@ -75,14 +80,16 @@ export function RepoListItem({
           </button>
         </div>
       </div>
+
+      {/* Repo name */}
+      <div className="repo-item-name">{repo.name}</div>
+
+      {/* Badges: branch + tags */}
       <div className="repo-item-meta">
         {repo.gitBranch && <BranchIndicator branch={repo.gitBranch} />}
         {repo.tags.map((tag) => (
           <TagBadge key={tag} tag={tag} />
         ))}
-        {repo.lastOpened && (
-          <span className="repo-item-time">{formatRelativeTime(repo.lastOpened)}</span>
-        )}
       </div>
     </div>
   )

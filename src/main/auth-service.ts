@@ -18,7 +18,7 @@ export async function signIn(): Promise<void> {
   const { data } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: 'repo-launcher://auth/callback',
+      redirectTo: 'skilly://auth/callback',
       skipBrowserRedirect: true
     }
   })
@@ -28,7 +28,7 @@ export async function signIn(): Promise<void> {
 }
 
 export async function handleAuthCallback(url: string): Promise<Session | null> {
-  // URL format: repo-launcher://auth/callback#access_token=...&refresh_token=...
+  // URL format: skilly://auth/callback#access_token=...&refresh_token=...
   const fragment = url.split('#')[1]
   if (!fragment) return null
 

@@ -4,8 +4,8 @@ import { getLauncherWindow, showLauncher } from './window'
 import { IPC } from '../shared/constants'
 
 export function registerProtocolHandler(): void {
-  if (!app.isDefaultProtocolClient('repo-launcher')) {
-    app.setAsDefaultProtocolClient('repo-launcher')
+  if (!app.isDefaultProtocolClient('skilly')) {
+    app.setAsDefaultProtocolClient('skilly')
   }
 }
 
@@ -18,7 +18,7 @@ export function setupProtocolListener(): void {
 
   // Windows/Linux: protocol URLs arrive via second-instance
   app.on('second-instance', async (_event, commandLine) => {
-    const url = commandLine.find((arg) => arg.startsWith('repo-launcher://'))
+    const url = commandLine.find((arg) => arg.startsWith('skilly://'))
     if (url) {
       await processAuthUrl(url)
     }
@@ -26,7 +26,7 @@ export function setupProtocolListener(): void {
 }
 
 async function processAuthUrl(url: string): Promise<void> {
-  if (!url.startsWith('repo-launcher://auth/callback')) return
+  if (!url.startsWith('skilly://auth/callback')) return
 
   const session = await handleAuthCallback(url)
   const win = getLauncherWindow()

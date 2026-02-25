@@ -10,7 +10,7 @@ import { updateShortcut } from './shortcut'
 import { signIn, signOut, getSession } from './auth-service'
 import { verifyLicense } from './license-service'
 import { scanRepoSkills } from './skills-scanner'
-import { createSkill, updateSkill, deleteSkill, toggleSkill, globalizeSkill } from './skills-io'
+import { createSkill, updateSkill, deleteSkill, toggleSkill, globalizeSkill, installSkillFromGitHub } from './skills-io'
 import { searchMarketplaceSkills, getMarketplaceSkillContent, getMarketplaceFilterStats } from './skills-marketplace'
 import { scanMemoryFiles, readMemoryFile, writeMemoryFile, globalizeMemoryFile } from './memory-files'
 import type { MemoryTool } from './memory-files'
@@ -225,6 +225,11 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle(IPC.SKILLS_MARKETPLACE_INSTALL, async (_event, repoPath: string, tool: AITool, name: string, content: string, skillsDir?: 'tool-specific' | 'shared') => {
+    // If name is a full slug (owner/repo/skillId), use git-based multi-file install
+    if (name.split('/').length >= 3) {
+      return await installSkillFromGitHub(name, repoPath, tool, skillsDir ?? 'tool-specific')
+    }
+    // Fallback: single-file install (for user-created skills with just a name)
     return await createSkill(repoPath, tool, name, content, skillsDir ?? 'tool-specific')
   })
 

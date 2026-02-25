@@ -1,6 +1,9 @@
 import fs from 'fs'
+import fsp from 'fs/promises'
 import path from 'path'
+import os from 'os'
 import crypto from 'crypto'
+import simpleGit from 'simple-git'
 import type { AITool, SkillFile } from '../shared/types'
 
 interface ToolFileConfig {
@@ -176,4 +179,108 @@ export async function globalizeSkill(
   }
 
   return count
+}
+
+// ── Multi-file skill install from GitHub ──────────────────────────────────────
+
+async function findSkillDir(root: string, skillId: string): Promise<string | null> {
+  // BFS: find a directory named skillId that contains SKILL.md
+  const queue: string[] = [root]
+  while (queue.length) {
+    const dir = queue.shift()!
+    let entries: fs.Dirent[]
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true })
+    } catch {
+      continue
+    }
+    for (const entry of entries) {
+      if (!entry.isDirectory() && !entry.isSymbolicLink()) continue
+      if (entry.name === '.git') continue
+      const fullPath = path.join(dir, entry.name)
+      if (entry.name === skillId) {
+        const skillMd = path.join(fullPath, 'SKILL.md')
+        if (fs.existsSync(skillMd)) return fullPath
+      }
+      // Only recurse into directories (not symlinks, to avoid cycles)
+      if (entry.isDirectory()) queue.push(fullPath)
+    }
+  }
+  return null
+}
+
+async function copyDirDeref(src: string, dest: string): Promise<number> {
+  // Recursively copy src → dest, resolving symlinks so real files are written
+  await fsp.mkdir(dest, { recursive: true })
+  const entries = await fsp.readdir(src, { withFileTypes: true })
+  let count = 0
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name)
+    const destPath = path.join(dest, entry.name)
+    if (entry.isSymbolicLink()) {
+      // Resolve to real path
+      try {
+        const real = await fsp.realpath(srcPath)
+        const stat = await fsp.stat(real)
+        if (stat.isDirectory()) {
+          count += await copyDirDeref(real, destPath)
+        } else {
+          await fsp.copyFile(real, destPath)
+          count++
+        }
+      } catch {
+        // Skip broken symlinks
+      }
+    } else if (entry.isDirectory()) {
+      count += await copyDirDeref(srcPath, destPath)
+    } else {
+      await fsp.copyFile(srcPath, destPath)
+      count++
+    }
+  }
+  return count
+}
+
+export async function installSkillFromGitHub(
+  slug: string,
+  targetRepoPath: string,
+  tool: AITool,
+  skillsDir: 'tool-specific' | 'shared' = 'tool-specific'
+): Promise<{ filesInstalled: number; targetDir: string }> {
+  const parts = slug.split('/')
+  if (parts.length < 3) throw new Error(`Invalid skill slug: ${slug}`)
+  const [owner, repo, ...rest] = parts
+  const skillId = rest.join('/')
+
+  const tempDir = path.join(os.tmpdir(), `skill-clone-${Date.now()}`)
+
+  try {
+    // Shallow clone the GitHub repo
+    const git = simpleGit()
+    await git.clone(`https://github.com/${owner}/${repo}`, tempDir, ['--depth=1'])
+
+    // Find the skill directory inside the clone
+    const skillSourceDir = await findSkillDir(tempDir, skillId)
+    if (!skillSourceDir) {
+      throw new Error(`Skill directory "${skillId}" not found in ${owner}/${repo}`)
+    }
+
+    // Determine install target
+    const targetDir =
+      skillsDir === 'shared'
+        ? path.join(targetRepoPath, SHARED_DIR, skillId)
+        : path.join(targetRepoPath, TOOL_FILE_CONFIGS[tool].dir, skillId)
+
+    // Copy entire skill directory (resolving symlinks for data/ scripts/ etc.)
+    const filesInstalled = await copyDirDeref(skillSourceDir, targetDir)
+
+    return { filesInstalled, targetDir }
+  } finally {
+    // Clean up temp clone
+    try {
+      await fsp.rm(tempDir, { recursive: true, force: true })
+    } catch {
+      // Best-effort cleanup
+    }
+  }
 }
