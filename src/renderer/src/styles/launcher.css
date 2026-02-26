@@ -386,11 +386,44 @@
   box-shadow: 0 2px 8px var(--color-shadow);
 }
 
-/* Top row: icon + launch button */
+/* Top row: icon + three-dot menu */
 .repo-item-top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+}
+
+/* Three-dot (⋯) menu button */
+.repo-item-menu-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.1s ease, color 0.1s ease;
+  flex-shrink: 0;
+}
+
+.repo-item:hover .repo-item-menu-btn,
+.repo-item.selected .repo-item-menu-btn {
+  opacity: 1;
+}
+
+.repo-item-menu-btn:hover {
+  background: var(--color-surface-active);
+  color: var(--color-text-primary);
+}
+
+/* Bottom row: meta badges + Open button */
+.repo-item-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 20px;
 }
 
 /* Colored initial circle */
@@ -457,6 +490,15 @@
 .repo-item-open-picker:hover {
   background: var(--color-surface-active);
   color: var(--color-text-secondary);
+}
+
+/* Danger-colored "Remove from app" item in repo context menu */
+.repo-context-remove {
+  color: var(--color-danger, #EF4444);
+}
+
+.repo-context-remove:hover {
+  background: rgba(239, 68, 68, 0.08) !important;
 }
 
 .repo-item-name {

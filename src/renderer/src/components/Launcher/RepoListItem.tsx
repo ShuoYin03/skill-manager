@@ -18,6 +18,16 @@ function getRepoColor(name: string): string {
   return REPO_COLORS[Math.abs(hash) % REPO_COLORS.length]
 }
 
+function DotsIcon(): JSX.Element {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+      <circle cx="5" cy="12" r="2" />
+      <circle cx="12" cy="12" r="2" />
+      <circle cx="19" cy="12" r="2" />
+    </svg>
+  )
+}
+
 interface RepoListItemProps {
   repo: RepoEntry
   isSelected: boolean
@@ -25,6 +35,7 @@ interface RepoListItemProps {
   onContextMenu: (e: React.MouseEvent) => void
   onLaunch: (e: React.MouseEvent) => void
   onPickEditor: (e: React.MouseEvent) => void
+  onOpenMenu: (e: React.MouseEvent) => void
 }
 
 export function RepoListItem({
@@ -33,7 +44,8 @@ export function RepoListItem({
   onClick,
   onContextMenu,
   onLaunch,
-  onPickEditor
+  onPickEditor,
+  onOpenMenu
 }: RepoListItemProps): JSX.Element {
   const ref = useRef<HTMLDivElement>(null)
 
@@ -53,10 +65,30 @@ export function RepoListItem({
       onClick={onClick}
       onContextMenu={onContextMenu}
     >
-      {/* Top row: colored icon + launch buttons */}
+      {/* Top row: colored icon + three-dot menu */}
       <div className="repo-item-top">
         <div className="repo-item-icon" style={{ background: iconColor }}>
           {initial}
+        </div>
+        <button
+          className="repo-item-menu-btn"
+          onClick={onOpenMenu}
+          title="More options"
+        >
+          <DotsIcon />
+        </button>
+      </div>
+
+      {/* Repo name */}
+      <div className="repo-item-name">{repo.name}</div>
+
+      {/* Bottom row: badges + Open button */}
+      <div className="repo-item-bottom">
+        <div className="repo-item-meta">
+          {repo.gitBranch && <BranchIndicator branch={repo.gitBranch} />}
+          {repo.tags.map((tag) => (
+            <TagBadge key={tag} tag={tag} />
+          ))}
         </div>
         <div className="repo-item-open-group">
           <button
@@ -75,17 +107,6 @@ export function RepoListItem({
             </svg>
           </button>
         </div>
-      </div>
-
-      {/* Repo name */}
-      <div className="repo-item-name">{repo.name}</div>
-
-      {/* Badges: branch + tags */}
-      <div className="repo-item-meta">
-        {repo.gitBranch && <BranchIndicator branch={repo.gitBranch} />}
-        {repo.tags.map((tag) => (
-          <TagBadge key={tag} tag={tag} />
-        ))}
       </div>
     </div>
   )

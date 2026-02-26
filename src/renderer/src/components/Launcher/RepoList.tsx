@@ -5,6 +5,7 @@ import { useKeyboardNavigation } from '../../hooks/useKeyboardNavigation'
 import { useLicense } from '../../hooks/useLicense'
 import { RepoListItem } from './RepoListItem'
 import { EditorPicker } from './EditorPicker'
+import { RepoContextMenu } from './RepoContextMenu'
 
 export function RepoList(): JSX.Element {
   const { state, dispatch } = useAppContext()
@@ -13,6 +14,12 @@ export function RepoList(): JSX.Element {
   const filtered = isLimited ? allFiltered.slice(0, maxRepos) : allFiltered
 
   const [editorPicker, setEditorPicker] = useState<{
+    repoId: string
+    x: number
+    y: number
+  } | null>(null)
+
+  const [repoMenu, setRepoMenu] = useState<{
     repoId: string
     x: number
     y: number
@@ -53,6 +60,15 @@ export function RepoList(): JSX.Element {
   const handleLaunch = (repoId: string, e: React.MouseEvent): void => {
     e.stopPropagation()
     window.electronAPI.openInEditor(repoId)
+  }
+
+  const handleRemoveRepo = async (repoId: string): Promise<void> => {
+    await window.electronAPI.removeRepo(repoId)
+    const repos = await window.electronAPI.getRepos()
+    dispatch({ type: 'SET_REPOS', payload: repos })
+    if (state.selectedRepo?.id === repoId) {
+      dispatch({ type: 'DESELECT_REPO' })
+    }
   }
 
   const handleAddRepo = async (): Promise<void> => {
@@ -97,6 +113,7 @@ export function RepoList(): JSX.Element {
           onContextMenu={(e) => openEditorPicker(repo.id, e)}
           onLaunch={(e) => handleLaunch(repo.id, e)}
           onPickEditor={(e) => openEditorPicker(repo.id, e)}
+          onOpenMenu={(e) => { e.stopPropagation(); setRepoMenu({ repoId: repo.id, x: e.clientX, y: e.clientY }) }}
         />
       ))}
       {editorPicker && (
@@ -104,6 +121,14 @@ export function RepoList(): JSX.Element {
           repoId={editorPicker.repoId}
           position={{ x: editorPicker.x, y: editorPicker.y }}
           onClose={() => setEditorPicker(null)}
+        />
+      )}
+      {repoMenu && (
+        <RepoContextMenu
+          repoId={repoMenu.repoId}
+          position={{ x: repoMenu.x, y: repoMenu.y }}
+          onClose={() => setRepoMenu(null)}
+          onRemove={() => handleRemoveRepo(repoMenu.repoId)}
         />
       )}
     </div>

@@ -45,13 +45,14 @@ export function createTray(): Tray {
     }
   ])
 
-  tray.setContextMenu(contextMenu)
-
-  // On macOS, left-click toggles the launcher
   if (process.platform === 'darwin') {
-    tray.on('click', () => {
-      showLauncher()
-    })
+    // On macOS, setContextMenu overrides left-click — show the menu on right-click
+    // only, so left-click can toggle the launcher as expected.
+    tray.on('right-click', () => tray!.popUpContextMenu(contextMenu))
+    tray.on('click', () => showLauncher())
+  } else {
+    tray.setContextMenu(contextMenu)
+    tray.on('double-click', () => showLauncher())
   }
 
   return tray
