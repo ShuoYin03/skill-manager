@@ -4,6 +4,7 @@ import { useTheme } from './hooks/useTheme'
 import { LauncherView } from './components/Launcher/LauncherView'
 import { SettingsView } from './components/Settings/SettingsView'
 import { MarketplaceStandaloneView } from './components/Skills/MarketplaceStandaloneView'
+import { MarketplaceEmbeddedView } from './components/Skills/MarketplaceEmbeddedView'
 
 const isMarketplaceWindow = window.location.hash === '#view=marketplace'
 
@@ -71,7 +72,13 @@ function AppInner(): JSX.Element {
 
   return (
     <div className="launcher-container">
-      {state.currentView === 'launcher' ? <LauncherView /> : <SettingsView />}
+      {state.currentView === 'launcher' ? (
+        <LauncherView />
+      ) : state.currentView === 'marketplace' ? (
+        <MarketplaceEmbeddedView />
+      ) : (
+        <SettingsView />
+      )}
     </div>
   )
 }

@@ -43,6 +43,15 @@ export function LauncherView(): JSX.Element {
   const [nagDismissed, setNagDismissed] = useState(false)
 
   const panelOpen = state.selectedRepo !== null
+  const hasRepos = state.repos.length > 0
+
+  const handleAddRepo = async (): Promise<void> => {
+    const newRepo = await window.electronAPI.addRepo()
+    if (newRepo) {
+      const repos = await window.electronAPI.getRepos()
+      dispatch({ type: 'SET_REPOS', payload: repos })
+    }
+  }
 
   return (
     <div className="launcher">
@@ -56,7 +65,7 @@ export function LauncherView(): JSX.Element {
         <button
           className="app-sidebar-icon"
           title="Marketplace"
-          onClick={() => window.electronAPI.openMarketplaceWindow()}
+          onClick={() => dispatch({ type: 'SET_VIEW', payload: 'marketplace' })}
         >
           <MarketplaceIcon />
         </button>
@@ -78,6 +87,18 @@ export function LauncherView(): JSX.Element {
           <div className="app-topbar-search">
             <SearchBar />
           </div>
+          {hasRepos && (
+            <button
+              className="topbar-add-repo-btn"
+              onClick={handleAddRepo}
+              title="Add repository"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Add
+            </button>
+          )}
           <TrialBanner />
         </div>
 

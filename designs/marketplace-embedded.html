@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketplace Embedded — 8 Concept Designs</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #111;
+      color: #f0f0f0;
+      min-height: 100vh;
+    }
+
+    /* ─── Page layout ─── */
+    .page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 24px 60px;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .page-header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.6px;
+      margin-bottom: 6px;
+    }
+    .page-header p {
+      color: #888;
+      font-size: 13px;
+    }
+
+    /* ─── Concept nav ─── */
+    .concept-nav {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 28px;
+      background: rgba(255,255,255,0.06);
+      padding: 4px;
+      border-radius: 10px;
+    }
+    .concept-nav button {
+      padding: 6px 14px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: #888;
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: 'DM Sans', sans-serif;
+      white-space: nowrap;
+    }
+    .concept-nav button:hover { background: rgba(255,255,255,0.08); color: #ddd; }
+    .concept-nav button.active { background: #fff; color: #0a0a0a; }
+
+    /* ─── Window frame ─── */
+    .window-wrap {
+      position: relative;
+    }
+    .window-frame {
+      width: 900px;
+      height: 600px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.09), 0 40px 80px rgba(0,0,0,0.75);
+    }
+    /* Expanded variant for Concept H */
+    .window-frame.expanded {
+      width: 1100px;
+      height: 660px;
+    }
+    .win-titlebar {
+      height: 30px;
+      background: #e8e8e8;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+    .win-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .win-dot.c { background: #ff5f57; }
+    .win-dot.m { background: #febc2e; }
+    .win-dot.x { background: #28c840; }
+    .win-title { flex: 1; text-align: center; font-size: 11px; color: #666; font-weight: 500; }
+    .win-content { display: flex; background: #fafafa; height: calc(100% - 30px); }
+
+    /* ─── Sidebar (shared) ─── */
+    .app-sidebar {
+      width: 52px;
+      background: #fff;
+      border-right: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 0;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+    .sb-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: #9ca3af;
+    }
+    .sb-icon.active { background: #f3f4f6; color: #0a0a0a; }
+    .sb-icon.mkt { background: #0a0a0a; color: #fff; border-radius: 8px; }
+    .sb-spacer { flex: 1; }
+
+    /* ─── Common shared UI tokens ─── */
+    :root {
+      --bg: #fafafa; --card: #fff; --border: #e5e7eb;
+      --text: #0a0a0a; --muted: #6b7280; --faint: #9ca3af;
+      --hover: #f3f4f6; --accent: #0a0a0a;
+      --tag-bg: #f3f4f6; --tag-text: #374151;
+    }
+
+    /* ─── Topbar ─── */
+    .topbar {
+      height: 44px;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .topbar-title {
+      font-size: 13px; font-weight: 600; color: var(--text);
+    }
+    .topbar-back {
+      font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 4px;
+      background: var(--hover); padding: 4px 10px; border-radius: 6px;
+    }
+    .topbar-spacer { flex: 1; }
+    .search-box {
+      height: 28px; background: var(--hover); border-radius: 6px;
+      display: flex; align-items: center; gap: 6px; padding: 0 10px;
+      font-size: 11.5px; color: var(--faint);
+      flex: 1; max-width: 260px;
+    }
+    .select-box {
+      height: 28px; background: #fff; border: 1px solid var(--border);
+      border-radius: 6px; display: flex; align-items: center;
+      padding: 0 10px; gap: 6px; font-size: 11.5px; color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* ─── Filter row ─── */
+    .filter-row {
+      height: 36px; background: #fff; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; padding: 0 14px; gap: 6px; flex-shrink: 0;
+    }
+    .pill {
+      height: 22px; padding: 0 9px; border-radius: 20px;
+      border: 1px solid var(--border); background: #fff;
+      font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 4px;
+      white-space: nowrap;
+    }
+    .pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .pill-count { opacity: 0.55; }
+
+    /* ─── Content area ─── */
+    .mp-content {
+      flex: 1; overflow: hidden; display: flex; flex-direction: column;
+    }
+    .mp-scroll {
+      flex: 1; overflow-y: auto; padding: 16px 14px;
+    }
+
+    /* ─── Section header ─── */
+    .sec-header {
+      font-size: 11px; font-weight: 600; color: var(--faint);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 10px; margin-top: 16px;
+    }
+    .sec-header:first-child { margin-top: 0; }
+
+    /* ─── Skill card (grid) ─── */
+    .cards-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 8px;
+    }
+    .cards-grid.col3 { grid-template-columns: repeat(3, 1fr); }
+    .cards-grid.col5 { grid-template-columns: repeat(5, 1fr); }
+    .skill-card {
+      background: #fff; border: 1px solid var(--border); border-radius: 10px;
+      padding: 10px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .card-top { display: flex; align-items: center; justify-content: space-between; }
+    .card-icon {
+      width: 28px; height: 28px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #fff;
+    }
+    .card-name { font-size: 11.5px; font-weight: 600; color: var(--text); line-height: 1.3; }
+    .card-meta { font-size: 10px; color: var(--faint); }
+    .card-bottom { display: flex; align-items: center; justify-content: space-between; }
+    .card-tag { font-size: 10px; color: var(--tag-text); background: var(--tag-bg); padding: 2px 6px; border-radius: 4px; }
+    .install-btn {
+      height: 22px; border: 1px solid var(--border); border-radius: 6px;
+      display: flex; align-items: center; font-size: 10.5px; color: var(--muted);
+      overflow: hidden;
+    }
+    .install-btn .main { padding: 0 7px; font-weight: 500; }
+    .install-btn .divider { width: 1px; background: var(--border); height: 100%; }
+    .install-btn .chev { padding: 0 5px; }
+
+    /* ─── My skills (small cards) ─── */
+    .my-skills-row { display: flex; gap: 8px; margin-bottom: 8px; }
+    .my-skill-chip {
+      background: #fff; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; display: flex; align-items: center; gap: 7px;
+    }
+    .chip-dot { width: 8px; height: 8px; border-radius: 50%; background: #6366f1; }
+    .chip-name { font-size: 11.5px; font-weight: 500; color: var(--text); }
+    .chip-tool { font-size: 10px; color: var(--faint); }
+
+    /* ─── List row style (Concept B, F) ─── */
+    .skill-list { display: flex; flex-direction: column; gap: 1px; }
+    .skill-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 0; border-bottom: 1px solid var(--border);
+    }
+    .skill-row-icon {
+      width: 24px; height: 24px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .skill-row-name { font-size: 12px; font-weight: 500; color: var(--text); flex: 1; }
+    .skill-row-author { font-size: 10.5px; color: var(--faint); }
+    .skill-row-tag { font-size: 10px; color: var(--tag-text); background: var(--tag-bg); padding: 1px 6px; border-radius: 4px; }
+    .skill-row-btn {
+      height: 22px; padding: 0 8px; background: var(--accent); color: #fff;
+      border-radius: 5px; font-size: 10.5px; font-weight: 500;
+      display: flex; align-items: center;
+    }
+
+    /* ─── Repo strip (Concept C, D) ─── */
+    .repo-strip {
+      width: 160px; background: #fff; border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; padding: 8px;
+      gap: 2px; flex-shrink: 0;
+    }
+    .repo-strip-title {
+      font-size: 10px; font-weight: 600; color: var(--faint);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      padding: 4px 6px 8px;
+    }
+    .repo-strip-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 7px; border-radius: 7px;
+    }
+    .repo-strip-item.selected { background: #f3f4f6; }
+    .repo-dot {
+      width: 24px; height: 24px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .repo-strip-name { font-size: 11px; font-weight: 500; color: var(--text); }
+    .repo-add-btn {
+      margin-top: auto; padding: 6px 7px; text-align: center;
+      font-size: 11px; color: var(--muted); border: 1px dashed var(--border);
+      border-radius: 7px;
+    }
+
+    /* ─── Pagination ─── */
+    .pagination {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 10px; border-top: 1px solid var(--border);
+      font-size: 11px; color: var(--muted);
+    }
+    .pag-btn {
+      width: 24px; height: 24px; border: 1px solid var(--border);
+      border-radius: 5px; display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+    }
+
+    /* ─── Tabs (Concept E) ─── */
+    .tab-bar {
+      height: 40px; background: #fff; border-bottom: 1px solid var(--border);
+      display: flex; align-items: stretch; padding: 0 14px; gap: 0;
+      flex-shrink: 0;
+    }
+    .tab {
+      padding: 0 16px; font-size: 12.5px; font-weight: 500;
+      color: var(--muted); border-bottom: 2px solid transparent;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .tab.active { color: var(--text); border-bottom-color: var(--text); }
+    .tab-spacer { flex: 1; }
+
+    /* ─── Cmd palette (Concept F) ─── */
+    .cmd-search {
+      margin: 16px 14px 0;
+      height: 38px; background: #fff; border: 1.5px solid var(--text);
+      border-radius: 9px; display: flex; align-items: center;
+      padding: 0 12px; gap: 8px;
+    }
+    .cmd-search input-mock {
+      flex: 1; font-size: 13px; color: var(--muted);
+    }
+    .cmd-search .ai-pick {
+      font-size: 11px; color: var(--faint); padding: 3px 8px;
+      background: var(--hover); border-radius: 5px;
+    }
+
+    /* ─── Overlay / dimmed backdrop (Concept D) ─── */
+    .overlay-backdrop {
+      position: absolute; left: 52px; right: 0; top: 0; bottom: 0;
+      background: rgba(0,0,0,0.25);
+    }
+    .overlay-sheet {
+      position: absolute; right: 0; top: 0; bottom: 0; width: 620px;
+      background: #fff; border-left: 1px solid var(--border);
+      box-shadow: -12px 0 40px rgba(0,0,0,0.15);
+      display: flex; flex-direction: column;
+    }
+    .overlay-handle {
+      height: 44px; display: flex; align-items: center;
+      padding: 0 14px; gap: 10px; border-bottom: 1px solid var(--border);
+    }
+    .close-btn {
+      width: 28px; height: 28px; border-radius: 6px; background: var(--hover);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; color: var(--muted); flex-shrink: 0;
+    }
+
+    /* ─── Sidebar expansion (Concept G) ─── */
+    .expanded-sidebar {
+      width: 280px; background: #fff; border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; flex-shrink: 0;
+    }
+    .exp-sb-header {
+      height: 44px; display: flex; align-items: center;
+      padding: 0 14px; gap: 8px; border-bottom: 1px solid var(--border);
+    }
+    .exp-sb-title { font-size: 13px; font-weight: 600; color: var(--text); }
+    .exp-sb-close {
+      margin-left: auto; width: 22px; height: 22px;
+      border-radius: 5px; background: var(--hover);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; color: var(--muted);
+    }
+    .exp-sb-search {
+      height: 28px; margin: 10px; background: var(--hover);
+      border-radius: 6px; display: flex; align-items: center;
+      padding: 0 10px; gap: 6px; font-size: 11.5px; color: var(--faint);
+    }
+    .exp-sb-list { flex: 1; overflow: hidden; padding: 0 8px; }
+    .exp-sb-sec {
+      font-size: 9.5px; font-weight: 600; color: var(--faint);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      padding: 10px 4px 5px;
+    }
+    .exp-sb-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 6px; border-radius: 6px; font-size: 11.5px;
+    }
+    .exp-sb-row:hover { background: var(--hover); }
+    .exp-sb-row .name { flex: 1; color: var(--text); font-weight: 400; }
+    .exp-sb-row .install {
+      font-size: 10px; padding: 2px 7px; background: var(--accent); color: #fff;
+      border-radius: 4px; opacity: 0.85;
+    }
+    .exp-sb-pag {
+      padding: 8px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      font-size: 10.5px; color: var(--muted);
+    }
+    .dimmed-main { flex: 1; opacity: 0.2; pointer-events: none; }
+
+    /* ─── Description card ─── */
+    .desc-card {
+      margin-top: 20px;
+      width: 900px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 18px 24px;
+      display: flex; gap: 32px;
+    }
+    .desc-card.wide { width: 1100px; }
+    .desc-main { flex: 1; }
+    .desc-title { font-size: 15px; font-weight: 600; margin-bottom: 5px; }
+    .desc-text { font-size: 12.5px; color: #aaa; line-height: 1.6; }
+    .desc-meta { display: flex; flex-direction: column; gap: 10px; min-width: 200px; }
+    .meta-row { font-size: 11.5px; }
+    .meta-label { color: #666; margin-bottom: 2px; }
+    .meta-val { color: #ccc; }
+    .pro-con { display: flex; gap: 16px; margin-top: 10px; }
+    .pros, .cons { flex: 1; }
+    .pros-title { font-size: 10.5px; font-weight: 600; color: #4ade80; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+    .cons-title { font-size: 10.5px; font-weight: 600; color: #f87171; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+    .pros li, .cons li { font-size: 11.5px; color: #bbb; margin-left: 14px; margin-bottom: 2px; }
+
+    /* ─── Concept visibility ─── */
+    .concept { display: none; }
+    .concept.active { display: flex; flex-direction: column; align-items: center; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <h1>Marketplace Embedded — 8 UI Concepts</h1>
+    <p>Select a concept below to preview. Click to discuss with Claude which to implement.</p>
+  </div>
+
+  <div class="concept-nav">
+    <button class="active" onclick="show('a')">A · Full Replace</button>
+    <button onclick="show('b')">B · List Rows</button>
+    <button onclick="show('c')">C · Split View</button>
+    <button onclick="show('d')">D · Slide Drawer</button>
+    <button onclick="show('e')">E · Tab Bar</button>
+    <button onclick="show('f')">F · Cmd Palette</button>
+    <button onclick="show('g')">G · Sidebar Expand</button>
+    <button onclick="show('h')">H · Window Expands</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       CONCEPT A — Full Canvas Replace
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="concept active" id="ca">
+    <div class="window-frame">
+      <div class="win-titlebar">
+        <div class="win-dot c"></div><div class="win-dot m"></div><div class="win-dot x"></div>
+        <div class="win-title">Repo Launcher</div>
+      </div>
+      <div class="win-content">
+        <!-- Sidebar -->
+        <div class="app-sidebar">
+          <div class="sb-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+            </svg>
+          </div>
+          <div class="sb-icon mkt">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </div>
+          <div class="sb-spacer"></div>
+          <div class="sb-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/>
+            </svg>
+          </div>
+        </div>
+        <!-- Main -->
+        <div class="mp-content">
+          <!-- Topbar -->
+          <div class="topbar">
+            <div class="topbar-back">← Projects</div>
+            <div class="topbar-title">Skill Marketplace</div>
+            <div class="topbar-spacer"></div>
+            <div class="search-box">🔍 Search skills...</div>
+            <div class="select-box">desktop-tool ▾</div>
+            <div class="select-box">Claude ▾</div>
+          </div>
+          <!-- Filters -->
+          <div class="filter-row">
+            <div class="pill active">agent-skills <span class="pill-count">234</span></div>
+            <div class="pill">web <span class="pill-count">189</span></div>
+            <div class="pill">dev-tools <span class="pill-count">67</span></div>
+            <div class="pill">react <span class="pill-count">45</span></div>
+            <div class="pill">python <span class="pill-count">38</span></div>
+            <div style="flex:1"></div>
+            <div style="font-size:11px;color:#9ca3af;cursor:pointer;">Clear ×</div>
+          </div>
+          <!-- Scrollable -->
+          <div class="mp-scroll">
+            <div class="sec-header">My Skills (2)</div>
+            <div class="my-skills-row">
+              <div class="my-skill-chip"><div class="chip-dot" style="background:#6366f1"></div><div><div class="chip-name">commit-msg</div><div class="chip-tool">Claude</div></div></div>
+              <div class="my-skill-chip"><div class="chip-dot" style="background:#0ea5e9"></div><div><div class="chip-name">cursor-rules</div><div class="chip-tool">Cursor</div></div></div>
+            </div>
+            <div class="sec-header">All Skills · 1,234</div>
+            <div class="cards-grid">
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#FF6B35">F</div></div>
+                <div class="card-name">find-skills</div>
+                <div class="card-meta">vercel-labs</div>
+                <div class="card-bottom"><div class="card-tag">agent-skills</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#10B981">R</div></div>
+                <div class="card-name">review-pr</div>
+                <div class="card-meta">anthropics</div>
+                <div class="card-bottom"><div class="card-tag">agent-skills</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#8B5CF6">U</div></div>
+                <div class="card-name">ui-ux-pro-max</div>
+                <div class="card-meta">nxtlvl</div>
+                <div class="card-bottom"><div class="card-tag">design</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#F59E0B">C</div></div>
+                <div class="card-name">commit-msg</div>
+                <div class="card-meta">anthropics</div>
+                <div class="card-bottom"><div class="card-tag">git</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#0EA5E9">C</div></div>
+                <div class="card-name">cursor-rules</div>
+                <div class="card-meta">cursor</div>
+                <div class="card-bottom"><div class="card-tag">cursor</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#EC4899">D</div></div>
+                <div class="card-name">doc-writer</div>
+                <div class="card-meta">gh-skills</div>
+                <div class="card-bottom"><div class="card-tag">writing</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#14B8A6">T</div></div>
+                <div class="card-name">test-writer</div>
+                <div class="card-meta">testing-team</div>
+                <div class="card-bottom"><div class="card-tag">testing</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#6366F1">C</div></div>
+                <div class="card-name">code-review</div>
+                <div class="card-meta">gh-skills</div>
+                <div class="card-bottom"><div class="card-tag">git</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="pagination">
+            <div class="pag-btn">←</div>
+            <span>1 / 52</span>
+            <div class="pag-btn">→</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-card">
+      <div class="desc-main">
+        <div class="desc-title">A · Full Canvas Replace</div>
+        <div class="desc-text">点击侧边栏 Marketplace 图标，主内容区完全替换为 marketplace 视图（同 Settings 的切换方式）。"← Projects" 按钮返回 repo 列表。最大化可用空间，4 列卡片网格。</div>
+        <div class="pro-con">
+          <div class="pros"><div class="pros-title">Pros</div><ul><li>空间最大，显示最多卡片</li><li>实现最简单，与现有设置切换模式一致</li><li>最干净，无分心</li></ul></div>
+          <div class="cons"><div class="cons-title">Cons</div><ul><li>浏览 marketplace 时看不到 repos</li><li>需要点击返回才能回到项目列表</li></ul></div>
+        </div>
+      </div>
+      <div class="desc-meta">
+        <div class="meta-row"><div class="meta-label">Window size</div><div class="meta-val">900×600 (unchanged)</div></div>
+        <div class="meta-row"><div class="meta-label">Nav pattern</div><div class="meta-val">Back button + sidebar icons</div></div>
+        <div class="meta-row"><div class="meta-label">Implementation</div><div class="meta-val">Low complexity</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       CONCEPT B — Compact List Rows
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="concept" id="cb">
+    <div class="window-frame">
+      <div class="win-titlebar">
+        <div class="win-dot c"></div><div class="win-dot m"></div><div class="win-dot x"></div>
+        <div class="win-title">Repo Launcher</div>
+      </div>
+      <div class="win-content">
+        <div class="app-sidebar">
+          <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+          <div class="sb-icon mkt"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          <div class="sb-spacer"></div>
+          <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg></div>
+        </div>
+        <div class="mp-content">
+          <div class="topbar">
+            <div class="topbar-back">← Projects</div>
+            <div class="topbar-title">Skill Marketplace</div>
+            <div class="topbar-spacer"></div>
+            <div class="search-box">🔍 Search skills...</div>
+            <div class="select-box">desktop-tool ▾</div>
+            <div class="select-box">Claude ▾</div>
+          </div>
+          <div class="filter-row">
+            <div class="pill active">agent-skills <span class="pill-count">234</span></div>
+            <div class="pill">web <span class="pill-count">189</span></div>
+            <div class="pill">dev-tools <span class="pill-count">67</span></div>
+            <div class="pill">react <span class="pill-count">45</span></div>
+            <div style="flex:1"></div>
+            <div style="font-size:11px;color:#9ca3af;">Clear ×</div>
+          </div>
+          <div class="mp-scroll">
+            <div class="sec-header">My Skills (2)</div>
+            <div class="skill-list" style="margin-bottom:12px;">
+              <div class="skill-row">
+                <div class="skill-row-icon" style="background:#6366f1">C</div>
+                <div class="skill-row-name">commit-msg</div>
+                <div class="skill-row-author">anthropics</div>
+                <div class="skill-row-tag">git</div>
+                <div style="font-size:10px;color:#9ca3af;padding:2px 6px;">Installed ✓</div>
+              </div>
+              <div class="skill-row">
+                <div class="skill-row-icon" style="background:#0ea5e9">C</div>
+                <div class="skill-row-name">cursor-rules</div>
+                <div class="skill-row-author">cursor</div>
+                <div class="skill-row-tag">cursor</div>
+                <div style="font-size:10px;color:#9ca3af;padding:2px 6px;">Installed ✓</div>
+              </div>
+            </div>
+            <div class="sec-header">All Skills · 1,234</div>
+            <div class="skill-list">
+              <div class="skill-row">
+                <div class="skill-row-icon" style="background:#FF6B35">F</div>
+                <div class="skill-row-name">find-skills</div>
+                <div class="skill-row-author">vercel-labs</div>
+                <div class="skill-row-tag">agent-skills</div>
+                <div class="skill-row-btn">Install ▾</div>
+              </div>
+              <div class="skill-row">
+                <div class="skill-row-icon" style="background:#10B981">R</div>
+                <div class="skill-row-name">review-pr</div>
+                <div class="skill-row-author">anthropics</div>
+                <div class="skill-row-tag">agent-skills</div>
+                <div class="skill-row-btn">Install ▾</div>
+              </div>
+              <div class="skill-row">
+                <div class="skill-row-icon" style="background:#8B5CF6">U</div>
+                <div class="skill-row-name">ui-ux-pro-max</div>
+                <div class="skill-row-author">nxtlvl</div>
+                <div class="skill-row-tag">design</div>
+                <div class="skill-row-btn">Install ▾</div>
+              </div>
+              <div class="skill-row">
+                <div class="skill-row-icon" style="background:#F59E0B">C</div>
+                <div class="skill-row-name">commit-analyzer</div>
+                <div class="skill-row-author">gh-skills</div>
+                <div class="skill-row-tag">git</div>
+                <div class="skill-row-btn">Install ▾</div>
+              </div>
+              <div class="skill-row">
+                <div class="skill-row-icon" style="background:#EC4899">D</div>
+                <div class="skill-row-name">doc-writer</div>
+                <div class="skill-row-author">gh-skills</div>
+                <div class="skill-row-tag">writing</div>
+                <div class="skill-row-btn">Install ▾</div>
+              </div>
+              <div class="skill-row">
+                <div class="skill-row-icon" style="background:#14B8A6">T</div>
+                <div class="skill-row-name">test-writer</div>
+                <div class="skill-row-author">testing-team</div>
+                <div class="skill-row-tag">testing</div>
+                <div class="skill-row-btn">Install ▾</div>
+              </div>
+              <div class="skill-row">
+                <div class="skill-row-icon" style="background:#6366F1">C</div>
+                <div class="skill-row-name">code-review</div>
+                <div class="skill-row-author">gh-skills</div>
+                <div class="skill-row-tag">git</div>
+                <div class="skill-row-btn">Install ▾</div>
+              </div>
+              <div class="skill-row">
+                <div class="skill-row-icon" style="background:#06B6D4">P</div>
+                <div class="skill-row-name">pr-description</div>
+                <div class="skill-row-author">anthropics</div>
+                <div class="skill-row-tag">git</div>
+                <div class="skill-row-btn">Install ▾</div>
+              </div>
+            </div>
+          </div>
+          <div class="pagination">
+            <div class="pag-btn">←</div>
+            <span>1 / 52</span>
+            <div class="pag-btn">→</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-card">
+      <div class="desc-main">
+        <div class="desc-title">B · Compact List Rows</div>
+        <div class="desc-text">与 A 相同的全替换模式，但技能以紧凑的列表行呈现（而非网格卡片）。每行显示图标、名称、作者、标签和安装按钮。单屏可显示更多技能，密度更高，适合快速浏览。</div>
+        <div class="pro-con">
+          <div class="pros"><div class="pros-title">Pros</div><ul><li>密度最高，每屏显示 8-10 个技能</li><li>快速扫描，信息更清晰</li><li>更接近 Linear/Raycast 风格</li></ul></div>
+          <div class="cons"><div class="cons-title">Cons</div><ul><li>无法展示技能预览图或详细描述</li><li>视觉吸引力不如卡片</li></ul></div>
+        </div>
+      </div>
+      <div class="desc-meta">
+        <div class="meta-row"><div class="meta-label">Window size</div><div class="meta-val">900×600 (unchanged)</div></div>
+        <div class="meta-row"><div class="meta-label">Layout</div><div class="meta-val">List rows</div></div>
+        <div class="meta-row"><div class="meta-label">Implementation</div><div class="meta-val">Low complexity</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       CONCEPT C — Horizontal Split
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="concept" id="cc">
+    <div class="window-frame">
+      <div class="win-titlebar">
+        <div class="win-dot c"></div><div class="win-dot m"></div><div class="win-dot x"></div>
+        <div class="win-title">Repo Launcher</div>
+      </div>
+      <div class="win-content">
+        <div class="app-sidebar">
+          <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+          <div class="sb-icon mkt"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          <div class="sb-spacer"></div>
+          <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg></div>
+        </div>
+        <!-- Repos strip -->
+        <div class="repo-strip">
+          <div class="repo-strip-title">Projects</div>
+          <div class="repo-strip-item selected">
+            <div class="repo-dot" style="background:#FF6B35">D</div>
+            <div class="repo-strip-name">desktop-tool</div>
+          </div>
+          <div class="repo-strip-item">
+            <div class="repo-dot" style="background:#0EA5E9">M</div>
+            <div class="repo-strip-name">my-website</div>
+          </div>
+          <div class="repo-strip-item">
+            <div class="repo-dot" style="background:#10B981">A</div>
+            <div class="repo-strip-name">api-server</div>
+          </div>
+          <div class="repo-strip-item">
+            <div class="repo-dot" style="background:#F59E0B">M</div>
+            <div class="repo-strip-name">mobile-app</div>
+          </div>
+          <div class="repo-add-btn">+ Add Project</div>
+        </div>
+        <!-- Marketplace panel -->
+        <div class="mp-content">
+          <div class="topbar" style="border-bottom:1px solid #e5e7eb;">
+            <div class="topbar-title" style="font-size:12px;">Skill Marketplace</div>
+            <div class="topbar-spacer"></div>
+            <div class="search-box" style="max-width:180px;">🔍 Search...</div>
+            <div class="select-box">Claude ▾</div>
+          </div>
+          <div class="filter-row">
+            <div class="pill active">agent-skills</div>
+            <div class="pill">web</div>
+            <div class="pill">git</div>
+            <div style="flex:1"></div>
+          </div>
+          <div class="mp-scroll">
+            <div class="sec-header">My Skills (2)</div>
+            <div class="my-skills-row">
+              <div class="my-skill-chip"><div class="chip-dot" style="background:#6366f1"></div><div><div class="chip-name">commit-msg</div><div class="chip-tool">Claude</div></div></div>
+              <div class="my-skill-chip"><div class="chip-dot" style="background:#0ea5e9"></div><div><div class="chip-name">cursor-rules</div><div class="chip-tool">Cursor</div></div></div>
+            </div>
+            <div class="sec-header">All Skills · 1,234</div>
+            <div class="cards-grid col3">
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#FF6B35">F</div></div>
+                <div class="card-name">find-skills</div>
+                <div class="card-meta">vercel-labs</div>
+                <div class="card-bottom"><div class="card-tag">agent</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#10B981">R</div></div>
+                <div class="card-name">review-pr</div>
+                <div class="card-meta">anthropics</div>
+                <div class="card-bottom"><div class="card-tag">agent</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#8B5CF6">U</div></div>
+                <div class="card-name">ui-ux-pro-max</div>
+                <div class="card-meta">nxtlvl</div>
+                <div class="card-bottom"><div class="card-tag">design</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#F59E0B">C</div></div>
+                <div class="card-name">commit-msg</div>
+                <div class="card-meta">anthropics</div>
+                <div class="card-bottom"><div class="card-tag">git</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#EC4899">D</div></div>
+                <div class="card-name">doc-writer</div>
+                <div class="card-meta">gh-skills</div>
+                <div class="card-bottom"><div class="card-tag">writing</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#14B8A6">T</div></div>
+                <div class="card-name">test-writer</div>
+                <div class="card-meta">testing-team</div>
+                <div class="card-bottom"><div class="card-tag">testing</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="pagination"><div class="pag-btn">←</div><span>1 / 52</span><div class="pag-btn">→</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-card">
+      <div class="desc-main">
+        <div class="desc-title">C · Horizontal Split</div>
+        <div class="desc-text">左侧 160px 保留 repo 列表（与当前 Skills Panel 打开时的列表栏类似），右侧显示 marketplace。可以选择 repo 后直接在右侧安装，无需切换视图。Repo selector 下拉框变为左侧列表点击选择。</div>
+        <div class="pro-con">
+          <div class="pros"><div class="pros-title">Pros</div><ul><li>随时可见 repos，切换 repo 直接点击</li><li>与现有 SkillsPanel 分栏风格一致</li><li>不需要"返回"导航</li></ul></div>
+          <div class="cons"><div class="cons-title">Cons</div><ul><li>marketplace 宽度压缩（只有 688px）</li><li>3 列卡片略小</li></ul></div>
+        </div>
+      </div>
+      <div class="desc-meta">
+        <div class="meta-row"><div class="meta-label">Window size</div><div class="meta-val">900×600 (unchanged)</div></div>
+        <div class="meta-row"><div class="meta-label">Layout</div><div class="meta-val">160px + 688px split</div></div>
+        <div class="meta-row"><div class="meta-label">Implementation</div><div class="meta-val">Low-Medium</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       CONCEPT D — Slide Drawer
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="concept" id="cd">
+    <div class="window-frame" style="position:relative;">
+      <div class="win-titlebar">
+        <div class="win-dot c"></div><div class="win-dot m"></div><div class="win-dot x"></div>
+        <div class="win-title">Repo Launcher</div>
+      </div>
+      <div class="win-content" style="position:relative;">
+        <!-- Sidebar -->
+        <div class="app-sidebar">
+          <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+          <div class="sb-icon mkt"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          <div class="sb-spacer"></div>
+          <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg></div>
+        </div>
+        <!-- Dimmed repo list behind -->
+        <div style="flex:1;padding:14px;opacity:0.2;overflow:hidden;">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+            <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:10px;height:100px;"></div>
+            <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:10px;height:100px;"></div>
+            <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:10px;height:100px;"></div>
+            <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:10px;height:100px;"></div>
+            <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:10px;height:100px;"></div>
+          </div>
+        </div>
+        <!-- Dim overlay -->
+        <div style="position:absolute;left:52px;right:0;top:0;bottom:0;background:rgba(0,0,0,0.2);"></div>
+        <!-- Sheet -->
+        <div class="overlay-sheet">
+          <div class="overlay-handle">
+            <div class="close-btn">×</div>
+            <div style="font-size:13px;font-weight:600;color:#0a0a0a;">Skill Marketplace</div>
+            <div style="flex:1"></div>
+            <div class="select-box" style="font-size:10.5px;">desktop-tool ▾</div>
+            <div class="select-box" style="font-size:10.5px;">Claude ▾</div>
+          </div>
+          <div class="filter-row">
+            <div class="search-box" style="max-width:200px;margin-right:8px;">🔍 Search skills...</div>
+            <div class="pill active">agent-skills</div>
+            <div class="pill">web</div>
+            <div class="pill">git</div>
+          </div>
+          <div class="mp-scroll" style="flex:1;overflow-y:auto;padding:14px;">
+            <div class="sec-header">My Skills (2)</div>
+            <div class="my-skills-row">
+              <div class="my-skill-chip"><div class="chip-dot" style="background:#6366f1"></div><div><div class="chip-name">commit-msg</div><div class="chip-tool">Claude</div></div></div>
+              <div class="my-skill-chip"><div class="chip-dot" style="background:#0ea5e9"></div><div><div class="chip-name">cursor-rules</div><div class="chip-tool">Cursor</div></div></div>
+            </div>
+            <div class="sec-header">All Skills · 1,234</div>
+            <div class="cards-grid col3" style="gap:7px;">
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#FF6B35">F</div></div>
+                <div class="card-name">find-skills</div><div class="card-meta">vercel-labs</div>
+                <div class="card-bottom"><div class="card-tag">agent</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#10B981">R</div></div>
+                <div class="card-name">review-pr</div><div class="card-meta">anthropics</div>
+                <div class="card-bottom"><div class="card-tag">agent</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#8B5CF6">U</div></div>
+                <div class="card-name">ui-ux-pro-max</div><div class="card-meta">nxtlvl</div>
+                <div class="card-bottom"><div class="card-tag">design</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#F59E0B">C</div></div>
+                <div class="card-name">commit-msg</div><div class="card-meta">anthropics</div>
+                <div class="card-bottom"><div class="card-tag">git</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#EC4899">D</div></div>
+                <div class="card-name">doc-writer</div><div class="card-meta">gh-skills</div>
+                <div class="card-bottom"><div class="card-tag">writing</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+              <div class="skill-card">
+                <div class="card-top"><div class="card-icon" style="background:#14B8A6">T</div></div>
+                <div class="card-name">test-writer</div><div class="card-meta">team</div>
+                <div class="card-bottom"><div class="card-tag">testing</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="pagination"><div class="pag-btn">←</div><span>1 / 52</span><div class="pag-btn">→</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-card">
+      <div class="desc-main">
+        <div class="desc-title">D · Slide Drawer</div>
+        <div class="desc-text">Marketplace 从右侧滑入，覆盖约 70% 的窗口宽度。左侧 repo 列表依然可见但被半透明遮罩变暗。带有动画过渡效果。点击 × 或遮罩区域关闭。</div>
+        <div class="pro-con">
+          <div class="pros"><div class="pros-title">Pros</div><ul><li>视觉上明确区分 "临时" 状态</li><li>关闭后自动回到 repos</li><li>动画过渡流畅感强</li></ul></div>
+          <div class="cons"><div class="cons-title">Cons</div><ul><li>Drawer 宽度受限（约 620px）</li><li>实现相对复杂（动画 + z-index）</li></ul></div>
+        </div>
+      </div>
+      <div class="desc-meta">
+        <div class="meta-row"><div class="meta-label">Window size</div><div class="meta-val">900×600 (unchanged)</div></div>
+        <div class="meta-row"><div class="meta-label">Pattern</div><div class="meta-val">Slide-over drawer</div></div>
+        <div class="meta-row"><div class="meta-label">Implementation</div><div class="meta-val">Medium complexity</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       CONCEPT E — Tab Bar
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="concept" id="ce">
+    <div class="window-frame">
+      <div class="win-titlebar">
+        <div class="win-dot c"></div><div class="win-dot m"></div><div class="win-dot x"></div>
+        <div class="win-title">Repo Launcher</div>
+      </div>
+      <div class="win-content">
+        <div class="app-sidebar">
+          <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+          <div class="sb-icon mkt"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          <div class="sb-spacer"></div>
+          <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg></div>
+        </div>
+        <div class="mp-content">
+          <!-- Tab bar replaces topbar -->
+          <div class="tab-bar">
+            <div class="tab">Projects</div>
+            <div class="tab active">★ Marketplace</div>
+            <div class="tab">Presets</div>
+            <div class="tab-spacer"></div>
+            <div class="select-box" style="font-size:10.5px;align-self:center;height:24px;">desktop-tool ▾</div>
+            <div class="select-box" style="font-size:10.5px;align-self:center;height:24px;margin-left:6px;">Claude ▾</div>
+          </div>
+          <div class="filter-row">
+            <div class="search-box">🔍 Search skills...</div>
+            <div style="margin-left:8px"></div>
+            <div class="pill active">agent-skills <span class="pill-count">234</span></div>
+            <div class="pill">web <span class="pill-count">189</span></div>
+            <div class="pill">dev-tools <span class="pill-count">67</span></div>
+            <div style="flex:1"></div>
+          </div>
+          <div class="mp-scroll">
+            <div class="sec-header">My Skills (2)</div>
+            <div class="my-skills-row">
+              <div class="my-skill-chip"><div class="chip-dot" style="background:#6366f1"></div><div><div class="chip-name">commit-msg</div><div class="chip-tool">Claude</div></div></div>
+              <div class="my-skill-chip"><div class="chip-dot" style="background:#0ea5e9"></div><div><div class="chip-name">cursor-rules</div><div class="chip-tool">Cursor</div></div></div>
+            </div>
+            <div class="sec-header">All Skills · 1,234</div>
+            <div class="cards-grid">
+              <div class="skill-card"><div class="card-top"><div class="card-icon" style="background:#FF6B35">F</div></div><div class="card-name">find-skills</div><div class="card-meta">vercel-labs</div><div class="card-bottom"><div class="card-tag">agent</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div></div>
+              <div class="skill-card"><div class="card-top"><div class="card-icon" style="background:#10B981">R</div></div><div class="card-name">review-pr</div><div class="card-meta">anthropics</div><div class="card-bottom"><div class="card-tag">agent</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div></div>
+              <div class="skill-card"><div class="card-top"><div class="card-icon" style="background:#8B5CF6">U</div></div><div class="card-name">ui-ux-pro-max</div><div class="card-meta">nxtlvl</div><div class="card-bottom"><div class="card-tag">design</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div></div>
+              <div class="skill-card"><div class="card-top"><div class="card-icon" style="background:#F59E0B">C</div></div><div class="card-name">commit-msg</div><div class="card-meta">anthropics</div><div class="card-bottom"><div class="card-tag">git</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div></div>
+              <div class="skill-card"><div class="card-top"><div class="card-icon" style="background:#EC4899">D</div></div><div class="card-name">doc-writer</div><div class="card-meta">gh-skills</div><div class="card-bottom"><div class="card-tag">writing</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div></div>
+              <div class="skill-card"><div class="card-top"><div class="card-icon" style="background:#14B8A6">T</div></div><div class="card-name">test-writer</div><div class="card-meta">testing</div><div class="card-bottom"><div class="card-tag">testing</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div></div>
+              <div class="skill-card"><div class="card-top"><div class="card-icon" style="background:#6366F1">C</div></div><div class="card-name">code-review</div><div class="card-meta">gh-skills</div><div class="card-bottom"><div class="card-tag">git</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div></div>
+              <div class="skill-card"><div class="card-top"><div class="card-icon" style="background:#06B6D4">P</div></div><div class="card-name">pr-description</div><div class="card-meta">anthropics</div><div class="card-bottom"><div class="card-tag">git</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div></div>
+            </div>
+          </div>
+          <div class="pagination"><div class="pag-btn">←</div><span>1 / 52</span><div class="pag-btn">→</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-card">
+      <div class="desc-main">
+        <div class="desc-title">E · Tab Bar Navigation</div>
+        <div class="desc-text">将顶部 topbar 改为水平 Tab 导航："Projects | ★ Marketplace | Presets"。点击 tab 切换视图，侧边栏图标和 tab 双重导航并存。Presets 也作为 tab 出现，与 sidebar 形成层次化导航。</div>
+        <div class="pro-con">
+          <div class="pros"><div class="pros-title">Pros</div><ul><li>所有主要视图一目了然</li><li>Presets 单独成 tab 比埋在 marketplace 里更突出</li><li>直觉性强，与 web app 习惯一致</li></ul></div>
+          <div class="cons"><div class="cons-title">Cons</div><ul><li>tab + sidebar 双重导航可能造成冗余</li><li>topbar 高度被 tab 占用，内容区略小</li></ul></div>
+        </div>
+      </div>
+      <div class="desc-meta">
+        <div class="meta-row"><div class="meta-label">Window size</div><div class="meta-val">900×600 (unchanged)</div></div>
+        <div class="meta-row"><div class="meta-label">Pattern</div><div class="meta-val">Horizontal tab bar</div></div>
+        <div class="meta-row"><div class="meta-label">Implementation</div><div class="meta-val">Low-Medium</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       CONCEPT F — Command Palette Style
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="concept" id="cf">
+    <div class="window-frame">
+      <div class="win-titlebar">
+        <div class="win-dot c"></div><div class="win-dot m"></div><div class="win-dot x"></div>
+        <div class="win-title">Repo Launcher</div>
+      </div>
+      <div class="win-content">
+        <div class="app-sidebar">
+          <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+          <div class="sb-icon mkt"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          <div class="sb-spacer"></div>
+          <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg></div>
+        </div>
+        <div class="mp-content">
+          <!-- Command search -->
+          <div style="padding:14px 14px 0;background:#fff;border-bottom:1px solid #e5e7eb;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <div class="topbar-back" style="padding:4px 8px;">← Projects</div>
+              <div style="font-size:12px;color:#9ca3af;">Skill Marketplace</div>
+              <div style="flex:1"></div>
+              <div class="select-box" style="font-size:10.5px;height:26px;">desktop-tool ▾</div>
+              <div class="select-box" style="font-size:10.5px;height:26px;">Claude ▾</div>
+            </div>
+            <div style="height:38px;background:#fafafa;border:1.5px solid #0a0a0a;border-radius:9px;display:flex;align-items:center;padding:0 12px;gap:8px;margin-bottom:10px;">
+              <span style="font-size:14px;">🔍</span>
+              <span style="font-size:13px;color:#9ca3af;flex:1;">Search 1,234 skills...</span>
+              <span style="font-size:10px;color:#d1d5db;background:#f3f4f6;padding:2px 6px;border-radius:4px;">⌘K</span>
+            </div>
+            <div style="display:flex;gap:5px;padding-bottom:10px;overflow:hidden;">
+              <div class="pill active">agent-skills</div>
+              <div class="pill">web</div>
+              <div class="pill">git</div>
+              <div class="pill">design</div>
+              <div class="pill">testing</div>
+              <div class="pill">writing</div>
+            </div>
+          </div>
+          <div class="mp-scroll">
+            <!-- My Skills section -->
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+              <div class="sec-header" style="margin:0;">Installed</div>
+              <div style="font-size:10px;color:#9ca3af;">(2)</div>
+            </div>
+            <div class="skill-list" style="margin-bottom:14px;border:1px solid #f3f4f6;border-radius:8px;overflow:hidden;">
+              <div class="skill-row" style="padding:8px 10px;border-bottom:1px solid #f3f4f6;">
+                <div class="skill-row-icon" style="background:#6366f1">C</div>
+                <div class="skill-row-name">commit-msg</div>
+                <div class="skill-row-author">anthropics</div>
+                <div class="skill-row-tag">git</div>
+                <div style="font-size:10px;color:#10b981;padding:2px 7px;background:#f0fdf4;border-radius:4px;">✓ Installed</div>
+              </div>
+              <div class="skill-row" style="padding:8px 10px;border-bottom:0;">
+                <div class="skill-row-icon" style="background:#0ea5e9">C</div>
+                <div class="skill-row-name">cursor-rules</div>
+                <div class="skill-row-author">cursor</div>
+                <div class="skill-row-tag">cursor</div>
+                <div style="font-size:10px;color:#10b981;padding:2px 7px;background:#f0fdf4;border-radius:4px;">✓ Installed</div>
+              </div>
+            </div>
+            <!-- All skills -->
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+              <div class="sec-header" style="margin:0;">All Skills</div>
+              <div style="font-size:10px;color:#9ca3af;">· 1,234</div>
+            </div>
+            <div class="skill-list" style="border:1px solid #f3f4f6;border-radius:8px;overflow:hidden;">
+              <div class="skill-row" style="padding:8px 10px;border-bottom:1px solid #f3f4f6;">
+                <div class="skill-row-icon" style="background:#FF6B35">F</div>
+                <div class="skill-row-name">find-skills</div>
+                <div class="skill-row-author">vercel-labs</div>
+                <div class="skill-row-tag">agent-skills</div>
+                <div class="skill-row-btn">↓ Install</div>
+              </div>
+              <div class="skill-row" style="padding:8px 10px;border-bottom:1px solid #f3f4f6;">
+                <div class="skill-row-icon" style="background:#10B981">R</div>
+                <div class="skill-row-name">review-pr</div>
+                <div class="skill-row-author">anthropics</div>
+                <div class="skill-row-tag">agent-skills</div>
+                <div class="skill-row-btn">↓ Install</div>
+              </div>
+              <div class="skill-row" style="padding:8px 10px;border-bottom:1px solid #f3f4f6;">
+                <div class="skill-row-icon" style="background:#8B5CF6">U</div>
+                <div class="skill-row-name">ui-ux-pro-max</div>
+                <div class="skill-row-author">nxtlvl</div>
+                <div class="skill-row-tag">design</div>
+                <div class="skill-row-btn">↓ Install</div>
+              </div>
+              <div class="skill-row" style="padding:8px 10px;border-bottom:1px solid #f3f4f6;">
+                <div class="skill-row-icon" style="background:#F59E0B">C</div>
+                <div class="skill-row-name">commit-analyzer</div>
+                <div class="skill-row-author">gh-skills</div>
+                <div class="skill-row-tag">git</div>
+                <div class="skill-row-btn">↓ Install</div>
+              </div>
+              <div class="skill-row" style="padding:8px 10px;border-bottom:1px solid #f3f4f6;">
+                <div class="skill-row-icon" style="background:#EC4899">D</div>
+                <div class="skill-row-name">doc-writer</div>
+                <div class="skill-row-author">gh-skills</div>
+                <div class="skill-row-tag">writing</div>
+                <div class="skill-row-btn">↓ Install</div>
+              </div>
+              <div class="skill-row" style="padding:8px 10px;border-bottom:0;">
+                <div class="skill-row-icon" style="background:#14B8A6">T</div>
+                <div class="skill-row-name">test-writer</div>
+                <div class="skill-row-author">team</div>
+                <div class="skill-row-tag">testing</div>
+                <div class="skill-row-btn">↓ Install</div>
+              </div>
+            </div>
+          </div>
+          <div class="pagination"><div class="pag-btn">←</div><span>1 / 52</span><div class="pag-btn">→</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-card">
+      <div class="desc-main">
+        <div class="desc-title">F · Command Palette Style</div>
+        <div class="desc-text">以搜索为核心。顶部是大号搜索框（带 ⌘K 提示），技能以结构化列表呈现，分 "已安装 / 全部" 两组。更偏 Raycast / Alfred 风格，键盘操作体验最佳。</div>
+        <div class="pro-con">
+          <div class="pros"><div class="pros-title">Pros</div><ul><li>键盘操作体验最佳</li><li>密度高，分组清晰</li><li>极简风格，无视觉干扰</li></ul></div>
+          <div class="cons"><div class="cons-title">Cons</div><ul><li>无卡片封面图，视觉吸引力弱</li><li>与当前 marketplace 卡片风格差异最大，改动最多</li></ul></div>
+        </div>
+      </div>
+      <div class="desc-meta">
+        <div class="meta-row"><div class="meta-label">Window size</div><div class="meta-val">900×600 (unchanged)</div></div>
+        <div class="meta-row"><div class="meta-label">Pattern</div><div class="meta-val">Search-first list</div></div>
+        <div class="meta-row"><div class="meta-label">Implementation</div><div class="meta-val">Medium (UI redesign)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       CONCEPT G — Sidebar Expansion
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="concept" id="cg">
+    <div class="window-frame">
+      <div class="win-titlebar">
+        <div class="win-dot c"></div><div class="win-dot m"></div><div class="win-dot x"></div>
+        <div class="win-title">Repo Launcher</div>
+      </div>
+      <div class="win-content">
+        <!-- Expanded sidebar replaces the 52px one -->
+        <div class="expanded-sidebar">
+          <div class="exp-sb-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#0a0a0a"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <div class="exp-sb-title">Marketplace</div>
+            <div class="exp-sb-close">×</div>
+          </div>
+          <div style="padding:6px 10px;display:flex;gap:6px;">
+            <div class="exp-sb-search" style="flex:1;margin:0;">🔍 Search...</div>
+            <div class="select-box" style="font-size:10px;height:28px;padding:0 7px;">Claude ▾</div>
+          </div>
+          <div class="exp-sb-list">
+            <div class="exp-sb-sec">Installed</div>
+            <div class="exp-sb-row">
+              <div class="skill-row-icon" style="background:#6366f1;width:20px;height:20px;border-radius:5px;font-size:9px;">C</div>
+              <div class="name">commit-msg</div>
+              <div style="font-size:10px;color:#10b981;">✓</div>
+            </div>
+            <div class="exp-sb-row">
+              <div class="skill-row-icon" style="background:#0ea5e9;width:20px;height:20px;border-radius:5px;font-size:9px;">C</div>
+              <div class="name">cursor-rules</div>
+              <div style="font-size:10px;color:#10b981;">✓</div>
+            </div>
+            <div class="exp-sb-sec">All Skills · 1,234</div>
+            <div class="exp-sb-row">
+              <div class="skill-row-icon" style="background:#FF6B35;width:20px;height:20px;border-radius:5px;font-size:9px;">F</div>
+              <div class="name">find-skills</div>
+              <div class="install">↓</div>
+            </div>
+            <div class="exp-sb-row">
+              <div class="skill-row-icon" style="background:#10B981;width:20px;height:20px;border-radius:5px;font-size:9px;">R</div>
+              <div class="name">review-pr</div>
+              <div class="install">↓</div>
+            </div>
+            <div class="exp-sb-row">
+              <div class="skill-row-icon" style="background:#8B5CF6;width:20px;height:20px;border-radius:5px;font-size:9px;">U</div>
+              <div class="name">ui-ux-pro-max</div>
+              <div class="install">↓</div>
+            </div>
+            <div class="exp-sb-row">
+              <div class="skill-row-icon" style="background:#F59E0B;width:20px;height:20px;border-radius:5px;font-size:9px;">C</div>
+              <div class="name">commit-analyzer</div>
+              <div class="install">↓</div>
+            </div>
+            <div class="exp-sb-row">
+              <div class="skill-row-icon" style="background:#EC4899;width:20px;height:20px;border-radius:5px;font-size:9px;">D</div>
+              <div class="name">doc-writer</div>
+              <div class="install">↓</div>
+            </div>
+            <div class="exp-sb-row">
+              <div class="skill-row-icon" style="background:#14B8A6;width:20px;height:20px;border-radius:5px;font-size:9px;">T</div>
+              <div class="name">test-writer</div>
+              <div class="install">↓</div>
+            </div>
+            <div class="exp-sb-row">
+              <div class="skill-row-icon" style="background:#6366F1;width:20px;height:20px;border-radius:5px;font-size:9px;">C</div>
+              <div class="name">code-review</div>
+              <div class="install">↓</div>
+            </div>
+          </div>
+          <div class="exp-sb-pag">
+            <div class="pag-btn" style="width:20px;height:20px;font-size:10px;">←</div>
+            <span>1 / 52</span>
+            <div class="pag-btn" style="width:20px;height:20px;font-size:10px;">→</div>
+          </div>
+        </div>
+        <!-- Dimmed main repos area -->
+        <div class="dimmed-main">
+          <div style="padding:14px;">
+            <div style="height:30px;background:#f3f4f6;border-radius:6px;margin-bottom:12px;"></div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+              <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;height:120px;"></div>
+              <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;height:120px;"></div>
+              <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;height:120px;"></div>
+              <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;height:120px;"></div>
+              <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;height:120px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-card">
+      <div class="desc-main">
+        <div class="desc-title">G · Sidebar Expansion Panel</div>
+        <div class="desc-text">点击 Marketplace 图标，侧边栏从 52px 展开为 280px 的面板，显示紧凑列表式 marketplace。主内容区（repo 列表）依然可见但被 overlay 遮暗。关闭面板回到 52px 侧边栏。</div>
+        <div class="pro-con">
+          <div class="pros"><div class="pros-title">Pros</div><ul><li>Repos 依然可见（可选择 repo 作为安装目标）</li><li>与 VS Code 侧边栏展开模式相似</li><li>不需要切换视图，状态连续</li></ul></div>
+          <div class="cons"><div class="cons-title">Cons</div><ul><li>展开后主内容区只有 620px</li><li>卡片视图无法展示（空间不够），只能显示列表</li></ul></div>
+        </div>
+      </div>
+      <div class="desc-meta">
+        <div class="meta-row"><div class="meta-label">Window size</div><div class="meta-val">900×600 (unchanged)</div></div>
+        <div class="meta-row"><div class="meta-label">Pattern</div><div class="meta-val">Expanding sidebar panel</div></div>
+        <div class="meta-row"><div class="meta-label">Implementation</div><div class="meta-val">Medium complexity</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       CONCEPT H — Window Expands
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="concept" id="ch">
+    <div class="window-frame expanded">
+      <div class="win-titlebar">
+        <div class="win-dot c"></div><div class="win-dot m"></div><div class="win-dot x"></div>
+        <div class="win-title">Repo Launcher — Skill Marketplace</div>
+      </div>
+      <div class="win-content">
+        <div class="app-sidebar">
+          <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+          <div class="sb-icon mkt"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          <div class="sb-spacer"></div>
+          <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg></div>
+        </div>
+        <div class="mp-content">
+          <div class="topbar">
+            <div class="topbar-back">← Projects</div>
+            <div class="topbar-title">Skill Marketplace</div>
+            <div class="topbar-spacer"></div>
+            <div class="search-box" style="max-width:300px;">🔍 Search 1,234 skills...</div>
+            <div class="select-box">desktop-tool ▾</div>
+            <div class="select-box">Claude ▾</div>
+          </div>
+          <div class="filter-row">
+            <div class="pill active">agent-skills <span class="pill-count">234</span></div>
+            <div class="pill">web <span class="pill-count">189</span></div>
+            <div class="pill">dev-tools <span class="pill-count">67</span></div>
+            <div class="pill">react <span class="pill-count">45</span></div>
+            <div class="pill">python <span class="pill-count">38</span></div>
+            <div class="pill">testing <span class="pill-count">31</span></div>
+            <div style="flex:1"></div>
+            <div style="font-size:11px;color:#9ca3af;">Clear ×</div>
+          </div>
+          <div class="mp-scroll">
+            <div class="sec-header">My Skills (2)</div>
+            <div class="my-skills-row">
+              <div class="my-skill-chip"><div class="chip-dot" style="background:#6366f1"></div><div><div class="chip-name">commit-msg</div><div class="chip-tool">Claude</div></div></div>
+              <div class="my-skill-chip"><div class="chip-dot" style="background:#0ea5e9"></div><div><div class="chip-name">cursor-rules</div><div class="chip-tool">Cursor</div></div></div>
+              <div class="my-skill-chip"><div class="chip-dot" style="background:#8b5cf6"></div><div><div class="chip-name">ui-ux-pro-max</div><div class="chip-tool">Claude</div></div></div>
+            </div>
+            <div class="sec-header">All Skills · 1,234</div>
+            <div class="cards-grid col5">
+              <div class="skill-card"><div class="card-top"><div class="card-icon" style="background:#FF6B35">F</div></div><div class="card-name">find-skills</div><div class="card-meta">vercel-labs</div><div class="card-bottom"><div class="card-tag">agent</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div></div>
+              <div class="skill-card"><div class="card-top"><div class="card-icon" style="background:#10B981">R</div></div><div class="card-name">review-pr</div><div class="card-meta">anthropics</div><div class="card-bottom"><div class="card-tag">agent</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div></div>
+              <div class="skill-card"><div class="card-top"><div class="card-icon" style="background:#8B5CF6">U</div></div><div class="card-name">ui-ux-pro-max</div><div class="card-meta">nxtlvl</div><div class="card-bottom"><div class="card-tag">design</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div></div>
+              <div class="skill-card"><div class="card-top"><div class="card-icon" style="background:#F59E0B">C</div></div><div class="card-name">commit-msg</div><div class="card-meta">anthropics</div><div class="card-bottom"><div class="card-tag">git</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div></div>
+              <div class="skill-card"><div class="card-top"><div class="card-icon" style="background:#0EA5E9">C</div></div><div class="card-name">cursor-rules</div><div class="card-meta">cursor</div><div class="card-bottom"><div class="card-tag">cursor</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div></div>
+              <div class="skill-card"><div class="card-top"><div class="card-icon" style="background:#EC4899">D</div></div><div class="card-name">doc-writer</div><div class="card-meta">gh-skills</div><div class="card-bottom"><div class="card-tag">writing</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div></div>
+              <div class="skill-card"><div class="card-top"><div class="card-icon" style="background:#14B8A6">T</div></div><div class="card-name">test-writer</div><div class="card-meta">testing</div><div class="card-bottom"><div class="card-tag">testing</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div></div>
+              <div class="skill-card"><div class="card-top"><div class="card-icon" style="background:#6366F1">C</div></div><div class="card-name">code-review</div><div class="card-meta">gh-skills</div><div class="card-bottom"><div class="card-tag">git</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div></div>
+              <div class="skill-card"><div class="card-top"><div class="card-icon" style="background:#06B6D4">P</div></div><div class="card-name">pr-description</div><div class="card-meta">anthropics</div><div class="card-bottom"><div class="card-tag">git</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div></div>
+              <div class="skill-card"><div class="card-top"><div class="card-icon" style="background:#F97316">R</div></div><div class="card-name">refactor-ai</div><div class="card-meta">dev-team</div><div class="card-bottom"><div class="card-tag">refactor</div><div class="install-btn"><span class="main">Install</span><span class="divider"></span><span class="chev">▾</span></div></div></div>
+            </div>
+          </div>
+          <div class="pagination"><div class="pag-btn">←</div><span>1 / 42</span><div class="pag-btn">→</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-card wide">
+      <div class="desc-main">
+        <div class="desc-title">H · Window Expands (1100×660)</div>
+        <div class="desc-text">点击 Marketplace 图标时，窗口从 900×600 动态扩大至 1100×660，提供更宽敞的浏览空间。5 列卡片网格，每页显示更多技能。关闭 marketplace 时窗口缩回 900×600。</div>
+        <div class="pro-con">
+          <div class="pros"><div class="pros-title">Pros</div><ul><li>空间最大，5 列展示最多内容</li><li>接近原来独立窗口的使用体验</li><li>不牺牲卡片尺寸</li></ul></div>
+          <div class="cons"><div class="cons-title">Cons</div><ul><li>窗口大小变化会破坏"紧凑 launcher"的感觉</li><li>窗口动态 resize 实现稍复杂</li><li>1100px 可能被屏幕边界截断</li></ul></div>
+        </div>
+      </div>
+      <div class="desc-meta">
+        <div class="meta-row"><div class="meta-label">Window size</div><div class="meta-val">900→1100×660 (dynamic)</div></div>
+        <div class="meta-row"><div class="meta-label">Pattern</div><div class="meta-val">Dynamic resize</div></div>
+        <div class="meta-row"><div class="meta-label">Implementation</div><div class="meta-val">Medium (window resize)</div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- .page -->
+
+<script>
+  function show(id) {
+    // Update concepts
+    document.querySelectorAll('.concept').forEach(el => el.classList.remove('active'));
+    document.getElementById('c' + id).classList.add('active');
+    // Update nav buttons
+    document.querySelectorAll('.concept-nav button').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>

@@ -73,7 +73,7 @@ export interface StoreSchema {
   skillPresets: SkillPreset[]
 }
 
-export type ViewMode = 'launcher' | 'settings'
+export type ViewMode = 'launcher' | 'settings' | 'marketplace'
 
 // AI Skills Manager
 export type AITool = 'claude' | 'cursor' | 'windsurf' | 'codex' | 'copilot'

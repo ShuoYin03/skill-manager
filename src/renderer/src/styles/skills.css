@@ -281,6 +281,10 @@
   letter-spacing: 0.02em;
   margin-bottom: 12px;
   text-transform: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 /* Responsive card grid — max 2 columns, 1 column when narrow */
@@ -2745,3 +2749,375 @@
   opacity: 0.4;
   cursor: default;
 }
+
+/* ============================================================
+   Marketplace Embedded View — Split layout (Concept C)
+   52px sidebar + 160px repo strip + remaining content
+   ============================================================ */
+
+/* Repo strip — left 160px panel */
+.mp-repo-strip {
+  width: 160px;
+  flex-shrink: 0;
+  background: var(--color-surface, #F5F5F5);
+  border-right: 1px solid var(--color-border, #E5E7EB);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 0 12px;
+  gap: 1px;
+}
+
+[data-theme='dark'] .mp-repo-strip {
+  background: var(--color-surface, #1A1A1A);
+  border-right-color: var(--color-border, #2A2A2A);
+}
+
+.mp-repo-strip-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-tertiary, #9CA3AF);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 12px 6px;
+}
+
+.mp-repo-strip-sep {
+  height: 1px;
+  background: var(--color-border, #E5E7EB);
+  margin: 4px 10px;
+}
+
+[data-theme='dark'] .mp-repo-strip-sep {
+  background: var(--color-border, #2A2A2A);
+}
+
+.mp-repo-strip-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  margin: 0 6px;
+  transition: background 0.1s ease;
+  min-height: 30px;
+}
+
+.mp-repo-strip-item:hover {
+  background: var(--color-surface-hover, rgba(0,0,0,0.05));
+}
+
+.mp-repo-strip-item.selected {
+  background: var(--color-surface-active, rgba(0,0,0,0.08));
+}
+
+[data-theme='dark'] .mp-repo-strip-item.selected {
+  background: rgba(255,255,255,0.08);
+}
+
+.mp-repo-strip-globe {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--color-text-secondary, #6B7280);
+}
+
+.mp-repo-strip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mp-repo-strip-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-primary, #0A0A0A);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+[data-theme='dark'] .mp-repo-strip-name {
+  color: var(--color-text-primary, #F5F5F5);
+}
+
+/* Embedded topbar — tabs + search */
+.mp-embedded-topbar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 14px 0 0;
+  min-height: 44px;
+  flex-shrink: 0;
+  justify-content: flex-start;
+}
+
+.mp-embedded-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  flex-shrink: 0;
+  height: 100%;
+}
+
+.mp-embedded-tab {
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #6B7280);
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+  white-space: nowrap;
+  background: transparent;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.mp-embedded-tab:hover {
+  color: var(--color-text-primary, #0A0A0A);
+}
+
+.mp-embedded-tab.active {
+  color: var(--color-text-primary, #0A0A0A);
+  border-bottom-color: var(--color-text-primary, #0A0A0A);
+  font-weight: 600;
+}
+
+[data-theme='dark'] .mp-embedded-tab.active {
+  color: var(--color-text-primary, #F5F5F5);
+  border-bottom-color: var(--color-text-primary, #F5F5F5);
+}
+
+/* Search bar in embedded topbar */
+.mp-embedded-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.mp-embedded-search-input {
+  padding: 6px 10px 6px 30px !important;
+  font-size: 12px !important;
+  height: 30px;
+  box-sizing: border-box;
+  width: 160px;
+}
+
+.mp-embedded-search-btn {
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+  height: 30px;
+  box-sizing: border-box;
+}
+
+/* Collapsible filter pills — Feature 1 */
+.mp-filter-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 14px 6px;
+  border-bottom: 1px solid var(--color-border, #E5E7EB);
+  flex-shrink: 0;
+}
+
+[data-theme='dark'] .mp-filter-wrap {
+  border-bottom-color: var(--color-border, #2A2A2A);
+}
+
+.mp-filter-pills {
+  flex: 1;
+  overflow: hidden;
+  max-height: 56px; /* ~2 rows */
+  transition: max-height 0.2s ease;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 0;
+}
+
+.mp-filter-pills.expanded {
+  max-height: 220px;
+}
+
+.mp-filter-expand-btn {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  font-size: 11px;
+  color: var(--color-text-secondary, #6B7280);
+  border: 1px solid var(--color-border, #E5E7EB);
+  border-radius: 6px;
+  margin-top: 1px;
+  white-space: nowrap;
+  cursor: pointer;
+  background: transparent;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.mp-filter-expand-btn:hover {
+  background: var(--color-surface-hover, rgba(0,0,0,0.04));
+  color: var(--color-text-primary, #0A0A0A);
+}
+
+[data-theme='dark'] .mp-filter-expand-btn {
+  border-color: var(--color-border, #2A2A2A);
+  color: var(--color-text-secondary, #9CA3AF);
+}
+
+/* Embedded content area — removes standalone header padding */
+.mp-embedded-content {
+  padding: 16px 16px 24px !important;
+}
+
+/* Install menu label */
+.marketplace-install-menu-label {
+  padding: 6px 14px 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--mp-text-tertiary, #9CA3AF);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Selected item in install menu */
+.marketplace-install-menu-item.selected {
+  color: var(--mp-text-primary, #0A0A0A);
+  font-weight: 600;
+}
+
+/* Bookmark button on marketplace cards */
+.marketplace-card-bookmark-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--mp-border, #E5E7EB);
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mp-text-secondary, #6B7280);
+  cursor: pointer;
+  flex-shrink: 0;
+  background: transparent;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.marketplace-card-bookmark-btn:hover {
+  background: var(--mp-hover, #F5F5F5);
+  color: var(--mp-text-primary, #0A0A0A);
+  border-color: var(--mp-text-tertiary, #9CA3AF);
+}
+
+/* Card actions gap when bookmark is present */
+.marketplace-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Installed badge on marketplace cards */
+.marketplace-card-installed-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .marketplace-card-installed-badge {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+/* Repo strip header with collapse button */
+.mp-repo-strip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px 0 12px;
+  min-height: 30px;
+  flex-shrink: 0;
+}
+
+/* Collapse/expand toggle button in repo strip */
+.mp-repo-strip-toggle {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  color: var(--color-text-tertiary, #9CA3AF);
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.mp-repo-strip-toggle:hover {
+  background: var(--color-surface-hover, rgba(0,0,0,0.06));
+  color: var(--color-text-secondary, #6B7280);
+}
+
+/* Narrow collapsed bar shown when strip is hidden */
+.mp-repo-strip-collapsed-bar {
+  width: 20px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 10px;
+  border-right: 1px solid var(--color-border, #E5E7EB);
+  background: var(--color-surface, #F9F9F9);
+  cursor: pointer;
+  color: var(--color-text-tertiary, #9CA3AF);
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.mp-repo-strip-collapsed-bar:hover {
+  background: var(--color-surface-hover, rgba(0,0,0,0.05));
+  color: var(--color-text-secondary, #6B7280);
+}
+
+[data-theme='dark'] .mp-repo-strip-collapsed-bar {
+  background: var(--color-surface, #1A1A1A);
+  border-right-color: var(--color-border, #2A2A2A);
+}
+
+/* Installed-only filter checkbox label */
+.mp-installed-only-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--mp-text-secondary, #6B7280);
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.mp-installed-only-label input[type='checkbox'] {
+  width: 13px;
+  height: 13px;
+  accent-color: var(--mp-btn-bg, #0A0A0A);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+

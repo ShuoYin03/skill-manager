@@ -23,7 +23,6 @@ const api = {
   // Window
   hideLauncher: () => ipcRenderer.invoke(IPC.WINDOW_HIDE),
   getHomeDir: () => ipcRenderer.invoke(IPC.GET_HOME_DIR),
-  openMarketplaceWindow: () => ipcRenderer.invoke(IPC.MARKETPLACE_OPEN),
 
   // Events from main
   onLauncherShown: (callback: () => void) => {

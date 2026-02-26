@@ -47,7 +47,6 @@ export const IPC = {
   SKILLS_MARKETPLACE_INSTALL: 'skills:marketplace:install',
   SKILLS_MARKETPLACE_FILTER_STATS: 'skills:marketplace:filter-stats',
   GET_HOME_DIR: 'get:home-dir',
-  MARKETPLACE_OPEN: 'marketplace:open',
 
   // Instruction files (CLAUDE.md, .cursorrules, etc.)
   INSTRUCTIONS_SCAN: 'instructions:scan',

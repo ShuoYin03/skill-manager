@@ -5,7 +5,7 @@ import type { EditorId, RepoEntry, AITool, SkillFile, SkillPreset, SkillSearchPa
 import { getRepos, addRepo, removeRepo, updateRepo, getSettings, updateSettings, getSkillPresets, addSkillPreset, removeSkillPreset, updateSkillPreset } from './store'
 import { getGitBranch, isGitRepo, refreshAllBranches } from './git-service'
 import { openInEditor, getAvailableEditors } from './editor-launcher'
-import { hideLauncher, openMarketplaceWindow } from './window'
+import { hideLauncher } from './window'
 import { updateShortcut } from './shortcut'
 import { signIn, signOut, getSession } from './auth-service'
 import { verifyLicense } from './license-service'
@@ -109,10 +109,6 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle(IPC.GET_HOME_DIR, () => {
     return os.homedir()
-  })
-
-  ipcMain.handle(IPC.MARKETPLACE_OPEN, () => {
-    openMarketplaceWindow()
   })
 
   // Auth

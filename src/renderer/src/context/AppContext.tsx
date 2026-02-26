@@ -83,7 +83,6 @@ function appReducer(state: AppState, action: AppAction): AppState {
         searchQuery: '',
         selectedIndex: 0,
         activeTagFilter: null,
-        currentView: 'launcher',
         selectedRepo: null,
         repoSkills: null,
         editingSkill: null,

@@ -3,12 +3,8 @@ import { join } from 'path'
 import { IPC } from '../shared/constants'
 
 let launcherWindow: BrowserWindow | null = null
-let marketplaceWindow: BrowserWindow | null = null
 const BASE_WIDTH = 900
 const BASE_HEIGHT = 600
-// When marketplace opens, the launcher loses focus. Suppress that blur-triggered
-// hide so the launcher stays visible while switching between the two windows.
-let suppressLauncherHide = false
 
 export function createLauncherWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -38,11 +34,6 @@ export function createLauncherWindow(): BrowserWindow {
   }
 
   win.on('blur', () => {
-    if (suppressLauncherHide) {
-      suppressLauncherHide = false
-      return
-    }
-    // Also don't hide if focus moved to another window in this app (e.g. marketplace)
     setTimeout(() => {
       const focused = BrowserWindow.getFocusedWindow()
       if (!focused) hideLauncher()
@@ -99,48 +90,4 @@ export function toggleLauncher(): void {
 
 export function getLauncherWindow(): BrowserWindow | null {
   return launcherWindow
-}
-
-export function openMarketplaceWindow(): void {
-  if (marketplaceWindow && !marketplaceWindow.isDestroyed()) {
-    suppressLauncherHide = true
-    marketplaceWindow.focus()
-    return
-  }
-
-  // Prevent the launcher from hiding when the new marketplace window steals focus
-  suppressLauncherHide = true
-
-  const win = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    minWidth: 800,
-    minHeight: 600,
-    resizable: true,
-    frame: true,
-    title: 'Skill Marketplace',
-    webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: true,
-      contextIsolation: true,
-      nodeIntegration: false
-    }
-  })
-
-  win.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
-
-  win.on('closed', () => {
-    marketplaceWindow = null
-  })
-
-  if (!app.isPackaged && process.env['ELECTRON_RENDERER_URL']) {
-    win.loadURL(process.env['ELECTRON_RENDERER_URL'] + '#view=marketplace')
-  } else {
-    win.loadFile(join(__dirname, '../renderer/index.html'), { hash: 'view=marketplace' })
-  }
-
-  marketplaceWindow = win
 }

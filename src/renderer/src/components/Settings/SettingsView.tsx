@@ -56,7 +56,7 @@ export function SettingsView(): JSX.Element {
         <button
           className="app-sidebar-icon"
           title="Marketplace"
-          onClick={() => window.electronAPI.openMarketplaceWindow()}
+          onClick={() => dispatch({ type: 'SET_VIEW', payload: 'marketplace' })}
         >
           <MarketplaceIcon />
         </button>
