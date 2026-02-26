@@ -58,23 +58,19 @@ export function RepoListItem({
         <div className="repo-item-icon" style={{ background: iconColor }}>
           {initial}
         </div>
-        <div className="repo-item-launch-split">
+        <div className="repo-item-open-group">
           <button
-            className="repo-item-launch-main"
+            className="repo-item-open-btn"
             onClick={onLaunch}
-            title="Open in editor"
           >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12h14" />
-              <path d="M12 5l7 7-7 7" />
-            </svg>
+            Open
           </button>
           <button
-            className="repo-item-launch-chevron"
+            className="repo-item-open-picker"
             onClick={onPickEditor}
             title="Choose editor"
           >
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M6 9l6 6 6-6" />
             </svg>
           </button>

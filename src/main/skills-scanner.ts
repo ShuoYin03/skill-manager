@@ -225,6 +225,57 @@ function scanSingleFile(repoPath: string, tool: AITool, singleFile: string): Ski
   ]
 }
 
+/**
+ * Recursively scans .claude/plugins looking for skill directories that contain
+ * a SKILL.md file. Handles deeply nested structures like:
+ *   .claude/plugins/cache/{repo}/{name}/{version}/.claude/skills/{skillId}/SKILL.md
+ */
+function scanPluginsDir(repoPath: string): SkillFile[] {
+  const pluginsDir = path.join(repoPath, '.claude', 'plugins')
+  if (!fs.existsSync(pluginsDir)) return []
+
+  const skills: SkillFile[] = []
+
+  function walkDir(dir: string): void {
+    let entries: fs.Dirent[]
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true })
+    } catch {
+      return
+    }
+
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue
+      const fullPath = path.join(dir, entry.name)
+      const skillMdPath = path.join(fullPath, 'SKILL.md')
+
+      if (fs.existsSync(skillMdPath)) {
+        const relativePath = path.relative(repoPath, skillMdPath)
+        let content: string
+        try {
+          content = fs.readFileSync(skillMdPath, 'utf-8')
+        } catch {
+          continue
+        }
+        skills.push({
+          id: makeSkillId('claude', repoPath, relativePath),
+          tool: 'claude',
+          name: entry.name,
+          relativePath,
+          content,
+          enabled: true,
+          frontmatter: parseFrontmatter(content)
+        })
+      } else {
+        walkDir(fullPath)
+      }
+    }
+  }
+
+  walkDir(pluginsDir)
+  return skills
+}
+
 export async function scanRepoSkills(
   repoId: string,
   repoPath: string,
@@ -247,6 +298,10 @@ export async function scanRepoSkills(
   // Scan shared .agents/skills once (not per-tool) — handles both flat files and
   // skills.sh-style subdirectories (each folder has a SKILL.md entry file)
   skills.push(...scanSharedSkillsDir(repoPath, '.agents/skills'))
+
+  // Scan .claude/plugins — tools like Claude Code install plugins here that
+  // may contain nested .claude/skills/<skillId>/SKILL.md entries
+  skills.push(...scanPluginsDir(repoPath))
 
   return {
     repoId,

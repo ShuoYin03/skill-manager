@@ -55,6 +55,14 @@ export function RepoList(): JSX.Element {
     window.electronAPI.openInEditor(repoId)
   }
 
+  const handleAddRepo = async (): Promise<void> => {
+    const newRepo = await window.electronAPI.addRepo()
+    if (newRepo) {
+      const repos = await window.electronAPI.getRepos()
+      dispatch({ type: 'SET_REPOS', payload: repos })
+    }
+  }
+
   if (state.repos.length === 0) {
     return (
       <div className="empty-state">
@@ -62,8 +70,8 @@ export function RepoList(): JSX.Element {
         <div className="empty-state-subtitle">
           Add your project folders to quickly open them from here
         </div>
-        <button onClick={() => dispatch({ type: 'SET_VIEW', payload: 'settings' })}>
-          Open Settings
+        <button onClick={handleAddRepo}>
+          Add Repo
         </button>
       </div>
     )

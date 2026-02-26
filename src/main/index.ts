@@ -1,5 +1,5 @@
 import { app, BrowserWindow } from 'electron'
-import { createLauncherWindow } from './window'
+import { createLauncherWindow, showLauncher } from './window'
 import { createTray } from './tray'
 import { registerGlobalShortcut, unregisterAllShortcuts } from './shortcut'
 import { registerIpcHandlers } from './ipc-handlers'
@@ -37,6 +37,8 @@ app.whenReady().then(async () => {
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createLauncherWindow()
+    } else {
+      showLauncher()
     }
   })
 })

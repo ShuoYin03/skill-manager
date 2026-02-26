@@ -138,6 +138,7 @@
   transition: color 0.15s ease, background 0.15s ease;
   -webkit-app-region: no-drag;
   flex-shrink: 0;
+  position: relative;
 }
 
 .app-sidebar-icon:hover {
@@ -148,6 +149,30 @@
 .app-sidebar-icon.active {
   color: var(--color-text-primary);
   background: var(--color-surface);
+}
+
+/* Tooltip that appears to the right of the sidebar icon on hover */
+.app-sidebar-icon::after {
+  content: attr(title);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--color-text-primary);
+  color: var(--color-bg-solid);
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+  z-index: 200;
+}
+
+.app-sidebar-icon:hover::after {
+  opacity: 1;
 }
 
 .app-sidebar-spacer {
@@ -381,6 +406,57 @@
   color: white;
   flex-shrink: 0;
   letter-spacing: -0.5px;
+}
+
+/* ── Repo card Open split-button ── */
+.repo-item-open-group {
+  display: flex;
+  align-items: stretch;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.repo-item:hover .repo-item-open-group,
+.repo-item.selected .repo-item-open-group {
+  opacity: 1;
+}
+
+.repo-item-open-btn {
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: none;
+  border: none;
+  border-right: 1px solid var(--color-border);
+  line-height: 1;
+  transition: background 0.1s ease;
+  cursor: pointer;
+}
+
+.repo-item-open-btn:hover {
+  background: var(--color-surface-active);
+}
+
+.repo-item-open-picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--color-text-tertiary);
+  transition: background 0.1s ease;
+  cursor: pointer;
+}
+
+.repo-item-open-picker:hover {
+  background: var(--color-surface-active);
+  color: var(--color-text-secondary);
 }
 
 .repo-item-name {

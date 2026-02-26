@@ -6,6 +6,9 @@ let launcherWindow: BrowserWindow | null = null
 let marketplaceWindow: BrowserWindow | null = null
 const BASE_WIDTH = 900
 const BASE_HEIGHT = 600
+// When marketplace opens, the launcher loses focus. Suppress that blur-triggered
+// hide so the launcher stays visible while switching between the two windows.
+let suppressLauncherHide = false
 
 export function createLauncherWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -35,7 +38,15 @@ export function createLauncherWindow(): BrowserWindow {
   }
 
   win.on('blur', () => {
-    hideLauncher()
+    if (suppressLauncherHide) {
+      suppressLauncherHide = false
+      return
+    }
+    // Also don't hide if focus moved to another window in this app (e.g. marketplace)
+    setTimeout(() => {
+      const focused = BrowserWindow.getFocusedWindow()
+      if (!focused) hideLauncher()
+    }, 150)
   })
 
   win.webContents.setWindowOpenHandler((details) => {
@@ -92,9 +103,13 @@ export function getLauncherWindow(): BrowserWindow | null {
 
 export function openMarketplaceWindow(): void {
   if (marketplaceWindow && !marketplaceWindow.isDestroyed()) {
+    suppressLauncherHide = true
     marketplaceWindow.focus()
     return
   }
+
+  // Prevent the launcher from hiding when the new marketplace window steals focus
+  suppressLauncherHide = true
 
   const win = new BrowserWindow({
     width: 1200,
