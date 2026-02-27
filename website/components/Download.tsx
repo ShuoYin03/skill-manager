@@ -30,7 +30,7 @@ export function Download() {
   const [error, setError] = useState(false)
 
   useEffect(() => {
-    fetch('https://api.github.com/repos/shuo-yin/desktop-tool/releases/latest', {
+    fetch('https://api.github.com/repos/ShuoYin03/skill-manager/releases/latest', {
       headers: { Accept: 'application/vnd.github+json' },
     })
       .then(r => {
