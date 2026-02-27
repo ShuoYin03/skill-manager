@@ -20,9 +20,7 @@ jobs:
         run: npm ci
 
       - name: Build macOS app
-        run: npm run build:mac
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build && electron-builder --mac --publish never
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
@@ -44,9 +42,7 @@ jobs:
         run: npm ci
 
       - name: Build Windows app
-        run: npm run build:win
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build && electron-builder --win --publish never
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
@@ -71,9 +67,7 @@ jobs:
         run: sudo apt-get install -y libarchive-tools
 
       - name: Build Linux app
-        run: npm run build:linux
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build && electron-builder --linux --publish never
 
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
