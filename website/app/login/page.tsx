@@ -14,15 +14,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-gray-900/80 p-8 text-center">
-        <h1 className="text-2xl font-bold">Sign in</h1>
-        <p className="mt-2 text-sm text-gray-400">
+    <div className="flex min-h-screen items-center justify-center bg-[#FAFAFA]">
+      <div className="w-full max-w-sm rounded-2xl border border-[#E5E7EB] bg-white p-8 text-center shadow-sm">
+        <h1 className="text-2xl font-bold text-[#0A0A0A]">Sign in</h1>
+        <p className="mt-2 text-sm text-[#6B7280]">
           Sign in to purchase a license or manage your account.
         </p>
         <button
           onClick={handleGoogleLogin}
-          className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl border border-white/15 bg-white/5 py-3 font-medium transition hover:bg-white/10"
+          className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl border border-[#E5E7EB] bg-white py-3 font-medium text-[#0A0A0A] transition hover:bg-[#F9FAFB]"
         >
           <svg width="18" height="18" viewBox="0 0 24 24">
             <path

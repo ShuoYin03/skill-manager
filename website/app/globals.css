@@ -1,1 +1,17 @@
 @import "tailwindcss";
+
+:root {
+  --bg: #FAFAFA;
+  --card: #FFFFFF;
+  --border: #E5E7EB;
+  --text: #0A0A0A;
+  --muted: #6B7280;
+  --faint: #9CA3AF;
+  --btn: #0A0A0A;
+  --btn-text: #FFFFFF;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+}

@@ -1,19 +1,19 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { DM_Sans } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const dmSans = DM_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'] })
 
 export const metadata: Metadata = {
-  title: 'Repo Launcher — Open any repo in one keystroke',
+  title: 'Skilly — Manage AI skills across all your projects',
   description:
-    'A Spotlight-like launcher for quickly opening repos in your editor. Global hotkey, fuzzy search, multi-editor support. macOS, Windows, Linux.',
+    'Browse, install, and manage AI coding skills across all your projects. Works with Claude, Cursor, Windsurf, and more. macOS, Windows, Linux.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${inter.className} bg-gray-950 text-white antialiased`}>
+      <body className={`${dmSans.className} bg-[#FAFAFA] text-[#0A0A0A] antialiased`}>
         {children}
       </body>
     </html>

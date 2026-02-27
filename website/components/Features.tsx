@@ -1,29 +1,18 @@
 const features = [
   {
-    title: 'Global Hotkey',
+    title: 'Skills Marketplace',
     description:
-      'Summon the launcher from anywhere with a configurable keyboard shortcut. Default: Cmd+Shift+O.',
+      'Browse 70,000+ community skills from skills.sh. Install any skill into any project with one click — no copy-pasting.',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z" />
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
       </svg>
     ),
   },
   {
-    title: 'Fuzzy Search',
+    title: 'Multi-AI Support',
     description:
-      'Start typing and instantly find any repo. Smart fuzzy matching means you don\'t need exact names.',
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="11" cy="11" r="8" />
-        <path d="m21 21-4.3-4.3" />
-      </svg>
-    ),
-  },
-  {
-    title: 'Multi-Editor',
-    description:
-      'VSCode, Cursor, WebStorm, Sublime Text — choose your default or pick per-repo. Right-click any repo for a quick editor switcher.',
+      'Works with Claude, Cursor, Windsurf, Codex, and GitHub Copilot. Install the right skill format for each tool automatically.',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="16 18 22 12 16 6" />
@@ -32,38 +21,48 @@ const features = [
     ),
   },
   {
-    title: 'Git Branch',
+    title: 'Per-Project Management',
     description:
-      'See the current branch for each repo at a glance — no terminal needed. Branches refresh automatically.',
+      'Different projects need different skills. See exactly which skills are active in each repo, add or remove them in seconds.',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="6" x2="6" y1="3" y2="15" />
-        <circle cx="18" cy="6" r="3" />
-        <circle cx="6" cy="18" r="3" />
-        <path d="M18 9a9 9 0 0 1-9 9" />
+        <rect width="7" height="7" x="3" y="3" rx="1" />
+        <rect width="7" height="7" x="14" y="3" rx="1" />
+        <rect width="7" height="7" x="14" y="14" rx="1" />
+        <rect width="7" height="7" x="3" y="14" rx="1" />
       </svg>
     ),
   },
   {
-    title: 'Tags & Filters',
+    title: 'Skill Editor',
     description:
-      'Organize repos with tags like "work", "personal", "open-source". Filter by tag to narrow your list.',
+      'Edit any installed skill\'s markdown content right in the app. Customize community skills or write your own from scratch.',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z" />
-        <circle cx="7.5" cy="7.5" r=".5" fill="currentColor" />
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
       </svg>
     ),
   },
   {
-    title: 'Cross-Platform',
+    title: 'Skill Presets',
     description:
-      'Works on macOS, Windows, and Linux. Runs quietly in the menu bar / system tray.',
+      'Bundle your favourite skills into presets like "Full Stack Starter" or "Code Review Kit" and apply them to any project instantly.',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect width="20" height="14" x="2" y="3" rx="2" />
-        <line x1="8" x2="16" y1="21" y2="21" />
-        <line x1="12" x2="12" y1="17" y2="21" />
+        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Global Skills',
+    description:
+      'Some skills belong everywhere. Share them across all repos via a global skills directory — write once, use everywhere.',
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="2" y1="12" x2="22" y2="12" />
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
       </svg>
     ),
   },
@@ -71,26 +70,26 @@ const features = [
 
 export function Features() {
   return (
-    <section id="features" className="py-24">
+    <section id="features" className="border-t border-[#E5E7EB] bg-white py-24">
       <div className="mx-auto max-w-5xl px-6">
         <div className="text-center">
-          <h2 className="text-3xl font-bold sm:text-4xl">Everything you need to switch repos fast</h2>
-          <p className="mt-4 text-lg text-gray-400">
-            No more File &gt; Open Folder. Just hotkey, type, enter.
+          <h2 className="text-3xl font-bold tracking-tight text-[#0A0A0A] sm:text-4xl">Everything you need to manage AI skills</h2>
+          <p className="mt-4 text-lg text-[#6B7280]">
+            Browse the marketplace, install with one click, edit and organise per project.
           </p>
         </div>
 
-        <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f) => (
             <div
               key={f.title}
-              className="rounded-2xl border border-white/10 bg-gray-900/50 p-6 transition hover:border-white/20"
+              className="rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] p-6 transition hover:border-[#D1D5DB] hover:shadow-sm"
             >
-              <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10 text-blue-400">
+              <div className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#E5E7EB] bg-white text-[#0A0A0A]">
                 {f.icon}
               </div>
-              <h3 className="mb-2 text-base font-semibold">{f.title}</h3>
-              <p className="text-sm leading-relaxed text-gray-400">{f.description}</p>
+              <h3 className="mb-2 text-sm font-semibold text-[#0A0A0A]">{f.title}</h3>
+              <p className="text-sm leading-relaxed text-[#6B7280]">{f.description}</p>
             </div>
           ))}
         </div>
