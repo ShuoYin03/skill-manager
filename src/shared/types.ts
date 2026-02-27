@@ -40,6 +40,9 @@ export interface AppSettings {
   theme: 'light' | 'dark' | 'system'
   launchAtLogin: boolean
   skillsDir: 'tool-specific' | 'shared'
+  hideAfterOpen: boolean
+  alwaysOnTop: boolean
+  rememberWindowSize: boolean
 }
 
 export interface AuthTokens {
@@ -71,6 +74,7 @@ export interface StoreSchema {
   authTokens: AuthTokens | null
   licenseCache: LicenseCache | null
   skillPresets: SkillPreset[]
+  windowBounds: { x: number; y: number; width: number; height: number } | null
 }
 
 export type ViewMode = 'launcher' | 'settings' | 'marketplace'

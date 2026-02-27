@@ -41,21 +41,28 @@ export function LauncherView(): JSX.Element {
   const { state, dispatch } = useAppContext()
   const { isExpired } = useLicense()
   const [nagDismissed, setNagDismissed] = useState(false)
+  const [addingRepo, setAddingRepo] = useState(false)
 
   const panelOpen = state.selectedRepo !== null
   const hasRepos = state.repos.length > 0
 
   const handleAddRepo = async (): Promise<void> => {
-    const newRepo = await window.electronAPI.addRepo()
-    if (newRepo) {
-      const repos = await window.electronAPI.getRepos()
-      dispatch({ type: 'SET_REPOS', payload: repos })
+    setAddingRepo(true)
+    try {
+      const newRepo = await window.electronAPI.addRepo()
+      if (newRepo) {
+        const repos = await window.electronAPI.getRepos()
+        dispatch({ type: 'SET_REPOS', payload: repos })
+      }
+    } finally {
+      setAddingRepo(false)
     }
   }
 
   return (
     <div className="launcher">
       {isExpired && !nagDismissed && <NagScreen onDismiss={() => setNagDismissed(true)} />}
+      {addingRepo && <div className="dialog-overlay" />}
 
       {/* App Shell Sidebar */}
       <div className="app-sidebar">

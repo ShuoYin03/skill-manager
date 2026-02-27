@@ -5,7 +5,7 @@ import type { EditorId, RepoEntry, AITool, SkillFile, SkillPreset, SkillSearchPa
 import { getRepos, addRepo, removeRepo, updateRepo, getSettings, updateSettings, getSkillPresets, addSkillPreset, removeSkillPreset, updateSkillPreset } from './store'
 import { getGitBranch, isGitRepo, refreshAllBranches } from './git-service'
 import { openInEditor, getAvailableEditors } from './editor-launcher'
-import { hideLauncher } from './window'
+import { hideLauncher, setSuppressHide, applyAlwaysOnTop, getLauncherWindow } from './window'
 import { updateShortcut } from './shortcut'
 import { signIn, signOut, getSession } from './auth-service'
 import { verifyLicense } from './license-service'
@@ -25,9 +25,16 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle(IPC.REPOS_ADD, async () => {
-    const result = await dialog.showOpenDialog({
-      properties: ['openDirectory']
-    })
+    setSuppressHide(true)
+    let result: Awaited<ReturnType<typeof dialog.showOpenDialog>>
+    const win = getLauncherWindow()
+    try {
+      result = win
+        ? await dialog.showOpenDialog(win, { properties: ['openDirectory'] })
+        : await dialog.showOpenDialog({ properties: ['openDirectory'] })
+    } finally {
+      setSuppressHide(false)
+    }
 
     if (result.canceled || result.filePaths.length === 0) {
       return null
@@ -76,7 +83,7 @@ export function registerIpcHandlers(): void {
     openInEditor(repo.path, editor)
 
     updateRepo(repoId, { lastOpened: Date.now() })
-    hideLauncher()
+    if (settings.hideAfterOpen ?? true) hideLauncher()
   })
 
   ipcMain.handle(IPC.EDITOR_GET_AVAILABLE, () => {
@@ -97,6 +104,10 @@ export function registerIpcHandlers(): void {
 
     if (updates.launchAtLogin !== undefined) {
       app.setLoginItemSettings({ openAtLogin: updates.launchAtLogin })
+    }
+
+    if (updates.alwaysOnTop !== undefined) {
+      applyAlwaysOnTop(updates.alwaysOnTop)
     }
 
     const newSettings = updateSettings(updates)

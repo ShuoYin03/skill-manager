@@ -9,12 +9,16 @@ const store = new Store<StoreSchema>({
       defaultEditor: 'vscode',
       theme: 'system',
       launchAtLogin: false,
-      skillsDir: 'tool-specific'
+      skillsDir: 'tool-specific',
+      hideAfterOpen: true,
+      alwaysOnTop: true,
+      rememberWindowSize: true
     },
     trialStartedAt: null,
     authTokens: null,
     licenseCache: null,
-    skillPresets: []
+    skillPresets: [],
+    windowBounds: null
   }
 })
 
@@ -109,4 +113,13 @@ export function removeSkillPreset(id: string): void {
 export function updateSkillPreset(preset: SkillPreset): void {
   const presets = getSkillPresets().map((p) => (p.id === preset.id ? preset : p))
   store.set('skillPresets', presets)
+}
+
+// Window bounds
+export function getWindowBounds(): { x: number; y: number; width: number; height: number } | null {
+  return store.get('windowBounds')
+}
+
+export function setWindowBounds(bounds: { x: number; y: number; width: number; height: number }): void {
+  store.set('windowBounds', bounds)
 }

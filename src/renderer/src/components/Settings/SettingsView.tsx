@@ -1,10 +1,6 @@
-import { useState, useEffect } from 'react'
 import { useAppContext } from '../../context/AppContext'
 import { AccountSection } from './AccountSection'
 import { GeneralSettings } from './GeneralSettings'
-import { RepoManager } from './RepoManager'
-import { GlobalSkillsSection } from './GlobalSkillsSection'
-import { GlobalInstructionsSection } from './GlobalInstructionsSection'
 
 function ProjectsIcon(): JSX.Element {
   return (
@@ -36,11 +32,6 @@ function GearIcon(): JSX.Element {
 
 export function SettingsView(): JSX.Element {
   const { dispatch } = useAppContext()
-  const [homeDir, setHomeDir] = useState('')
-
-  useEffect(() => {
-    window.electronAPI.getHomeDir().then((dir: string) => setHomeDir(dir))
-  }, [])
 
   return (
     <div className="launcher">
@@ -74,9 +65,6 @@ export function SettingsView(): JSX.Element {
         <div className="settings-body">
           <AccountSection />
           <GeneralSettings />
-          {homeDir && <GlobalSkillsSection homeDir={homeDir} />}
-          {homeDir && <GlobalInstructionsSection homeDir={homeDir} />}
-          <RepoManager />
         </div>
       </div>
     </div>

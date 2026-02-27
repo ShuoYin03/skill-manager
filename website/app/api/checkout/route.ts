@@ -3,6 +3,10 @@ import { stripe } from '@/lib/stripe'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 
 export async function POST() {
+  if (!stripe) {
+    return NextResponse.json({ error: 'Payments not configured yet' }, { status: 503 })
+  }
+
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 

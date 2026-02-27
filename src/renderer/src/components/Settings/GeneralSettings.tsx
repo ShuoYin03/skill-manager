@@ -142,28 +142,6 @@ export function GeneralSettings(): JSX.Element {
         />
       </div>
 
-      <div className="settings-row">
-        <div>
-          <div className="settings-row-label">Skills Directory</div>
-          <div className="settings-row-description">Where skills are stored in each repo</div>
-        </div>
-        <div className="theme-toggle">
-          <button
-            className={(state.settings.skillsDir ?? 'tool-specific') === 'tool-specific' ? 'active' : ''}
-            onClick={() => updateSetting('skillsDir', 'tool-specific')}
-            title=".claude/skills, .cursor/rules, etc."
-          >
-            Tool-specific
-          </button>
-          <button
-            className={(state.settings.skillsDir ?? 'tool-specific') === 'shared' ? 'active' : ''}
-            onClick={() => updateSetting('skillsDir', 'shared')}
-            title=".agent/skills (shared across all AI tools)"
-          >
-            .agent/skills
-          </button>
-        </div>
-      </div>
     </div>
   )
 }
