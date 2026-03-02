@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { marked } from 'marked'
 import type { MarketplaceSkill, AITool, SkillFile, SkillFilterStats, SkillPreset } from '../../../../shared/types'
 import { useAppContext } from '../../context/AppContext'
-import { MarketplaceCard, SplitInstallButton, getIconColor } from './MarketplaceCard'
+import { MarketplaceCard, SplitInstallButton, SkeletonCard, getIconColor } from './MarketplaceCard'
 import { PresetsView } from './PresetsView'
 import { AddToPresetDialog } from './AddToPresetDialog'
 
@@ -20,6 +20,57 @@ function getRepoColor(name: string): string {
   let hash = 0
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
   return REPO_COLORS[Math.abs(hash) % REPO_COLORS.length]
+}
+
+const AI_TOOL_LABELS: Record<string, string> = {
+  claude: 'Claude', cursor: 'Cursor', windsurf: 'Windsurf', codex: 'Codex', copilot: 'Copilot',
+}
+
+function LocalInstalledCard({
+  skillFile,
+  isGlobal,
+  onDelete,
+}: {
+  skillFile: SkillFile
+  isGlobal: boolean
+  onDelete: (sf: SkillFile) => Promise<void>
+}): JSX.Element {
+  const [deleting, setDeleting] = useState(false)
+  const iconColor = getIconColor(skillFile.name)
+  const label = isGlobal ? 'Global' : AI_TOOL_LABELS[skillFile.tool] ?? skillFile.tool
+
+  const handleDelete = async (e: React.MouseEvent): Promise<void> => {
+    e.stopPropagation()
+    setDeleting(true)
+    try { await onDelete(skillFile) } finally { setDeleting(false) }
+  }
+
+  return (
+    <div className="marketplace-card is-installed">
+      <div className="marketplace-card-icon" style={{ background: iconColor }}>
+        {skillFile.name.charAt(0).toUpperCase()}
+      </div>
+      <div className="marketplace-card-content">
+        <div className="marketplace-card-header">
+          <span className="marketplace-card-title">{skillFile.name.replace(/-/g, ' ')}</span>
+        </div>
+        <div className="marketplace-card-installed-badges">
+          <span className="marketplace-card-installed-badge">
+            via {label}
+            <button
+              className={`marketplace-card-installed-delete${deleting ? ' deleting' : ''}`}
+              onClick={(e) => void handleDelete(e)}
+              title="Remove this installed skill"
+              disabled={deleting}
+            >
+              {deleting ? '…' : '×'}
+            </button>
+          </span>
+        </div>
+        <div className="marketplace-card-desc">{skillFile.relativePath}</div>
+      </div>
+    </div>
+  )
 }
 
 // Sidebar icons (same as LauncherView/SettingsView)
@@ -225,6 +276,7 @@ export function MarketplaceEmbeddedView(): JSX.Element {
 
   const [activeSection, setActiveSection] = useState<ActiveSection>('marketplace')
   const [query, setQuery] = useState('')
+  const [displayQuery, setDisplayQuery] = useState('')
   const [results, setResults] = useState<MarketplaceSkill[]>([])
   const [loading, setLoading] = useState(false)
   const [homeDir, setHomeDir] = useState<string>('')
@@ -251,6 +303,7 @@ export function MarketplaceEmbeddedView(): JSX.Element {
   const [tagsExpanded, setTagsExpanded] = useState(false)
   const [stripCollapsed, setStripCollapsed] = useState(false)
   const [showInstalledOnly, setShowInstalledOnly] = useState(false)
+  const [notification, setNotification] = useState<string | null>(null)
 
   // Preset management
   const [presets, setPresets] = useState<SkillPreset[]>([])
@@ -259,27 +312,21 @@ export function MarketplaceEmbeddedView(): JSX.Element {
 
   useEffect(() => {
     async function init(): Promise<void> {
-      const [home, presetList] = await Promise.all([
+      const [home, presetList, stats] = await Promise.all([
         window.electronAPI.getHomeDir(),
         window.electronAPI.getSkillPresets(),
+        window.electronAPI.getMarketplaceFilterStats().catch(() => null),
       ])
       if (repos.length > 0) setSelectedRepoValue(repos[0].path)
       setHomeDir(home)
       setPresets(presetList)
-      try {
-        const stats = await window.electronAPI.getMarketplaceFilterStats()
-        setFilterStats(stats)
-      } catch { /* ignore */ }
+      if (stats) setFilterStats(stats)
     }
     init()
   }, [repos]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const selectedRepo = repos.find((r) => r.path === selectedRepoValue) ?? null
   const isGlobal = selectedRepoValue === 'global'
-
-  const AI_TOOL_LABELS: Record<AITool, string> = {
-    claude: 'Claude', cursor: 'Cursor', windsurf: 'Windsurf', codex: 'Codex', copilot: 'Copilot',
-  }
 
   const installLabel = isGlobal
     ? `Install to Global via ${AI_TOOL_LABELS[selectedAITool]}`
@@ -329,6 +376,7 @@ export function MarketplaceEmbeddedView(): JSX.Element {
   const handleSearch = useCallback(async (): Promise<void> => {
     setLoading(true)
     setPage(1)
+    setDisplayQuery(query)
     try {
       const result = await window.electronAPI.searchMarketplace({
         query,
@@ -342,6 +390,13 @@ export function MarketplaceEmbeddedView(): JSX.Element {
       setTotalPages(result.totalPages)
     } finally { setLoading(false) }
   }, [query, selectedTags, selectedAuthor])
+
+  // Auto-dismiss toast notification after 2.5 seconds
+  useEffect(() => {
+    if (!notification) return
+    const t = setTimeout(() => setNotification(null), 2500)
+    return () => clearTimeout(t)
+  }, [notification])
 
   const handleViewSkill = async (skill: MarketplaceSkill): Promise<void> => {
     setDetailSkill(skill)
@@ -362,13 +417,13 @@ export function MarketplaceEmbeddedView(): JSX.Element {
     if (isGlobal) {
       if (!homeDir) { alert('Could not determine home directory.'); return }
       await window.electronAPI.installMarketplaceSkill(homeDir, selectedAITool, skill.slug, content, 'shared')
-      alert(`"${skill.title}" installed to ~/.agent/skills/`)
+      setNotification(`"${skill.title}" installed to ~/.agent/skills/`)
       const repoSkills = await window.electronAPI.scanRepoSkills('global', homeDir)
       setMySkills(repoSkills?.skills ?? [])
     } else {
       if (!selectedRepo) { alert('Please select a project first.'); return }
       await window.electronAPI.installMarketplaceSkill(selectedRepo.path, selectedAITool, skill.slug, content)
-      alert(`"${skill.title}" installed!`)
+      setNotification(`"${skill.title}" installed`)
       const repoSkills = await window.electronAPI.scanRepoSkills(selectedRepo.id, selectedRepo.path)
       setMySkills(repoSkills?.skills ?? [])
     }
@@ -415,7 +470,7 @@ export function MarketplaceEmbeddedView(): JSX.Element {
       if (!preset) return
       const alreadyIn = preset.skills.some((s) => s.name === addToPresetSkill.title)
       if (alreadyIn) {
-        alert(`"${addToPresetSkill.title}" is already in preset "${preset.name}"`)
+        setNotification(`"${addToPresetSkill.title}" is already in "${preset.name}"`)
         return
       }
       const newSkill = { tool: selectedAITool, name: addToPresetSkill.title, content }
@@ -423,7 +478,7 @@ export function MarketplaceEmbeddedView(): JSX.Element {
       await window.electronAPI.updateSkillPreset(updated as unknown as Record<string, unknown>)
       setPresets((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
       setAddToPresetSkill(null)
-      alert(`"${addToPresetSkill.title}" added to preset "${preset.name}"`)
+      setNotification(`"${addToPresetSkill.title}" added to "${preset.name}"`)
     } finally { setAddingToPresetId(null) }
   }
 
@@ -434,17 +489,28 @@ export function MarketplaceEmbeddedView(): JSX.Element {
   // We show all tags but collapse via CSS; count helps the button label
   const hiddenTagCount = Math.max(0, allTags.length - 8)
 
-  // Installed badge computation (Feature 2)
-  const installedNames = new Set(mySkills.map((s) => s.name.toLowerCase()))
-  const getInstalledIn = (skill: MarketplaceSkill): string | undefined => {
-    if (!installedNames.has(skill.title.toLowerCase())) return undefined
-    return isGlobal ? 'In Global' : (selectedRepo ? `In ${selectedRepo.name}` : undefined)
+  // Normalize skill names for matching: lowercase + replace hyphens/underscores with spaces
+  // This bridges the gap between local file names ("my-awesome-skill") and marketplace
+  // titles ("My Awesome Skill") which are derived from the same slug differently.
+  const normalizeName = (s: string): string => s.toLowerCase().replace(/[-_]/g, ' ')
+
+  // Return installed SkillFile entries that match a given marketplace skill title.
+  // In global mode: deduplicate to 1 entry max (multiple paths collapse to one "via Global" badge).
+  const getInstalledSkills = (skill: MarketplaceSkill): SkillFile[] => {
+    const matches = mySkills.filter((s) => normalizeName(s.name) === normalizeName(skill.title))
+    if (isGlobal && matches.length > 0) return [matches[0]]
+    return matches
   }
 
-  // Installed-only filter (Feature 5)
-  const visibleResults = showInstalledOnly
-    ? results.filter((r) => installedNames.has(r.title.toLowerCase()))
-    : results
+  // Fast set for installed-only filter
+  const installedNames = new Set(mySkills.map((s) => normalizeName(s.name)))
+
+  // Delete an installed skill and refresh the local mySkills list
+  const handleDeleteInstalled = async (skillFile: SkillFile): Promise<void> => {
+    await window.electronAPI.deleteSkill(mySkillRepoPath, skillFile as unknown as Record<string, unknown>)
+    setMySkills((prev) => prev.filter((s) => s.id !== skillFile.id))
+  }
+
 
   // --- Detail / editing overlays ---
   if (editingMySkill && !detailSkill) {
@@ -671,12 +737,10 @@ export function MarketplaceEmbeddedView(): JSX.Element {
           )}
 
           {/* All Skills section */}
-          {activeSection === 'marketplace' && (loading ? (
-            <div className="marketplace-loading">Loading…</div>
-          ) : (
+          {activeSection === 'marketplace' && (
             <div className="marketplace-section">
               <div className="marketplace-section-header">
-                <span>{query.trim() ? `Results for "${query}" · ${showInstalledOnly ? visibleResults.length : total}` : `All Skills · ${showInstalledOnly ? visibleResults.length : total}`}</span>
+                <span>{displayQuery.trim() ? `Results for "${displayQuery}" · ${showInstalledOnly ? mySkills.length : total}` : `All Skills · ${showInstalledOnly ? mySkills.length : total}`}</span>
                 <label className="mp-installed-only-label">
                   <input
                     type="checkbox"
@@ -686,14 +750,31 @@ export function MarketplaceEmbeddedView(): JSX.Element {
                   Installed only
                 </label>
               </div>
-              {visibleResults.length === 0 ? (
-                <div className="marketplace-empty">
-                  {showInstalledOnly ? 'No installed skills — install some from the marketplace first' : 'No skills found'}
+              {showInstalledOnly ? (
+                mySkills.length === 0 ? (
+                  <div className="marketplace-empty">No installed skills — install some from the marketplace first</div>
+                ) : (
+                  <div className="marketplace-standalone-grid">
+                    {mySkills.map((sf) => (
+                      <LocalInstalledCard
+                        key={sf.id}
+                        skillFile={sf}
+                        isGlobal={isGlobal}
+                        onDelete={handleDeleteInstalled}
+                      />
+                    ))}
+                  </div>
+                )
+              ) : loading ? (
+                <div className="marketplace-standalone-grid">
+                  {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
                 </div>
+              ) : results.length === 0 ? (
+                <div className="marketplace-empty">No skills found</div>
               ) : (
                 <>
                   <div className="marketplace-standalone-grid">
-                    {visibleResults.map((skill) => (
+                    {results.map((skill) => (
                       <MarketplaceCard
                         key={skill.slug}
                         skill={skill}
@@ -703,11 +784,13 @@ export function MarketplaceEmbeddedView(): JSX.Element {
                         installLabel={installLabel}
                         selectedAITool={selectedAITool}
                         onSelectAITool={setSelectedAITool}
-                        installedIn={getInstalledIn(skill)}
+                        installedSkills={getInstalledSkills(skill)}
+                        onDeleteInstalled={handleDeleteInstalled}
+                        isGlobal={isGlobal}
                       />
                     ))}
                   </div>
-                  {totalPages > 1 && !showInstalledOnly && (
+                  {totalPages > 1 && (
                     <div className="marketplace-pagination">
                       <button disabled={page === 1} onClick={() => setPage((p) => p - 1)}>←</button>
                       <span>{page} / {totalPages}</span>
@@ -717,7 +800,7 @@ export function MarketplaceEmbeddedView(): JSX.Element {
                 </>
               )}
             </div>
-          ))}
+          )}
         </div>
       </div>
 
@@ -731,6 +814,9 @@ export function MarketplaceEmbeddedView(): JSX.Element {
           onClose={() => setAddToPresetSkill(null)}
         />
       )}
+
+      {/* Toast notification */}
+      {notification && <div className="mp-toast">{notification}</div>}
     </div>
   )
 }

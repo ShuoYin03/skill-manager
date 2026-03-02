@@ -48,6 +48,9 @@ export function LauncherView(): JSX.Element {
 
   const handleAddRepo = async (): Promise<void> => {
     setAddingRepo(true)
+    // Double RAF: guarantee React paints the "…" state and overlay before
+    // the native dialog IPC call blocks the event loop
+    await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
     try {
       const newRepo = await window.electronAPI.addRepo()
       if (newRepo) {
@@ -98,12 +101,17 @@ export function LauncherView(): JSX.Element {
             <button
               className="topbar-add-repo-btn"
               onClick={handleAddRepo}
+              disabled={addingRepo}
               title="Add repository"
             >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-              Add
+              {addingRepo ? '…' : (
+                <>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                  Add
+                </>
+              )}
             </button>
           )}
           <TrialBanner />

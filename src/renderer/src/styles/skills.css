@@ -1330,6 +1330,13 @@
   gap: 16px;
 }
 
+/* Flip tooltip to appear below in skill detail header (buttons near window top edge) */
+.skill-detail-header .marketplace-install-main[data-tooltip]::after,
+.skill-detail-header .marketplace-install-chevron-btn[data-tooltip]::after {
+  bottom: auto;
+  top: calc(100% + 6px);
+}
+
 .skill-detail-header-actions {
   display: flex;
   align-items: center;
@@ -2920,6 +2927,34 @@
   box-sizing: border-box;
 }
 
+/* Toast notification */
+.mp-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0A0A0A;
+  color: #FFFFFF;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 9999;
+  pointer-events: none;
+  white-space: nowrap;
+  animation: mp-toast-in 0.2s ease;
+}
+
+@keyframes mp-toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+[data-theme='dark'] .mp-toast {
+  background: #FFFFFF;
+  color: #0A0A0A;
+}
+
 /* Collapsible filter pills — Feature 1 */
 .mp-filter-wrap {
   display: flex;
@@ -3023,11 +3058,19 @@
   gap: 5px;
 }
 
-/* Installed badge on marketplace cards */
+/* Installed badges row on marketplace cards */
+.marketplace-card-installed-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 3px;
+}
+
 .marketplace-card-installed-badge {
   display: inline-flex;
   align-items: center;
-  padding: 1px 6px;
+  gap: 3px;
+  padding: 1px 5px 1px 6px;
   background: rgba(16, 185, 129, 0.12);
   color: #059669;
   border: 1px solid rgba(16, 185, 129, 0.3);
@@ -3039,10 +3082,74 @@
   line-height: 1.5;
 }
 
+.marketplace-card-installed-delete {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  color: inherit;
+  opacity: 0.6;
+  transition: opacity 0.1s ease;
+}
+
+.marketplace-card-installed-delete:hover:not(:disabled) {
+  opacity: 1;
+}
+
+.marketplace-card-installed-delete:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
 [data-theme='dark'] .marketplace-card-installed-badge {
   background: rgba(16, 185, 129, 0.15);
   color: #34d399;
   border-color: rgba(16, 185, 129, 0.25);
+}
+
+/* ─── Skeleton loading cards ─────────────────────────────────────────────── */
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeleton-box {
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-base, #EBEBEB) 25%,
+    var(--skeleton-hi, #F5F5F5) 50%,
+    var(--skeleton-base, #EBEBEB) 75%
+  );
+  background-size: 800px 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+[data-theme='dark'] .skeleton-box {
+  --skeleton-base: #2A2A2A;
+  --skeleton-hi: #333333;
+}
+
+.skeleton-card {
+  pointer-events: none;
+  cursor: default;
+}
+
+.skeleton-icon.skeleton-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.skeleton-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
 }
 
 /* Repo strip header with collapse button */

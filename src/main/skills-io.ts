@@ -99,6 +99,18 @@ export async function deleteSkill(
   skill: SkillFile
 ): Promise<void> {
   const fullPath = path.join(repoPath, skill.relativePath)
+
+  // Directory-based skill (git-installed): relativePath ends with /SKILL.md
+  // Delete the entire parent directory to remove all associated files
+  if (path.basename(skill.relativePath) === 'SKILL.md') {
+    const skillDir = path.dirname(fullPath)
+    if (fs.existsSync(skillDir)) {
+      fs.rmSync(skillDir, { recursive: true, force: true })
+    }
+    return
+  }
+
+  // Flat file skill
   if (fs.existsSync(fullPath)) {
     fs.unlinkSync(fullPath)
   }
@@ -184,7 +196,10 @@ export async function globalizeSkill(
 // ── Multi-file skill install from GitHub ──────────────────────────────────────
 
 async function findSkillDir(root: string, skillId: string): Promise<string | null> {
-  // BFS: find a directory named skillId that contains SKILL.md
+  // BFS: find a directory named skillId that contains SKILL.md.
+  // If no exact match, fall back to the first directory that contains SKILL.md
+  // (handles repos where the skill isn't in a subdirectory matching the skillId).
+  const fallbackCandidates: string[] = []
   const queue: string[] = [root]
   while (queue.length) {
     const dir = queue.shift()!
@@ -198,15 +213,18 @@ async function findSkillDir(root: string, skillId: string): Promise<string | nul
       if (!entry.isDirectory() && !entry.isSymbolicLink()) continue
       if (entry.name === '.git') continue
       const fullPath = path.join(dir, entry.name)
-      if (entry.name === skillId) {
-        const skillMd = path.join(fullPath, 'SKILL.md')
-        if (fs.existsSync(skillMd)) return fullPath
+      if (entry.name === skillId && fs.existsSync(path.join(fullPath, 'SKILL.md'))) {
+        return fullPath  // exact match wins immediately
       }
-      // Only recurse into directories (not symlinks, to avoid cycles)
-      if (entry.isDirectory()) queue.push(fullPath)
+      if (entry.isDirectory()) {
+        if (fs.existsSync(path.join(fullPath, 'SKILL.md'))) {
+          fallbackCandidates.push(fullPath)
+        }
+        queue.push(fullPath)
+      }
     }
   }
-  return null
+  return fallbackCandidates[0] ?? null  // best-effort: first SKILL.md dir
 }
 
 async function copyDirDeref(src: string, dest: string): Promise<number> {

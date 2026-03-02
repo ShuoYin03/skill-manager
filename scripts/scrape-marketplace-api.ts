@@ -1,19 +1,17 @@
-import path from 'path'
-import os from 'os'
-
-// Mock Electron app module BEFORE any imports that use it
-const mockApp = {
-  getPath: (name: string) => '',
-  getAppPath: () => process.cwd()
+// Load .env before anything else
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('dotenv').config()
+} catch {
+  // dotenv not available — rely on env vars being set externally
 }
 
-// Mock the electron module
+// Mock the electron module (required by transitively-imported modules)
 const Module = require('module')
 const originalRequire = Module.prototype.require
-
 Module.prototype.require = function (id: string) {
   if (id === 'electron') {
-    return { app: mockApp }
+    return { app: { getPath: () => '', getAppPath: () => process.cwd() } }
   }
   return originalRequire.apply(this, arguments)
 }
@@ -21,20 +19,24 @@ Module.prototype.require = function (id: string) {
 async function main() {
   const { scrapeAllSkillsViaAPI } = await import('../src/main/skills-scraper-api.js')
   const { batchFetchSkillContent } = await import('../src/main/skills-scraper.js')
-  const { closeDb } = await import('../src/main/skills-db.js')
+  const { createServiceClient, setMetadata } = await import('../src/main/skills-supabase.js')
+
+  const client = createServiceClient()
+
+  // --reset: clear saved progress so all queries run again (needed to populate installs data)
+  if (process.argv.includes('--reset')) {
+    console.log('🔄 Resetting scrape progress...')
+    await setMetadata('apiScrapeProgress', '', client)
+    console.log('✓ Progress cleared — will re-run all queries.\n')
+  }
 
   console.log('🌐 API-Based Full Scrape — Targeting ~71,667 skills')
   console.log('This will take 20-30 minutes with rate limiting.\n')
 
   console.log('Step 1/2: Enumerating ALL skills via search API...')
 
-  let lastUpdate = Date.now()
-  const { dbTotal, newThisRun, queries, skipped } = await scrapeAllSkillsViaAPI((current, total, phase, stats) => {
-    // Throttle progress updates to every 2 seconds
-    if (Date.now() - lastUpdate > 2000) {
-      console.log(`  [${current}/${total}] ${phase} — New this run: ${stats.discovered} (+${stats.newInBatch})`)
-      lastUpdate = Date.now()
-    }
+  const { dbTotal, newThisRun, queries, skipped } = await scrapeAllSkillsViaAPI(client, (current, total, phase, stats) => {
+    console.log(`  [${current}/${total}] ${phase} — New this run: ${stats.discovered} (+${stats.newInBatch})`)
   })
 
   if (skipped) {
@@ -48,7 +50,7 @@ async function main() {
 
   console.log('\nStep 2/2: Fetching content for new skills...')
 
-  const { successful, failed } = await batchFetchSkillContent((current, total, slug) => {
+  const { successful, failed } = await batchFetchSkillContent(client, (current, total, slug) => {
     if (current % 10 === 0) {
       console.log(`  Fetched ${current}/${total}: ${slug}`)
     }
@@ -57,15 +59,9 @@ async function main() {
   console.log(`\n✓ Content Fetch Complete!`)
   console.log(`  ${successful} skills fetched successfully`)
   console.log(`  ${failed} skills failed`)
-
-  // Close database connection
-  closeDb()
 }
 
 main().catch((err) => {
   console.error('Error:', err)
-  import('../src/main/skills-db.js')
-    .then(({ closeDb }) => closeDb())
-    .catch(() => {})
   process.exit(1)
 })

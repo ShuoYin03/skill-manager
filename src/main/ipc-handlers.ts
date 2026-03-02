@@ -232,12 +232,20 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle(IPC.SKILLS_MARKETPLACE_INSTALL, async (_event, repoPath: string, tool: AITool, name: string, content: string, skillsDir?: 'tool-specific' | 'shared') => {
-    // If name is a full slug (owner/repo/skillId), use git-based multi-file install
-    if (name.split('/').length >= 3) {
-      return await installSkillFromGitHub(name, repoPath, tool, skillsDir ?? 'tool-specific')
+    // Use git-based multi-file install when the name is a valid owner/repo/skillId slug.
+    // Skip git install if the slug contains template literals ({{...}}) — bad DB data.
+    const isFullSlug = name.split('/').length >= 3 && !name.includes('{{')
+    if (isFullSlug) {
+      try {
+        return await installSkillFromGitHub(name, repoPath, tool, skillsDir ?? 'tool-specific')
+      } catch (err) {
+        console.warn(`Git install failed for "${name}", falling back to single-file install:`, err)
+        // fall through to single-file install using the content from Supabase
+      }
     }
-    // Fallback: single-file install (for user-created skills with just a name)
-    return await createSkill(repoPath, tool, name, content, skillsDir ?? 'tool-specific')
+    // Single-file fallback: derive a clean skill name from the last slug segment
+    const skillName = name.split('/').pop() ?? name
+    return await createSkill(repoPath, tool, skillName, content, skillsDir ?? 'tool-specific')
   })
 
   // Instruction files

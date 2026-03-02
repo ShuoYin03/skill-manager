@@ -12,13 +12,13 @@
     "build:mac": "npm run build && electron-builder --mac",
     "build:win": "npm run build && electron-builder --win",
     "build:linux": "npm run build && electron-builder --linux",
-    "scrape": "npm rebuild better-sqlite3 && tsx scripts/scrape-marketplace.ts && npx electron-rebuild -f -w better-sqlite3",
-    "scrape-all": "npm rebuild better-sqlite3 && tsx scripts/scrape-marketplace-api.ts && npx electron-rebuild -f -w better-sqlite3"
+    "scrape": "tsx scripts/scrape-marketplace.ts",
+    "scrape-all": "tsx scripts/scrape-marketplace-api.ts",
+    "migrate-to-supabase": "tsx scripts/migrate-sqlite-to-supabase.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.95.3",
     "@types/marked": "^5.0.2",
-    "better-sqlite3": "^12.6.2",
     "electron-store": "^8.2.0",
     "fuse.js": "^7.0.0",
     "marked": "^17.0.3",
@@ -36,6 +36,8 @@
     "@types/turndown": "^5.0.6",
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-react": "^4.3.0",
+    "better-sqlite3": "^12.6.2",
+    "dotenv": "^16.4.5",
     "electron": "^40.3.0",
     "electron-builder": "^26.0.0",
     "electron-vite": "^5.0.0",

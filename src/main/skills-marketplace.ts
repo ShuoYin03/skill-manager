@@ -1,5 +1,5 @@
 import type { MarketplaceSkill, SkillSearchParams, SkillSearchResult, SkillFilterStats } from '../shared/types'
-import { getSkillBySlug, searchSkills, getFilterStats, getMetadata, type SkillRow } from './skills-db'
+import { getSkillBySlug, searchSkills, getFilterStats, getMetadata, type SkillRow } from './skills-supabase'
 
 const BUNDLED_SKILLS: MarketplaceSkill[] = [
   {
@@ -85,7 +85,7 @@ export async function searchMarketplaceSkills(params: SkillSearchParams): Promis
   try {
     // Query database with pagination
     const offset = (page - 1) * pageSize
-    const { skills, total } = searchSkills({
+    const { skills, total } = await searchSkills({
       query: query || undefined,
       tags,
       author,
@@ -126,7 +126,7 @@ export async function searchMarketplaceSkills(params: SkillSearchParams): Promis
 
 export async function getMarketplaceFilterStats(): Promise<SkillFilterStats> {
   try {
-    return getFilterStats()
+    return await getFilterStats()
   } catch (err) {
     console.error('Failed to get filter stats from database:', err)
     return { tags: [], authors: [] }
@@ -140,7 +140,7 @@ export async function getMarketplaceSkillContent(slug: string): Promise<string |
 
   // Query database for content
   try {
-    const skill = getSkillBySlug(slug)
+    const skill = await getSkillBySlug(slug)
     if (skill) {
       if (skill.content) {
         return skill.content
@@ -163,8 +163,8 @@ export async function getMarketplaceSkillContent(slug: string): Promise<string |
 
 export async function getMarketplaceCacheStatus(): Promise<{ lastScraped: string | null; count: number }> {
   try {
-    const lastScraped = getMetadata('lastScraped')
-    const countStr = getMetadata('count')
+    const lastScraped = await getMetadata('lastScraped')
+    const countStr = await getMetadata('count')
     const count = countStr ? parseInt(countStr, 10) : 0
     return { lastScraped, count }
   } catch (err) {

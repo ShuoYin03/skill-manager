@@ -160,6 +160,11 @@
   background: var(--color-surface);
 }
 
+.app-sidebar-icon:focus,
+.app-sidebar-icon:focus-visible {
+  outline: none;
+}
+
 /* Tooltip that appears to the right of the sidebar icon on hover */
 .app-sidebar-icon::after {
   content: attr(title);

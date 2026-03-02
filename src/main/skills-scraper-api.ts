@@ -1,4 +1,5 @@
-import { upsertSkill, setMetadata, getMetadata, getSkillCount, getAllSlugs } from './skills-db'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import { upsertSkill, setMetadata, getMetadata, getSkillCount, getAllSlugs } from './skills-supabase'
 
 interface APISearchResponse {
   query: string
@@ -22,8 +23,8 @@ interface APIScrapeProgress {
 
 const API_CONFIG = {
   BASE_URL: 'https://skills.sh/api/search',
-  CONCURRENCY: 3,
-  BATCH_DELAY_MS: 500,
+  CONCURRENCY: 5,
+  BATCH_DELAY_MS: 100,
   QUERY_LIMIT: 100,
   MAX_OFFSET: 10000,
   CONVERGENCE_THRESHOLD: 50,
@@ -53,7 +54,8 @@ function generateQueries(): string[] {
  */
 async function fetchSkillsForQuery(
   query: string,
-  discoveredSlugs: Set<string>
+  discoveredSlugs: Set<string>,
+  client: SupabaseClient
 ): Promise<{ newSkills: number; totalResults: number }> {
   let offset = 0
   let newSkills = 0
@@ -90,14 +92,18 @@ async function fetchSkillsForQuery(
           discoveredSlugs.add(slug)
           newSkills++
 
-          // Insert into database
-          upsertSkill({
-            slug,
-            owner,
-            repo,
-            skillId,
-            name: skill.name || skillId.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-          })
+          // Insert into database (include installs count for popularity ordering)
+          await upsertSkill(
+            {
+              slug,
+              owner,
+              repo,
+              skillId,
+              name: skill.name || skillId.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+              installs: skill.installs ?? 0
+            },
+            client
+          )
         }
       }
 
@@ -120,8 +126,8 @@ async function fetchSkillsForQuery(
 /**
  * Load progress from database
  */
-function loadProgress(): APIScrapeProgress | null {
-  const progressJson = getMetadata('apiScrapeProgress')
+async function loadProgress(): Promise<APIScrapeProgress | null> {
+  const progressJson = await getMetadata('apiScrapeProgress')
   if (!progressJson) return null
 
   try {
@@ -134,14 +140,15 @@ function loadProgress(): APIScrapeProgress | null {
 /**
  * Save progress to database
  */
-function saveProgress(progress: APIScrapeProgress): void {
-  setMetadata('apiScrapeProgress', JSON.stringify(progress))
+async function saveProgress(progress: APIScrapeProgress, client: SupabaseClient): Promise<void> {
+  await setMetadata('apiScrapeProgress', JSON.stringify(progress), client)
 }
 
 /**
  * Main API-based scraper function
  */
 export async function scrapeAllSkillsViaAPI(
+  client: SupabaseClient,
   onProgress?: (
     current: number,
     total: number,
@@ -153,7 +160,7 @@ export async function scrapeAllSkillsViaAPI(
   const discoveredSlugs = new Set<string>()
 
   // Load progress if resuming
-  const savedProgress = loadProgress()
+  const savedProgress = await loadProgress()
   let noNewSkillsCount = 0
 
   if (savedProgress) {
@@ -162,17 +169,17 @@ export async function scrapeAllSkillsViaAPI(
 
     // If all queries already completed, skip entirely
     if (remaining.length === 0) {
-      const dbTotal = getSkillCount()
+      const dbTotal = await getSkillCount()
       console.log(`All ${queries.length} queries already completed. Database has ${dbTotal} skills.`)
-      setMetadata('apiLastScraped', new Date().toISOString())
-      setMetadata('apiTotalDiscovered', String(dbTotal))
+      await setMetadata('apiLastScraped', new Date().toISOString(), client)
+      await setMetadata('apiTotalDiscovered', String(dbTotal), client)
       return { dbTotal, newThisRun: 0, queries: queries.length, skipped: true }
     }
 
     console.log(`Resuming: ${remaining.length} queries remaining (${savedProgress.completedQueries.length} already done)`)
 
     // Pre-populate discoveredSlugs from database so deduplication works correctly
-    const existingSlugs = getAllSlugs()
+    const existingSlugs = await getAllSlugs()
     for (const slug of existingSlugs) {
       discoveredSlugs.add(slug)
     }
@@ -195,7 +202,7 @@ export async function scrapeAllSkillsViaAPI(
     const batch = queries.slice(i, i + API_CONFIG.CONCURRENCY)
 
     // Fetch batch in parallel
-    const results = await Promise.all(batch.map((query) => fetchSkillsForQuery(query, discoveredSlugs)))
+    const results = await Promise.all(batch.map((query) => fetchSkillsForQuery(query, discoveredSlugs, client)))
 
     // Aggregate results
     let batchNewSkills = 0
@@ -221,7 +228,7 @@ export async function scrapeAllSkillsViaAPI(
       noNewSkillsCount,
       lastUpdated: new Date().toISOString()
     }
-    saveProgress(progress)
+    await saveProgress(progress, client)
 
     // Report progress
     const current = i + batch.length
@@ -245,11 +252,11 @@ export async function scrapeAllSkillsViaAPI(
     }
   }
 
-  const dbTotal = getSkillCount()
+  const dbTotal = await getSkillCount()
 
   // Update final metadata
-  setMetadata('apiLastScraped', new Date().toISOString())
-  setMetadata('apiTotalDiscovered', String(dbTotal))
+  await setMetadata('apiLastScraped', new Date().toISOString(), client)
+  await setMetadata('apiTotalDiscovered', String(dbTotal), client)
 
   return {
     dbTotal,

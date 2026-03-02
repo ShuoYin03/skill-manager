@@ -152,6 +152,29 @@ function scanDirectory(repoPath: string, tool: AITool, dir: string, extensions: 
   }
 
   for (const entry of entries) {
+    // Handle subdirectories with SKILL.md (git-installed multi-file skills)
+    if (entry.isDirectory()) {
+      const skillMdPath = path.join(fullDir, entry.name, 'SKILL.md')
+      if (!fs.existsSync(skillMdPath)) continue
+      const relativePath = path.join(dir, entry.name, 'SKILL.md')
+      let content: string
+      try {
+        content = fs.readFileSync(skillMdPath, 'utf-8')
+      } catch {
+        continue
+      }
+      skills.push({
+        id: makeSkillId(tool, repoPath, relativePath),
+        tool,
+        name: entry.name,
+        relativePath,
+        content,
+        enabled: true,
+        frontmatter: parseFrontmatter(content)
+      })
+      continue
+    }
+
     if (!entry.isFile()) continue
 
     const baseName = getBaseName(entry.name)
@@ -295,8 +318,11 @@ export async function scanRepoSkills(
     }
   }
 
-  // Scan shared .agents/skills once (not per-tool) — handles both flat files and
-  // skills.sh-style subdirectories (each folder has a SKILL.md entry file)
+  // Scan shared skills directories (not per-tool) — handles both flat files and
+  // skills.sh-style subdirectories (each folder has a SKILL.md entry file).
+  // .agent/skills (singular) matches the SHARED_DIR used by skills-io.ts installs.
+  // .agents/skills (plural) kept for legacy compatibility.
+  skills.push(...scanSharedSkillsDir(repoPath, '.agent/skills'))
   skills.push(...scanSharedSkillsDir(repoPath, '.agents/skills'))
 
   // Scan .claude/plugins — tools like Claude Code install plugins here that

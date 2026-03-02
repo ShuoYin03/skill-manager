@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import type { MarketplaceSkill, AITool } from '../../../../shared/types'
+import type { MarketplaceSkill, AITool, SkillFile } from '../../../../shared/types'
 
 // Deterministic colors for skill letter icons (no purple)
 const ICON_COLORS = [
@@ -30,6 +30,17 @@ const AI_TOOL_LABELS: Record<AITool, string> = {
   copilot: 'Copilot',
 }
 
+function getSkillToolLabel(sf: SkillFile): string {
+  // Skills in shared/global dirs show "Global" regardless of tool attribution
+  if (
+    sf.relativePath.startsWith('.agent/') ||
+    sf.relativePath.startsWith('.agents/')
+  ) {
+    return 'Global'
+  }
+  return AI_TOOL_LABELS[sf.tool] ?? sf.tool
+}
+
 const AI_TOOLS: AITool[] = ['claude', 'cursor', 'windsurf', 'codex', 'copilot']
 
 interface MarketplaceCardProps {
@@ -40,7 +51,11 @@ interface MarketplaceCardProps {
   installLabel?: string
   selectedAITool?: AITool
   onSelectAITool?: (tool: AITool) => void
-  installedIn?: string
+  /** SkillFile entries already installed that match this marketplace skill */
+  installedSkills?: SkillFile[]
+  onDeleteInstalled?: (skill: SkillFile) => Promise<void>
+  /** When true, all installed badges display "via Global" regardless of path */
+  isGlobal?: boolean
 }
 
 interface SplitInstallButtonProps {
@@ -159,6 +174,20 @@ function BookmarkIcon(): JSX.Element {
   )
 }
 
+/** Skeleton placeholder card shown while marketplace results are loading */
+export function SkeletonCard(): JSX.Element {
+  return (
+    <div className="marketplace-card skeleton-card" aria-hidden="true">
+      <div className="skeleton-icon skeleton-box" />
+      <div className="skeleton-content">
+        <div className="skeleton-box" style={{ width: '58%', height: 13, borderRadius: 4 }} />
+        <div className="skeleton-box" style={{ width: '85%', height: 11, borderRadius: 4, marginTop: 7 }} />
+        <div className="skeleton-box" style={{ width: '38%', height: 9, borderRadius: 10, marginTop: 7 }} />
+      </div>
+    </div>
+  )
+}
+
 export function MarketplaceCard({
   skill,
   onInstall,
@@ -167,9 +196,12 @@ export function MarketplaceCard({
   installLabel,
   selectedAITool,
   onSelectAITool,
-  installedIn,
+  installedSkills,
+  onDeleteInstalled,
+  isGlobal,
 }: MarketplaceCardProps): JSX.Element {
   const [installing, setInstalling] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const iconColor = getIconColor(skill.title)
 
   const handleInstall = async (): Promise<void> => {
@@ -181,8 +213,21 @@ export function MarketplaceCard({
     }
   }
 
+  const handleDelete = async (e: React.MouseEvent, sf: SkillFile): Promise<void> => {
+    e.stopPropagation()
+    if (!onDeleteInstalled) return
+    setDeletingId(sf.id)
+    try {
+      await onDeleteInstalled(sf)
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
+  const hasInstalled = installedSkills && installedSkills.length > 0
+
   return (
-    <div className="marketplace-card" onClick={() => onView(skill)}>
+    <div className={`marketplace-card${hasInstalled ? ' is-installed' : ''}`} onClick={() => onView(skill)}>
       {/* Colored letter icon */}
       <div className="marketplace-card-icon" style={{ background: iconColor }}>
         {skill.title.charAt(0).toUpperCase()}
@@ -192,10 +237,25 @@ export function MarketplaceCard({
       <div className="marketplace-card-content">
         <div className="marketplace-card-header">
           <span className="marketplace-card-title">{skill.title}</span>
-          {installedIn && (
-            <span className="marketplace-card-installed-badge">{installedIn}</span>
-          )}
         </div>
+        {/* Installed-via badges with delete × */}
+        {hasInstalled && (
+          <div className="marketplace-card-installed-badges">
+            {installedSkills!.map((sf) => (
+              <span key={sf.id} className="marketplace-card-installed-badge">
+                via {isGlobal ? 'Global' : getSkillToolLabel(sf)}
+                <button
+                  className={`marketplace-card-installed-delete${deletingId === sf.id ? ' deleting' : ''}`}
+                  onClick={(e) => void handleDelete(e, sf)}
+                  title="Remove this installed skill"
+                  disabled={deletingId === sf.id}
+                >
+                  {deletingId === sf.id ? '…' : '×'}
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
         {skill.description && (
           <div className="marketplace-card-desc">{skill.description}</div>
         )}

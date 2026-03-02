@@ -1,6 +1,7 @@
 import TurndownService from 'turndown'
 import { gfm } from 'turndown-plugin-gfm'
-import { upsertSkill, getSkillsWithoutContent, updateSkillContent, setMetadata } from './skills-db'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import { upsertSkills, getSkillsWithoutContent, updateSkillContent, setMetadata } from './skills-supabase'
 
 interface SkillIndexEntry {
   slug: string    // "owner/repo/skillId"
@@ -45,6 +46,7 @@ async function fetchSitemapUrls(url: string): Promise<string[]> {
 }
 
 export async function scrapeSkillsToDb(
+  client: SupabaseClient,
   onProgress?: (done: number, total: number, phase: string) => void
 ): Promise<{ count: number }> {
   onProgress?.(0, 1, 'Fetching sitemap...')
@@ -85,25 +87,27 @@ export async function scrapeSkillsToDb(
     return true
   })
 
-  // Insert into database
-  for (const skill of unique) {
-    upsertSkill(skill)
+  // Batch upsert into database (500 per request)
+  const BATCH = 500
+  for (let i = 0; i < unique.length; i += BATCH) {
+    await upsertSkills(unique.slice(i, i + BATCH), client)
   }
 
   // Update metadata
-  setMetadata('lastScraped', new Date().toISOString())
-  setMetadata('count', String(unique.length))
+  await setMetadata('lastScraped', new Date().toISOString(), client)
+  await setMetadata('count', String(unique.length), client)
 
   return { count: unique.length }
 }
 
 export async function batchFetchSkillContent(
+  client: SupabaseClient,
   onProgress?: (current: number, total: number, slug: string) => void
 ): Promise<{ successful: number; failed: number }> {
   const CONCURRENCY = 5
   const BATCH_DELAY_MS = 200
 
-  const skillsToFetch = getSkillsWithoutContent()
+  const skillsToFetch = await getSkillsWithoutContent()
   const total = skillsToFetch.length
 
   let successful = 0
@@ -117,11 +121,11 @@ export async function batchFetchSkillContent(
       batch.map(async (skill) => {
         try {
           const content = await fetchSkillContent(skill.slug)
-          updateSkillContent(skill.slug, content, null)
+          await updateSkillContent(skill.slug, content, null, client)
           successful++
           onProgress?.(i + batch.indexOf(skill), total, skill.slug)
         } catch (err) {
-          updateSkillContent(skill.slug, null, String(err))
+          await updateSkillContent(skill.slug, null, String(err), client)
           failed++
         }
       })
@@ -133,7 +137,7 @@ export async function batchFetchSkillContent(
     }
   }
 
-  setMetadata('contentFetchedAt', new Date().toISOString())
+  await setMetadata('contentFetchedAt', new Date().toISOString(), client)
 
   return { successful, failed }
 }

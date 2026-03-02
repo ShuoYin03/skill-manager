@@ -19,8 +19,28 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Import Apple code signing certificate
+        if: ${{ env.CSC_LINK != '' }}
+        run: |
+          echo "$CSC_LINK" | base64 --decode > certificate.p12
+          security create-keychain -p "$CSC_KEY_PASSWORD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$CSC_KEY_PASSWORD" build.keychain
+          security import certificate.p12 -k build.keychain -P "$CSC_KEY_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$CSC_KEY_PASSWORD" build.keychain
+          rm certificate.p12
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+
       - name: Build macOS app
         run: npm run build && npx electron-builder --mac --publish never
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
