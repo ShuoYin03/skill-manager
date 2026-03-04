@@ -1,7 +1,8 @@
 import { createClient, type SupabaseClient, type Session } from '@supabase/supabase-js'
-import { SUPABASE_URL, SUPABASE_ANON_KEY, WEBSITE_URL } from './config'
+import { shell } from 'electron'
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config'
 import { getAuthTokens, setAuthTokens, clearAuthTokens } from './store'
-import { openOAuthWindow } from './oauth-window'
+import { startOAuthServer } from './oauth-local-server'
 
 let supabase: SupabaseClient
 
@@ -15,22 +16,30 @@ export function initSupabase(): void {
 }
 
 export async function signIn(): Promise<Session | null> {
+  const server = await startOAuthServer()
+
   const { data } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${WEBSITE_URL}/auth/callback`,
-      skipBrowserRedirect: true
-    }
+      redirectTo: server.callbackUrl,
+      skipBrowserRedirect: true,
+    },
   })
-  if (!data.url) return null
 
-  const tokens = await openOAuthWindow(data.url)
-  if (!tokens) return null
+  if (!data.url) {
+    server.shutdown()
+    return null
+  }
 
-  const { data: sessionData, error } = await supabase.auth.setSession({
-    access_token: tokens.at,
-    refresh_token: tokens.rt,
-  })
+  // Open in the user's real system browser (already signed into Google)
+  shell.openExternal(data.url)
+
+  // Block until the local server receives the OAuth code (or times out)
+  const code = await server.waitForCode()
+  if (!code) return null
+
+  // Exchange the code for a full session (PKCE verifier is held by this Supabase instance)
+  const { data: sessionData, error } = await supabase.auth.exchangeCodeForSession(code)
   if (error || !sessionData.session) return null
 
   setAuthTokens({
