@@ -36,9 +36,14 @@ jobs:
       - name: Build macOS app
         run: npm run build && npx electron-builder --mac --publish never
         env:
-          CSC_LINK: ${{ secrets.CSC_LINK }}
-          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+          # CSC_LINK/CSC_KEY_PASSWORD are intentionally NOT passed here.
+          # When the secret is set, the cert is already imported into the keychain
+          # by the previous step. Passing an empty CSC_LINK causes electron-builder
+          # to treat it as a file path, resolving to the workspace dir ("not a file").
+          # CSC_IDENTITY_AUTO_DISCOVERY=true lets it find the keychain cert when present.
+          # When the secret is absent the import step is skipped and auto-discovery
+          # finds nothing → electron-builder skips signing cleanly.
+          CSC_IDENTITY_AUTO_DISCOVERY: ${{ secrets.CSC_LINK != '' && 'true' || 'false' }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
