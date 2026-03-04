@@ -72,13 +72,24 @@ export function GeneralSettings(): JSX.Element {
       if (accelerator) {
         setHotkeyDisplay(formatAccelerator(accelerator))
         setIsRecording(false)
-        // Use CommandOrControl for cross-platform compatibility
-        const normalized = accelerator.replace('Command', 'CommandOrControl').replace('Control', 'CommandOrControl')
-        // Deduplicate CommandOrControl
-        const final = normalized.includes('CommandOrControl+CommandOrControl')
-          ? normalized.replace('CommandOrControl+CommandOrControl', 'CommandOrControl')
-          : normalized
-        updateSetting('globalHotkey', final)
+        // Normalize each part individually to avoid substring corruption
+        // e.g. 'CommandOrControl'.replace('Control', ...) would corrupt the string
+        const parts = accelerator.split('+')
+        const normalizedParts = parts.map((p) =>
+          p === 'Command' || p === 'Control' ? 'CommandOrControl' : p
+        )
+        // Deduplicate (e.g. if both Cmd and Ctrl were somehow pressed)
+        const seen = new Set<string>()
+        const final = normalizedParts
+          .filter((p) => {
+            if (seen.has(p)) return false
+            seen.add(p)
+            return true
+          })
+          .join('+')
+        void updateSetting('globalHotkey', final)
+        // Resume shortcut explicitly after saving — don't rely solely on onBlur
+        void window.electronAPI.resumeShortcut()
       }
     },
     [updateSetting]

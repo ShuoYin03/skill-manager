@@ -3,7 +3,7 @@ import { createLauncherWindow, showLauncher } from './window'
 import { createTray } from './tray'
 import { registerGlobalShortcut, unregisterAllShortcuts } from './shortcut'
 import { registerIpcHandlers } from './ipc-handlers'
-import { getSettings } from './store'
+import { getSettings, updateSettings } from './store'
 import { registerProtocolHandler, setupProtocolListener } from './protocol-handler'
 import { initSupabase, restoreSession } from './auth-service'
 import { initTrial } from './trial-service'
@@ -32,7 +32,14 @@ app.whenReady().then(async () => {
   setupProtocolListener()
 
   const settings = getSettings()
-  registerGlobalShortcut(settings.globalHotkey)
+  const shortcutRegistered = registerGlobalShortcut(settings.globalHotkey)
+  if (!shortcutRegistered) {
+    // Stored hotkey may be corrupted — reset to default
+    const defaultHotkey = 'CommandOrControl+Shift+O'
+    if (registerGlobalShortcut(defaultHotkey)) {
+      updateSettings({ globalHotkey: defaultHotkey })
+    }
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
