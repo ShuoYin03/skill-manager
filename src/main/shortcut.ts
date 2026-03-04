@@ -20,6 +20,18 @@ export function unregisterAllShortcuts(): void {
   currentAccelerator = null
 }
 
+export function suspendGlobalShortcut(): void {
+  if (currentAccelerator) {
+    globalShortcut.unregister(currentAccelerator)
+  }
+}
+
+export function resumeGlobalShortcut(): void {
+  if (currentAccelerator) {
+    globalShortcut.register(currentAccelerator, toggleLauncher)
+  }
+}
+
 export function updateShortcut(newAccelerator: string): boolean {
   const old = currentAccelerator
   if (old) {

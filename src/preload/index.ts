@@ -24,6 +24,10 @@ const api = {
   hideLauncher: () => ipcRenderer.invoke(IPC.WINDOW_HIDE),
   getHomeDir: () => ipcRenderer.invoke(IPC.GET_HOME_DIR),
 
+  // Shortcut
+  suspendShortcut: () => ipcRenderer.invoke(IPC.SHORTCUT_SUSPEND),
+  resumeShortcut: () => ipcRenderer.invoke(IPC.SHORTCUT_RESUME),
+
   // Events from main
   onLauncherShown: (callback: () => void) => {
     const handler = (): void => callback()

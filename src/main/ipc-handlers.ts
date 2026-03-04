@@ -6,7 +6,7 @@ import { getRepos, addRepo, removeRepo, updateRepo, getSettings, updateSettings,
 import { getGitBranch, isGitRepo, refreshAllBranches, getLastCommit } from './git-service'
 import { openInEditor, getAvailableEditors } from './editor-launcher'
 import { hideLauncher, setSuppressHide, applyAlwaysOnTop, getLauncherWindow } from './window'
-import { updateShortcut } from './shortcut'
+import { updateShortcut, suspendGlobalShortcut, resumeGlobalShortcut } from './shortcut'
 import { signIn, signOut, getSession } from './auth-service'
 import { verifyLicense } from './license-service'
 import { scanRepoSkills } from './skills-scanner'
@@ -117,6 +117,14 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle(IPC.WINDOW_HIDE, () => {
     hideLauncher()
+  })
+
+  ipcMain.handle(IPC.SHORTCUT_SUSPEND, () => {
+    suspendGlobalShortcut()
+  })
+
+  ipcMain.handle(IPC.SHORTCUT_RESUME, () => {
+    resumeGlobalShortcut()
   })
 
   ipcMain.handle(IPC.GET_HOME_DIR, () => {

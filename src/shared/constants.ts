@@ -17,6 +17,9 @@ export const IPC = {
   LAUNCHER_HIDDEN: 'launcher:hidden',
   NAVIGATE_SETTINGS: 'navigate:settings',
 
+  SHORTCUT_SUSPEND: 'shortcut:suspend',
+  SHORTCUT_RESUME: 'shortcut:resume',
+
   AUTH_SIGN_IN: 'auth:sign-in',
   AUTH_SIGN_OUT: 'auth:sign-out',
   AUTH_GET_SESSION: 'auth:get-session',

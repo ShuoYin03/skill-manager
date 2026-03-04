@@ -49,7 +49,7 @@ const initialState: AppState = {
   currentView: 'launcher',
   isLoading: true,
   searchQuery: '',
-  selectedIndex: 0,
+  selectedIndex: -1,
   activeTagFilter: null,
   licenseStatus: null,
   authUser: null,

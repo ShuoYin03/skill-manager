@@ -96,8 +96,8 @@ export function GeneralSettings(): JSX.Element {
         <input
           className={`hotkey-input ${isRecording ? 'recording' : ''}`}
           value={isRecording ? 'Press keys...' : hotkeyDisplay}
-          onFocus={() => setIsRecording(true)}
-          onBlur={() => setIsRecording(false)}
+          onFocus={() => { setIsRecording(true); void window.electronAPI.suspendShortcut() }}
+          onBlur={() => { setIsRecording(false); void window.electronAPI.resumeShortcut() }}
           onKeyDown={handleHotkeyKeyDown}
           readOnly
         />
