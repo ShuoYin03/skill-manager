@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient, type Session } from '@supabase/supabase-js'
 import { shell } from 'electron'
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config'
+import { SUPABASE_URL, SUPABASE_ANON_KEY, WEBSITE_URL } from './config'
 import { getAuthTokens, setAuthTokens, clearAuthTokens } from './store'
 
 let supabase: SupabaseClient
@@ -18,7 +18,7 @@ export async function signIn(): Promise<void> {
   const { data } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: 'skilly://auth/callback',
+      redirectTo: `${WEBSITE_URL}/auth/callback`,
       skipBrowserRedirect: true
     }
   })
