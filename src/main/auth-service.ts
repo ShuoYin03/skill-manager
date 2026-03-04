@@ -1,5 +1,6 @@
 import { createClient, type SupabaseClient, type Session } from '@supabase/supabase-js'
 import { shell } from 'electron'
+import { randomUUID } from 'crypto'
 import { SUPABASE_URL, SUPABASE_ANON_KEY, WEBSITE_URL } from './config'
 import { getAuthTokens, setAuthTokens, clearAuthTokens } from './store'
 
@@ -14,17 +15,20 @@ export function initSupabase(): void {
   })
 }
 
-export async function signIn(): Promise<void> {
+export async function signIn(): Promise<string | null> {
+  const stateId = randomUUID()
   const { data } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${WEBSITE_URL}/auth/callback`,
+      redirectTo: `${WEBSITE_URL}/auth/callback?es=${stateId}`,
       skipBrowserRedirect: true
     }
   })
   if (data.url) {
     shell.openExternal(data.url)
+    return stateId
   }
+  return null
 }
 
 export async function handleAuthCallback(url: string): Promise<Session | null> {

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 export default function AuthSuccessPage() {
   const [deepLinkUrl, setDeepLinkUrl] = useState<string | null>(null)
-  const [attempted, setAttempted] = useState(false)
+  const [showFallback, setShowFallback] = useState(false)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -15,15 +15,13 @@ export default function AuthSuccessPage() {
       const url = `skilly://auth/callback#access_token=${at}&refresh_token=${rt}&token_type=bearer`
       setDeepLinkUrl(url)
 
-      // Attempt auto-redirect (works in some browsers / Electron WebView)
+      // Best-effort auto-redirect (works in some environments)
       window.location.href = url
-
-      // Mark as attempted after a short delay
-      const t = setTimeout(() => setAttempted(true), 800)
-      return () => clearTimeout(t)
-    } else {
-      setAttempted(true)
     }
+
+    // Show the manual button after a short delay as fallback
+    const t = setTimeout(() => setShowFallback(true), 1500)
+    return () => clearTimeout(t)
   }, [])
 
   return (
@@ -47,13 +45,11 @@ export default function AuthSuccessPage() {
           </h1>
 
           <p className="text-[#6B7280] text-[14px] leading-relaxed">
-            {attempted
-              ? 'Click the button below to return to Skilly.'
-              : 'Returning you to Skilly…'}
+            Skilly has been updated. You can close this tab.
           </p>
 
-          {/* Primary CTA: open the app via user gesture (bypasses browser blocking) */}
-          {deepLinkUrl && attempted && (
+          {/* Fallback button — shown if auto-redirect didn't fire */}
+          {showFallback && deepLinkUrl && (
             <a
               href={deepLinkUrl}
               className="mt-5 inline-block w-full py-2.5 px-4 rounded-xl bg-[#0A0A0A] text-white text-[14px] font-medium tracking-tight cursor-pointer hover:bg-[#222] transition-colors"
@@ -61,15 +57,6 @@ export default function AuthSuccessPage() {
               Open Skilly
             </a>
           )}
-
-          <div className="mt-4 pt-4 border-t border-[#F3F4F6]">
-            <button
-              onClick={() => window.close()}
-              className="text-[13px] text-[#6B7280] hover:text-[#0A0A0A] transition-colors cursor-pointer"
-            >
-              Close this tab
-            </button>
-          </div>
         </div>
 
         <p className="text-center text-[12px] text-[#9CA3AF] mt-5">Skilly</p>

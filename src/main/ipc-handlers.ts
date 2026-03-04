@@ -8,6 +8,7 @@ import { openInEditor, getAvailableEditors } from './editor-launcher'
 import { hideLauncher, setSuppressHide, applyAlwaysOnTop, getLauncherWindow } from './window'
 import { updateShortcut } from './shortcut'
 import { signIn, signOut, getSession } from './auth-service'
+import { setupRealtimeAuth } from './protocol-handler'
 import { verifyLicense } from './license-service'
 import { scanRepoSkills } from './skills-scanner'
 import { createSkill, updateSkill, deleteSkill, toggleSkill, globalizeSkill, installSkillFromGitHub } from './skills-io'
@@ -125,7 +126,8 @@ export function registerIpcHandlers(): void {
 
   // Auth
   ipcMain.handle(IPC.AUTH_SIGN_IN, async () => {
-    await signIn()
+    const stateId = await signIn()
+    if (stateId) setupRealtimeAuth(stateId)
   })
 
   ipcMain.handle(IPC.AUTH_SIGN_OUT, async () => {
