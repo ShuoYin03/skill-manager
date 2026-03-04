@@ -1,3 +1,8 @@
+'use client'
+
+import { trackEvent } from '@/lib/analytics'
+import { SKILLY_ONE_LINER } from '@/lib/site'
+
 const SKILLS = [
   { name: 'commit-msg', desc: 'Write conventional commits automatically', tag: 'git', installed: true },
   { name: 'code-review', desc: 'Deep PR review with actionable feedback', tag: 'review', installed: true },
@@ -24,14 +29,19 @@ export function Hero() {
         </h1>
 
         <p className="mx-auto mt-6 max-w-2xl text-lg text-[#6B7280] leading-relaxed">
-          Skilly is a desktop app for browsing, installing, and managing AI coding skills
-          across all your projects. Works with Claude, Cursor, Windsurf, and more — one
-          place for all your AI tooling.
+          {SKILLY_ONE_LINER} Works with Claude, Cursor, Windsurf, Codex, and GitHub
+          Copilot in one place.
         </p>
 
         <div className="mt-10 flex items-center justify-center gap-4">
           <a
             href="#download"
+            onClick={() =>
+              trackEvent('trial_started', {
+                source: 'hero',
+                target: 'download_section'
+              })
+            }
             className="rounded-lg bg-[#0A0A0A] px-8 py-3 text-base font-semibold text-white transition hover:bg-[#333]"
           >
             Download Free

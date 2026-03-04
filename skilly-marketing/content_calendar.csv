@@ -1,0 +1,13 @@
+week,publish_date,primary_asset,seo_intent,distribution_assets,primary_channel,cta_target,utm_content
+1,2026-03-09,Pillar: AI coding skills management,Searchable,"3 short posts; 1 long post; 2 Reddit comments",X,/blog/ai-coding-skills-management,hook_a
+2,2026-03-16,Pillar: Claude Cursor Codex workflow,Searchable,"3 short posts; 1 comparison post; 1 GitHub discussion",Reddit,/blog/claude-cursor-codex-workflow,hook_b
+3,2026-03-23,Pillar: Prompt rules across repos,Searchable,"1 long thread; 1 checklist post; Dev.to mirror",X,/blog/prompt-rules-management-across-repos,hook_c
+4,2026-03-30,Comparison: Skilly vs manual setup,Searchable,"1 comparison post; 2 Reddit comments; 1 GitHub release note",Reddit,/vs/manual-setup,compare_a
+5,2026-04-06,Use case: indie dev multi-repo,Searchable,"3 short posts; 1 long post; Dev.to mirror",X,/use-cases/indie-dev-multi-repo,usecase_a
+6,2026-04-13,Template: weekly skill audit,Searchable,"1 checklist post; 2 Reddit comments; 1 GitHub discussion",GitHub,/templates/weekly-skill-audit,template_a
+7,2026-04-20,Guide: Skilly glossary,Searchable,"3 short posts; 1 long post; Dev.to mirror",Devto,/guides/skilly-glossary,guide_a
+8,2026-04-27,Guide: AI coding skills taxonomy,Searchable,"1 taxonomy post; 2 Reddit comments; 1 X thread",X,/guides/ai-coding-skills-taxonomy,guide_b
+9,2026-05-04,Update top pillar with new examples,Searchable,"1 recap post; 1 comparison post; GitHub update",X,/blog/ai-coding-skills-management,refresh_a
+10,2026-05-11,Programmatic page batch #1,Searchable,"2 short posts; 2 Reddit comments; Dev.to mirror",Reddit,/blog,programmatic_a
+11,2026-05-18,Programmatic page batch #2,Searchable,"1 long thread; 1 checklist post; GitHub release note",X,/blog,programmatic_b
+12,2026-05-25,Quarter recap + roadmap,Shareable,"1 founder reflection thread; 1 community ask post",X,/#download,recap_a

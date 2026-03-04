@@ -13,9 +13,18 @@ export function Navbar() {
           Skilly
         </Link>
         <div className="flex items-center gap-6">
-          <a href="#features" className="text-sm text-[#6B7280] transition hover:text-[#0A0A0A]">Features</a>
-          <a href="#pricing" className="text-sm text-[#6B7280] transition hover:text-[#0A0A0A]">Pricing</a>
-          <a href="#download" className="text-sm text-[#6B7280] transition hover:text-[#0A0A0A]">Download</a>
+          <Link href="/#features" className="text-sm text-[#6B7280] transition hover:text-[#0A0A0A]">
+            Features
+          </Link>
+          <Link href="/#pricing" className="text-sm text-[#6B7280] transition hover:text-[#0A0A0A]">
+            Pricing
+          </Link>
+          <Link href="/blog" className="text-sm text-[#6B7280] transition hover:text-[#0A0A0A]">
+            Blog
+          </Link>
+          <Link href="/#download" className="text-sm text-[#6B7280] transition hover:text-[#0A0A0A]">
+            Download
+          </Link>
           <Link
             href="/login"
             className="rounded-lg bg-[#0A0A0A] px-4 py-1.5 text-sm font-medium text-white transition hover:bg-[#333]"

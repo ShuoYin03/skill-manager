@@ -1,5 +1,4 @@
-// The website URL is duplicated here because the renderer can't import from main/config.ts
-export const WEBSITE_URL = 'https://skilly-azure.vercel.app'
+export const SITE_URL = 'https://skilly-azure.vercel.app'
 
 export const SKILLY_ONE_LINER =
   'Skilly is a desktop app to discover, install, and manage AI coding skills across projects.'

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { trackEvent } from '@/lib/analytics'
 
 interface ReleaseAsset {
   name: string
@@ -119,6 +120,16 @@ export function Download() {
                   <a
                     key={item.platform}
                     href={asset.browser_download_url}
+                    onClick={() => {
+                      trackEvent('download_click', {
+                        source: 'download_section',
+                        platform: item.key
+                      })
+                      trackEvent('platform_download_click', {
+                        source: 'download_section',
+                        platform: item.key
+                      })
+                    }}
                     className="group flex flex-col items-center gap-3 rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] p-6 transition hover:border-[#D1D5DB] hover:shadow-sm"
                   >
                     <div className="text-[#6B7280] transition group-hover:text-[#0A0A0A]">{item.icon}</div>

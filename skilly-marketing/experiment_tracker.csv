@@ -1,0 +1,5 @@
+experiment_id,start_date,end_date,hypothesis,variant_a,variant_b,metric,success_threshold,result,next_action
+EXP-001,2026-03-09,2026-03-23,Pain-led headline increases download clicks,"Stop repeating AI skill setup","Keep AI skills under control",download_click_rate,+15% vs control,pending,pending
+EXP-002,2026-03-16,2026-03-30,Comparison posts outperform generic tips,General workflow tip,Skilly vs manual setup comparison,ctr,>=1.5%,pending,pending
+EXP-003,2026-03-23,2026-04-06,List answers improve AI citation rate,Paragraph answer,List answer,aeo_citation_rate,+20% vs control,pending,pending
+EXP-004,2026-04-06,2026-04-20,Reddit comments convert better than self-posts,Reddit self-post,Reddit high-value comments,download_clicks,>=10/week,pending,pending

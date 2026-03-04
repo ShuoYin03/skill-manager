@@ -1,5 +1,7 @@
 'use client'
 
+import { trackEvent } from '@/lib/analytics'
+
 export function Pricing() {
   return (
     <section id="pricing" className="border-t border-[#E5E7EB] bg-[#FAFAFA] py-24">
@@ -36,6 +38,12 @@ export function Pricing() {
             </ul>
             <a
               href="#download"
+              onClick={() =>
+                trackEvent('trial_started', {
+                  source: 'pricing',
+                  target: 'download_section'
+                })
+              }
               className="mt-8 block rounded-lg bg-[#0A0A0A] py-3 text-center font-semibold text-white transition hover:bg-[#333]"
             >
               Start Free Trial
