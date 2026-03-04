@@ -739,6 +739,11 @@ export function MarketplaceEmbeddedView(): JSX.Element {
           {/* All Skills section */}
           {activeSection === 'marketplace' && (
             <div className="marketplace-section">
+              {!loading && total > 0 && total <= 8 && (
+                <div className="mp-offline-banner">
+                  Showing offline skills only — Supabase not connected. Check Authentication → URL Configuration and run GRANT SELECT ON marketplace_skills TO anon in SQL Editor.
+                </div>
+              )}
               <div className="marketplace-section-header">
                 <span>{displayQuery.trim() ? `Results for "${displayQuery}" · ${showInstalledOnly ? mySkills.length : total}` : `All Skills · ${showInstalledOnly ? mySkills.length : total}`}</span>
                 <label className="mp-installed-only-label">
