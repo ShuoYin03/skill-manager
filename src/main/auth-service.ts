@@ -1,8 +1,7 @@
 import { createClient, type SupabaseClient, type Session } from '@supabase/supabase-js'
-import { shell } from 'electron'
-import { randomUUID } from 'crypto'
 import { SUPABASE_URL, SUPABASE_ANON_KEY, WEBSITE_URL } from './config'
 import { getAuthTokens, setAuthTokens, clearAuthTokens } from './store'
+import { openOAuthWindow } from './oauth-window'
 
 let supabase: SupabaseClient
 
@@ -15,20 +14,31 @@ export function initSupabase(): void {
   })
 }
 
-export async function signIn(): Promise<string | null> {
-  const stateId = randomUUID()
+export async function signIn(): Promise<Session | null> {
   const { data } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${WEBSITE_URL}/auth/callback?es=${stateId}`,
+      redirectTo: `${WEBSITE_URL}/auth/callback`,
       skipBrowserRedirect: true
     }
   })
-  if (data.url) {
-    shell.openExternal(data.url)
-    return stateId
-  }
-  return null
+  if (!data.url) return null
+
+  const tokens = await openOAuthWindow(data.url)
+  if (!tokens) return null
+
+  const { data: sessionData, error } = await supabase.auth.setSession({
+    access_token: tokens.at,
+    refresh_token: tokens.rt,
+  })
+  if (error || !sessionData.session) return null
+
+  setAuthTokens({
+    accessToken: sessionData.session.access_token,
+    refreshToken: sessionData.session.refresh_token,
+  })
+
+  return sessionData.session
 }
 
 export async function handleAuthCallback(url: string): Promise<Session | null> {
