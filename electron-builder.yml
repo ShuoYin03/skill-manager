@@ -9,7 +9,6 @@ directories:
 files:
   - out/**/*
   - "!out/renderer/src/**"
-  - "!**/node_modules/supabase/bin/**"
 
 extraMetadata:
   main: ./out/main/index.js

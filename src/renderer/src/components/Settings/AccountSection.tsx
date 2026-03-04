@@ -10,10 +10,14 @@ export function AccountSection(): JSX.Element {
 
   const handleSignIn = useCallback(async () => {
     setSigningIn(true)
-    await window.electronAPI.signIn()
-    // The actual session will come via onAuthCallback event
-    // Set a timeout to reset the button in case the user cancels
-    setTimeout(() => setSigningIn(false), 30000)
+    try {
+      await window.electronAPI.signIn()
+    } finally {
+      // Reset signing state once the IPC resolves (success or failure).
+      // If auth succeeded, onAuthCallback will have set authUser so the
+      // component renders the account card instead of this button.
+      setSigningIn(false)
+    }
   }, [])
 
   const handleSignOut = useCallback(async () => {
