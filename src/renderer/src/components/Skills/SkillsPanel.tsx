@@ -5,6 +5,7 @@ import { SkillEditor } from './SkillEditor'
 import { SkillCreateDialog } from './SkillCreateDialog'
 import { PresetsView } from './PresetsView'
 import { RepoInfoView } from './RepoInfoView'
+import { EditorPicker } from '../Launcher/EditorPicker'
 
 import type { SkillsPanelView } from '../../../../shared/types'
 
@@ -17,6 +18,7 @@ const TABS: { id: SkillsPanelView; label: string }[] = [
 export function SkillsPanel(): JSX.Element {
   const { state, dispatch } = useAppContext()
   const [showCreate, setShowCreate] = useState(false)
+  const [openPickerPos, setOpenPickerPos] = useState<{ x: number; y: number } | null>(null)
 
   const activeRepo = state.selectedRepo
   const panelView = state.repoPanelView
@@ -73,24 +75,24 @@ export function SkillsPanel(): JSX.Element {
                 {tab.label}
               </button>
             ))}
-            <button
-              className="skills-panel-tab"
-              onClick={() => window.electronAPI.openMarketplaceWindow()}
-              title="Browse & install skills from the marketplace"
-            >
-              Marketplace ↗
-            </button>
-            {panelView === 'list' && (
-              <button
-                className="skills-panel-add"
-                onClick={() => setShowCreate(true)}
-                title="Create new skill"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 5v14" />
-                  <path d="M5 12h14" />
-                </svg>
-              </button>
+            {activeRepo && (
+              <div className="panel-open-group">
+                <button
+                  className="panel-open-btn"
+                  onClick={() => void window.electronAPI.openInEditor(activeRepo.id)}
+                >
+                  Open
+                </button>
+                <button
+                  className="panel-open-chevron"
+                  onClick={(e) => setOpenPickerPos({ x: e.clientX, y: e.clientY })}
+                  title="Choose editor"
+                >
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
+              </div>
             )}
           </div>
         )}
@@ -98,12 +100,24 @@ export function SkillsPanel(): JSX.Element {
 
       <div className="skills-panel-content">
         {panelView === 'info' && <RepoInfoView />}
-        {panelView === 'list' && <SkillsList />}
+        {panelView === 'list' && (
+          <SkillsList
+            onCreateSkill={() => setShowCreate(true)}
+            onGoToMarketplace={() => dispatch({ type: 'SET_VIEW', payload: 'marketplace' })}
+          />
+        )}
         {panelView === 'editor' && <SkillEditor />}
-{panelView === 'presets' && <PresetsView />}
+        {panelView === 'presets' && <PresetsView />}
       </div>
 
       {showCreate && <SkillCreateDialog onClose={() => setShowCreate(false)} />}
+      {openPickerPos && activeRepo && (
+        <EditorPicker
+          repoId={activeRepo.id}
+          position={openPickerPos}
+          onClose={() => setOpenPickerPos(null)}
+        />
+      )}
     </div>
   )
 }

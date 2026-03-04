@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { IPC } from '../shared/constants'
 import type { EditorId, RepoEntry, AITool, SkillFile, SkillPreset, SkillSearchParams } from '../shared/types'
 import { getRepos, addRepo, removeRepo, updateRepo, getSettings, updateSettings, getSkillPresets, addSkillPreset, removeSkillPreset, updateSkillPreset } from './store'
-import { getGitBranch, isGitRepo, refreshAllBranches } from './git-service'
+import { getGitBranch, isGitRepo, refreshAllBranches, getLastCommit } from './git-service'
 import { openInEditor, getAvailableEditors } from './editor-launcher'
 import { hideLauncher, setSuppressHide, applyAlwaysOnTop, getLauncherWindow } from './window'
 import { updateShortcut } from './shortcut'
@@ -17,6 +17,7 @@ import type { MemoryTool } from './memory-files'
 import { app } from 'electron'
 import path from 'path'
 import os from 'os'
+import fs from 'fs'
 
 export function registerIpcHandlers(): void {
   ipcMain.handle(IPC.REPOS_GET_ALL, async () => {
@@ -265,6 +266,53 @@ export function registerIpcHandlers(): void {
     const repos = getRepos()
     const allPaths = repos.map((r) => r.path)
     return await globalizeMemoryFile(repoPath, tool, allPaths)
+  })
+
+  ipcMain.handle(IPC.REPO_LAST_COMMIT, async (_event, repoPath: string) => {
+    return await getLastCommit(repoPath)
+  })
+
+  const LANG_IGNORE = new Set(['.git', 'node_modules', 'dist', 'build', '.next', 'out', '.cache', '.turbo', 'coverage', '.venv', 'venv', '__pycache__'])
+  const LANG_MAP: Record<string, { name: string; color: string }> = {
+    '.ts': { name: 'TypeScript', color: '#3178c6' }, '.tsx': { name: 'TypeScript', color: '#3178c6' },
+    '.js': { name: 'JavaScript', color: '#f1e05a' }, '.jsx': { name: 'JavaScript', color: '#f1e05a' },
+    '.py': { name: 'Python', color: '#3572A5' }, '.rs': { name: 'Rust', color: '#dea584' },
+    '.go': { name: 'Go', color: '#00ADD8' }, '.css': { name: 'CSS', color: '#563d7c' },
+    '.scss': { name: 'SCSS', color: '#c6538c' }, '.html': { name: 'HTML', color: '#e34c26' },
+    '.swift': { name: 'Swift', color: '#F05138' }, '.java': { name: 'Java', color: '#b07219' },
+    '.rb': { name: 'Ruby', color: '#701516' }, '.vue': { name: 'Vue', color: '#41b883' },
+    '.svelte': { name: 'Svelte', color: '#ff3e00' }, '.kt': { name: 'Kotlin', color: '#A97BFF' },
+    '.sh': { name: 'Shell', color: '#89e051' }, '.cs': { name: 'C#', color: '#178600' },
+    '.cpp': { name: 'C++', color: '#f34b7d' }, '.c': { name: 'C', color: '#555555' },
+    '.php': { name: 'PHP', color: '#4F5D95' }, '.dart': { name: 'Dart', color: '#00B4AB' },
+  }
+
+  ipcMain.handle(IPC.REPO_LANGUAGE_STATS, (_event, repoPath: string) => {
+    const counts = new Map<string, number>()
+    let total = 0
+    function scan(dir: string, depth: number): void {
+      if (depth > 8) return
+      let entries: fs.Dirent[]
+      try { entries = fs.readdirSync(dir, { withFileTypes: true }) } catch { return }
+      for (const e of entries) {
+        if (LANG_IGNORE.has(e.name)) continue
+        if (e.isDirectory()) { scan(path.join(dir, e.name), depth + 1); continue }
+        const ext = path.extname(e.name).toLowerCase()
+        if (LANG_MAP[ext]) { counts.set(ext, (counts.get(ext) ?? 0) + 1); total++ }
+      }
+    }
+    scan(repoPath, 0)
+    if (total === 0) return []
+    const langMap = new Map<string, { name: string; color: string; count: number }>()
+    Array.from(counts.entries()).forEach(([ext, count]) => {
+      const l = LANG_MAP[ext]
+      const ex = langMap.get(l.name)
+      if (ex) ex.count += count; else langMap.set(l.name, { ...l, count })
+    })
+    return Array.from(langMap.values())
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 8)
+      .map((l) => ({ name: l.name, color: l.color, pct: Math.round((l.count / total) * 100) }))
   })
 
 }

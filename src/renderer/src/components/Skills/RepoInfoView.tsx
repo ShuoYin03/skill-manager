@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAppContext } from '../../context/AppContext'
 
 function formatRelativeTime(timestamp: number | null): string {
@@ -27,20 +27,26 @@ const AI_TOOL_DIRS = [
 export function RepoInfoView(): JSX.Element {
   const { state } = useAppContext()
   const [copied, setCopied] = useState(false)
+  const [lastCommit, setLastCommit] = useState<{ message: string; date: string } | null>(null)
+  const [langStats, setLangStats] = useState<Array<{ name: string; color: string; pct: number }>>([])
 
   const repo = state.selectedRepo
-  if (!repo) return <div className="repo-info-empty">No repo selected</div>
+  const fullRepo = repo ? state.repos.find((r) => r.id === repo.id) : undefined
 
-  const fullRepo = state.repos.find((r) => r.id === repo.id)
+  useEffect(() => {
+    if (!repo?.path) return
+    setLastCommit(null)
+    setLangStats([])
+    window.electronAPI.getLastCommit(repo.path).then(setLastCommit).catch(() => {})
+    window.electronAPI.getLanguageStats(repo.path).then(setLangStats).catch(() => {})
+  }, [repo?.path])
+
+  if (!repo) return <div className="repo-info-empty">No repo selected</div>
 
   const handleCopyPath = (): void => {
     navigator.clipboard.writeText(repo.path)
     setCopied(true)
     setTimeout(() => setCopied(false), 1500)
-  }
-
-  const handleOpenInEditor = (editorId?: string): void => {
-    window.electronAPI.openInEditor(repo.id, editorId)
   }
 
   // Detect which AI tools have configs (from scanned skills)
@@ -75,6 +81,16 @@ export function RepoInfoView(): JSX.Element {
         </div>
       )}
 
+      {lastCommit && (
+        <div className="repo-info-section">
+          <div className="repo-info-label">Last Commit</div>
+          <div className="repo-info-commit">
+            <span className="repo-info-commit-msg">{lastCommit.message}</span>
+            <span className="repo-info-commit-date">{formatRelativeTime(new Date(lastCommit.date).getTime())}</span>
+          </div>
+        </div>
+      )}
+
       {fullRepo && fullRepo.tags.length > 0 && (
         <div className="repo-info-section">
           <div className="repo-info-label">Tags</div>
@@ -91,21 +107,29 @@ export function RepoInfoView(): JSX.Element {
         <div className="repo-info-value">{formatRelativeTime(fullRepo?.lastOpened ?? null)}</div>
       </div>
 
-      <div className="repo-info-section">
-        <div className="repo-info-label">Open With</div>
-        <div className="repo-info-editors">
-          {state.editors.map((editor) => (
-            <button
-              key={editor.id}
-              className="repo-info-editor-btn"
-              onClick={() => handleOpenInEditor(editor.id)}
-              title={`Open in ${editor.label}`}
-            >
-              {editor.label}
-            </button>
-          ))}
+      {langStats.length > 0 && (
+        <div className="repo-info-section">
+          <div className="repo-info-label">Languages</div>
+          <div className="repo-lang-bar">
+            {langStats.map((l) => (
+              <div
+                key={l.name}
+                className="repo-lang-segment"
+                style={{ width: `${l.pct}%`, background: l.color }}
+                title={`${l.name} ${l.pct}%`}
+              />
+            ))}
+          </div>
+          <div className="repo-lang-legend">
+            {langStats.map((l) => (
+              <span key={l.name} className="repo-lang-item">
+                <span className="repo-lang-dot" style={{ background: l.color }} />
+                {l.name} <span className="repo-lang-pct">{l.pct}%</span>
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {detectedTools.length > 0 && (
         <div className="repo-info-section">

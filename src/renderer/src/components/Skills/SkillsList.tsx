@@ -6,7 +6,12 @@ import { TOOL_LABELS } from './ToolIcon'
 
 const ALL_TOOLS: AITool[] = ['claude', 'cursor', 'windsurf', 'codex', 'copilot']
 
-export function SkillsList(): JSX.Element {
+interface SkillsListProps {
+  onCreateSkill?: () => void
+  onGoToMarketplace?: () => void
+}
+
+export function SkillsList({ onCreateSkill, onGoToMarketplace }: SkillsListProps): JSX.Element {
   const { state, dispatch } = useAppContext()
   const [toolFilter, setToolFilter] = useState<AITool | null>(null)
   const skills = state.repoSkills?.skills ?? []
@@ -24,7 +29,7 @@ export function SkillsList(): JSX.Element {
 
   const handleToggle = async (skill: SkillFile): Promise<void> => {
     if (!repoPath) return
-    const updated = await window.electronAPI.toggleSkill(repoPath, skill)
+    await window.electronAPI.toggleSkill(repoPath, skill)
     // Re-scan to refresh
     const repoSkills = await window.electronAPI.scanRepoSkills(
       state.selectedRepo!.id,
@@ -72,14 +77,24 @@ export function SkillsList(): JSX.Element {
             </button>
           )
         })}
+        {onCreateSkill && (
+          <button className="skills-create-btn" onClick={onCreateSkill}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14" /><path d="M5 12h14" />
+            </svg>
+            New Skill
+          </button>
+        )}
       </div>
 
       {grouped.length === 0 ? (
         <div className="skills-empty">
-          <div className="skills-empty-title">No skills found</div>
-          <div className="skills-empty-subtitle">
-            Click + to create a new skill, or browse the marketplace
-          </div>
+          <div className="skills-empty-title">No skills yet</div>
+          {onGoToMarketplace && (
+            <button className="skills-empty-marketplace-btn" onClick={onGoToMarketplace}>
+              Browse Marketplace
+            </button>
+          )}
         </div>
       ) : (
         <div className="skills-groups">

@@ -27,6 +27,22 @@ export async function isGitRepo(dirPath: string): Promise<boolean> {
   }
 }
 
+export async function getLastCommit(repoPath: string): Promise<{ message: string; date: string } | null> {
+  try {
+    const git = simpleGit(repoPath)
+    const log = await Promise.race([
+      git.log({ maxCount: 1 }),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('timeout')), TIMEOUT_MS)
+      )
+    ])
+    if (!log.latest) return null
+    return { message: log.latest.message.trim(), date: log.latest.date }
+  } catch {
+    return null
+  }
+}
+
 export async function refreshAllBranches(repos: RepoEntry[]): Promise<RepoEntry[]> {
   const CONCURRENCY = 5
   const results = [...repos]

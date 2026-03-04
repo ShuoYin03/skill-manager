@@ -98,6 +98,10 @@ const api = {
     ipcRenderer.invoke(IPC.SKILLS_MARKETPLACE_GET, slug),
   installMarketplaceSkill: (repoPath: string, tool: string, name: string, content: string, skillsDir?: 'tool-specific' | 'shared') =>
     ipcRenderer.invoke(IPC.SKILLS_MARKETPLACE_INSTALL, repoPath, tool, name, content, skillsDir),
+  // Repo info
+  getLastCommit: (repoPath: string) => ipcRenderer.invoke(IPC.REPO_LAST_COMMIT, repoPath),
+  getLanguageStats: (repoPath: string) => ipcRenderer.invoke(IPC.REPO_LANGUAGE_STATS, repoPath),
+
   // Instruction files
   scanInstructionFiles: (repoPath: string) =>
     ipcRenderer.invoke(IPC.INSTRUCTIONS_SCAN, repoPath),

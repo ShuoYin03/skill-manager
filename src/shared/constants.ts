@@ -48,6 +48,10 @@ export const IPC = {
   SKILLS_MARKETPLACE_FILTER_STATS: 'skills:marketplace:filter-stats',
   GET_HOME_DIR: 'get:home-dir',
 
+  // Repo info
+  REPO_LAST_COMMIT: 'repo:last-commit',
+  REPO_LANGUAGE_STATS: 'repo:language-stats',
+
   // Instruction files (CLAUDE.md, .cursorrules, etc.)
   INSTRUCTIONS_SCAN: 'instructions:scan',
   INSTRUCTIONS_READ: 'instructions:read',
