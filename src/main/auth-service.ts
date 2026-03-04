@@ -10,7 +10,8 @@ export function initSupabase(): void {
   supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
       autoRefreshToken: true,
-      persistSession: false // We persist manually via electron-store
+      persistSession: false, // We persist manually via electron-store
+      flowType: 'pkce',      // Force PKCE so callback uses ?code= not #access_token=
     }
   })
 }
