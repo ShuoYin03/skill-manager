@@ -9,9 +9,9 @@
     "build": "electron-vite build",
     "preview": "electron-vite preview",
     "postinstall": "electron-builder install-app-deps",
-    "build:mac": "npm run build && electron-builder --mac",
-    "build:win": "npm run build && electron-builder --win",
-    "build:linux": "npm run build && electron-builder --linux",
+    "build:mac": "rm -rf dist && npm run build && electron-builder --mac",
+    "build:win": "rm -rf dist && npm run build && electron-builder --win",
+    "build:linux": "rm -rf dist && npm run build && electron-builder --linux",
     "scrape": "tsx scripts/scrape-marketplace.ts",
     "scrape-all": "tsx scripts/scrape-marketplace-api.ts",
     "migrate-to-supabase": "tsx scripts/migrate-sqlite-to-supabase.ts"

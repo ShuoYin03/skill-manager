@@ -304,6 +304,7 @@ export function MarketplaceEmbeddedView(): JSX.Element {
   const [stripCollapsed, setStripCollapsed] = useState(false)
   const [showInstalledOnly, setShowInstalledOnly] = useState(false)
   const [notification, setNotification] = useState<string | null>(null)
+  const [supabaseError, setSupabaseError] = useState<string | null>(null)
 
   // Preset management
   const [presets, setPresets] = useState<SkillPreset[]>([])
@@ -368,6 +369,9 @@ export function MarketplaceEmbeddedView(): JSX.Element {
         setResults(result.skills)
         setTotal(result.total)
         setTotalPages(result.totalPages)
+        setSupabaseError(result.offlineReason ?? null)
+      } catch (err) {
+        setSupabaseError(String(err))
       } finally { setLoading(false) }
     }
     doSearch()
@@ -388,6 +392,7 @@ export function MarketplaceEmbeddedView(): JSX.Element {
       setResults(result.skills)
       setTotal(result.total)
       setTotalPages(result.totalPages)
+      setSupabaseError(result.offlineReason ?? null)
     } finally { setLoading(false) }
   }, [query, selectedTags, selectedAuthor])
 
@@ -739,9 +744,9 @@ export function MarketplaceEmbeddedView(): JSX.Element {
           {/* All Skills section */}
           {activeSection === 'marketplace' && (
             <div className="marketplace-section">
-              {!loading && total > 0 && total <= 8 && (
+              {!loading && supabaseError && (
                 <div className="mp-offline-banner">
-                  Showing offline skills only — Supabase not connected. Check Authentication → URL Configuration and run GRANT SELECT ON marketplace_skills TO anon in SQL Editor.
+                  Offline mode — {supabaseError}
                 </div>
               )}
               <div className="marketplace-section-header">

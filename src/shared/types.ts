@@ -135,6 +135,7 @@ export interface SkillSearchResult {
   total: number
   page: number
   totalPages: number
+  offlineReason?: string // Set when falling back to bundled skills; contains the Supabase error
 }
 
 export interface SkillFilterStats {

@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { net } from 'electron'
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config'
 
 export interface SkillRow {
@@ -50,7 +51,12 @@ let _anonClient: SupabaseClient | null = null
 
 function getAnonClient(): SupabaseClient {
   if (!_anonClient) {
-    _anonClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    // Use Electron's net.fetch (Chromium network stack) to correctly validate
+    // SSL certificates via the system CA store. Node.js native fetch (undici)
+    // fails with SELF_SIGNED_CERT_IN_CHAIN in packaged Electron apps.
+    _anonClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { fetch: net.fetch.bind(net) as typeof fetch }
+    })
   }
   return _anonClient
 }

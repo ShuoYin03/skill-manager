@@ -82,6 +82,8 @@ function skillRowToMarketplaceSkill(row: SkillRow): MarketplaceSkill {
 export async function searchMarketplaceSkills(params: SkillSearchParams): Promise<SkillSearchResult> {
   const { query = '', tags, author, page = 1, pageSize = 24 } = params
 
+  let offlineReason: string | undefined
+
   try {
     // Query database with pagination
     const offset = (page - 1) * pageSize
@@ -102,8 +104,11 @@ export async function searchMarketplaceSkills(params: SkillSearchParams): Promis
         totalPages
       }
     }
+    // Supabase returned 0 results — table may be empty
+    offlineReason = 'Supabase connected but returned 0 skills. Run npm run scrape-all to populate.'
   } catch (err) {
     console.error('Database search failed:', err)
+    offlineReason = err instanceof Error ? err.message : JSON.stringify(err)
   }
 
   // Fall back to bundled skills if database is empty or fails
@@ -121,7 +126,7 @@ export async function searchMarketplaceSkills(params: SkillSearchParams): Promis
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
   const safePage = Math.min(Math.max(1, page), totalPages)
   const slice = bundled.slice((safePage - 1) * pageSize, safePage * pageSize)
-  return { skills: slice, total, page: safePage, totalPages }
+  return { skills: slice, total, page: safePage, totalPages, offlineReason }
 }
 
 export async function getMarketplaceFilterStats(): Promise<SkillFilterStats> {

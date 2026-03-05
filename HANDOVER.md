@@ -150,30 +150,22 @@ RETURNS json LANGUAGE sql SECURITY DEFINER AS $$
 $$;
 ```
 
-### ⚠️ 待完成的 Supabase Dashboard 配置
+### Supabase Dashboard 配置状态（2026-03-04 确认）
 
-**登录失败（"Opening browser..." 永远停留）和 Marketplace 只显示 8 条的根本原因：**
+1. **Authentication → Redirect URLs** ✅ 已配置：
+   - `https://skilly-azure.vercel.app/auth/callback`
+   - `http://localhost:57235/callback`
+   - `http://localhost:57236/callback`
+   - `http://localhost:57237/callback`
+   - （可选）`http://localhost:57238/callback`
 
-1. **Authentication → URL Configuration → Redirect URLs** — 必须添加：
-   ```
-   http://localhost:57235/callback
-   http://localhost:57236/callback
-   http://localhost:57237/callback
-   http://localhost:57238/callback
-   ```
+2. **GRANT 权限** ✅ 已执行
 
-2. **SQL Editor** — 必须运行（若 GRANT 未执行）：
-   ```sql
-   GRANT USAGE ON SCHEMA public TO anon;
-   GRANT SELECT ON marketplace_skills TO anon;
-   GRANT SELECT ON marketplace_metadata TO anon;
-   GRANT EXECUTE ON FUNCTION get_marketplace_filter_stats() TO anon;
-   ```
+3. **marketplace_skills 表数据** ✅ 已确认：**25,728 条记录**（`SELECT COUNT(*) FROM marketplace_skills` = 25728）
 
-3. **skills.sh 爬虫（获取技能数据）** — 需要 Service Role Key：
-   ```bash
-   SUPABASE_SERVICE_ROLE_KEY=xxx npm run scrape-all
-   ```
+4. **待排查** ⚠️：生产版本（`npm run build:mac`）里 Marketplace 仍显示 8 条离线数据，
+   dev 版本未测试。已在 `MarketplaceEmbeddedView` 加入错误诊断（banner 显示实际 Supabase 错误信息），
+   需重新构建后检查 banner 文本来定位根因。
 
 ---
 

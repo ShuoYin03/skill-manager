@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient, type Session } from '@supabase/supabase-js'
-import { shell } from 'electron'
+import { shell, net } from 'electron'
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config'
 import { getAuthTokens, setAuthTokens, clearAuthTokens } from './store'
 import { startOAuthServer } from './oauth-local-server'
@@ -12,7 +12,8 @@ export function initSupabase(): void {
       autoRefreshToken: true,
       persistSession: false, // We persist manually via electron-store
       flowType: 'pkce',      // Force PKCE so callback uses ?code= not #access_token=
-    }
+    },
+    global: { fetch: net.fetch.bind(net) as typeof fetch }
   })
 }
 
