@@ -25,7 +25,8 @@
   --mp-toolbar-bg: rgba(250, 250, 250, 0.92);
 }
 
-[data-theme='dark'] .marketplace-standalone {
+[data-theme='dark'] .marketplace-standalone,
+[data-theme='dark'] .launcher {
   --mp-bg: #111111;
   --mp-bg-card: #1A1A1A;
   --mp-border: #2A2A2A;
@@ -414,7 +415,7 @@
   align-items: stretch;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid #0A0A0A;
+  border: 1px solid var(--color-accent);
   flex-shrink: 0;
   margin-left: auto;
 }
@@ -424,7 +425,7 @@
   font-size: 11px;
   font-weight: 600;
   color: #fff;
-  background: #0A0A0A;
+  background: var(--color-accent);
   border: none;
   border-right: 1px solid rgba(255, 255, 255, 0.2);
   cursor: pointer;
@@ -432,7 +433,7 @@
   transition: background 0.1s ease;
 }
 
-.panel-open-btn:hover { background: #333; }
+.panel-open-btn:hover { background: var(--color-accent-hover); }
 
 .panel-open-chevron {
   display: flex;
@@ -440,14 +441,14 @@
   justify-content: center;
   width: 22px;
   padding: 0;
-  background: #0A0A0A;
+  background: var(--color-accent);
   border: none;
   color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   transition: background 0.1s ease, color 0.1s ease;
 }
 
-.panel-open-chevron:hover { background: #333; color: #fff; }
+.panel-open-chevron:hover { background: var(--color-accent-hover); color: #fff; }
 
 .skills-panel-content {
   flex: 1;
@@ -635,6 +636,118 @@
 
 .repo-lang-pct {
   color: var(--color-text-tertiary);
+}
+
+/* ── Repo Settings View ── */
+.repo-settings-view {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.repo-settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.repo-settings-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.repo-settings-select {
+  padding: 6px 10px;
+  font-size: 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: var(--color-input-bg);
+  color: var(--color-text-primary);
+  outline: none;
+  cursor: pointer;
+  appearance: auto;
+}
+
+.repo-settings-select:focus {
+  border-color: var(--color-accent);
+}
+
+.repo-settings-hint {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  line-height: 1.4;
+}
+
+.repo-settings-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.repo-settings-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  background: var(--color-tag-bg);
+  color: var(--color-tag-text);
+}
+
+.repo-settings-tag-remove {
+  font-size: 13px;
+  line-height: 1;
+  color: var(--color-text-tertiary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.repo-settings-tag-remove:hover {
+  color: var(--color-danger);
+}
+
+.repo-settings-tag-input-row {
+  display: flex;
+  gap: 6px;
+}
+
+.repo-settings-tag-input {
+  flex: 1;
+  padding: 5px 10px;
+  font-size: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: var(--color-input-bg);
+  color: var(--color-text-primary);
+  outline: none;
+}
+
+.repo-settings-tag-input:focus {
+  border-color: var(--color-accent);
+}
+
+.repo-settings-tag-add-btn {
+  padding: 5px 10px;
+  font-size: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.repo-settings-tag-add-btn:hover {
+  background: var(--color-surface-hover);
 }
 
 /* Tool Icon */
@@ -3119,8 +3232,8 @@
 }
 
 [data-theme='dark'] .mp-toast {
-  background: #FFFFFF;
-  color: #0A0A0A;
+  background: #2c2c2e;
+  color: #F5F5F5;
 }
 
 /* Collapsible filter pills — Feature 1 */

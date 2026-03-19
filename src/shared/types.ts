@@ -143,7 +143,7 @@ export interface SkillFilterStats {
   authors: { name: string; count: number }[]
 }
 
-export type SkillsPanelView = 'info' | 'list' | 'editor' | 'marketplace' | 'presets' | 'instructions'
+export type SkillsPanelView = 'info' | 'list' | 'editor' | 'marketplace' | 'presets' | 'instructions' | 'settings'
 
 // Instruction files (CLAUDE.md, .cursorrules, etc.)
 export type InstructionTool = 'claude' | 'cursor' | 'windsurf' | 'copilot'

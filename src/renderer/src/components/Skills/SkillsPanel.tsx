@@ -5,6 +5,7 @@ import { SkillEditor } from './SkillEditor'
 import { SkillCreateDialog } from './SkillCreateDialog'
 import { PresetsView } from './PresetsView'
 import { RepoInfoView } from './RepoInfoView'
+import { RepoSettingsView } from './RepoSettingsView'
 import { EditorPicker } from '../Launcher/EditorPicker'
 
 import type { SkillsPanelView } from '../../../../shared/types'
@@ -12,7 +13,8 @@ import type { SkillsPanelView } from '../../../../shared/types'
 const TABS: { id: SkillsPanelView; label: string }[] = [
   { id: 'info', label: 'Info' },
   { id: 'list', label: 'Skills' },
-  { id: 'presets', label: 'Presets' }
+  { id: 'presets', label: 'Presets' },
+  { id: 'settings', label: 'Settings' }
 ]
 
 export function SkillsPanel(): JSX.Element {
@@ -108,6 +110,10 @@ export function SkillsPanel(): JSX.Element {
         )}
         {panelView === 'editor' && <SkillEditor />}
         {panelView === 'presets' && <PresetsView />}
+        {panelView === 'settings' && activeRepo && (() => {
+          const fullRepo = state.repos.find(r => r.id === activeRepo.id)
+          return fullRepo ? <RepoSettingsView repo={fullRepo} /> : null
+        })()}
       </div>
 
       {showCreate && <SkillCreateDialog onClose={() => setShowCreate(false)} />}

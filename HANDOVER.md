@@ -1,6 +1,18 @@
 # Handover Document
 
-Last Updated: 2026-03-04
+Last Updated: 2026-03-05
+
+## Recent Changes
+### 2026-03-05 — Dedicated /pricing page
+- **What was done**: Created a standalone `/pricing` page on the website with a full purchase flow (Google OAuth → Stripe checkout). Updated `auth/callback` to support web-only redirects (non-Electron). Updated Navbar Pricing link to `/pricing`.
+- **Files changed**:
+  - `website/app/pricing/page.tsx` (new) — pricing page with auth check + Stripe checkout trigger
+  - `website/app/auth/callback/route.ts` — added `next`-param redirect for non-Electron OAuth flows
+  - `website/components/Navbar.tsx` — Pricing nav link changed from `/#pricing` to `/pricing`
+- **Purchase flow**: User clicks "Buy now" → if not logged in, Google OAuth with redirect back to `/pricing?checkout=1` → auto-triggers `/api/checkout` → Stripe → `/success`
+- **Known issues**: None
+
+---
 
 ---
 

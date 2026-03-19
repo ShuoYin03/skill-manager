@@ -39,12 +39,13 @@ function GearIcon(): JSX.Element {
 
 export function LauncherView(): JSX.Element {
   const { state, dispatch } = useAppContext()
-  const { isExpired } = useLicense()
+  const { isExpired, isLimited, maxRepos } = useLicense()
   const [nagDismissed, setNagDismissed] = useState(false)
   const [addingRepo, setAddingRepo] = useState(false)
 
   const panelOpen = state.selectedRepo !== null
   const hasRepos = state.repos.length > 0
+  const repoLimitReached = isLimited && state.repos.length >= maxRepos
 
   const handleAddRepo = async (): Promise<void> => {
     setAddingRepo(true)
@@ -99,10 +100,10 @@ export function LauncherView(): JSX.Element {
           </div>
           {hasRepos && (
             <button
-              className="topbar-add-repo-btn"
-              onClick={handleAddRepo}
-              disabled={addingRepo}
-              title="Add repository"
+              className={`topbar-add-repo-btn${repoLimitReached ? ' repo-limit-reached' : ''}`}
+              onClick={repoLimitReached ? undefined : handleAddRepo}
+              disabled={addingRepo || repoLimitReached}
+              title={repoLimitReached ? `Repo limit reached (${maxRepos} max on free plan) — upgrade to unlock unlimited repos` : 'Add repository'}
             >
               {addingRepo ? '…' : (
                 <>
@@ -113,6 +114,9 @@ export function LauncherView(): JSX.Element {
                 </>
               )}
             </button>
+          )}
+          {repoLimitReached && (
+            <span className="topbar-repo-limit-note">Free plan: {maxRepos} repos max</span>
           )}
           <TrialBanner />
         </div>

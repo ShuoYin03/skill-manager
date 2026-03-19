@@ -16,7 +16,7 @@ export function Navbar() {
           <Link href="/#features" className="text-sm text-[#6B7280] transition hover:text-[#0A0A0A]">
             Features
           </Link>
-          <Link href="/#pricing" className="text-sm text-[#6B7280] transition hover:text-[#0A0A0A]">
+          <Link href="/pricing" className="text-sm text-[#6B7280] transition hover:text-[#0A0A0A]">
             Pricing
           </Link>
           <Link href="/blog" className="text-sm text-[#6B7280] transition hover:text-[#0A0A0A]">

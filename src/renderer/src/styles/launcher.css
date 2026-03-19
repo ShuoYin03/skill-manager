@@ -285,6 +285,25 @@
   border-color: var(--color-text-tertiary);
 }
 
+.topbar-add-repo-btn.repo-limit-reached,
+.topbar-add-repo-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.topbar-add-repo-btn.repo-limit-reached:hover {
+  color: var(--color-text-secondary);
+  background: transparent;
+  border-color: var(--color-border);
+}
+
+.topbar-repo-limit-note {
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

@@ -81,7 +81,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         searchQuery: '',
-        selectedIndex: 0,
+        selectedIndex: -1,
         activeTagFilter: null,
         selectedRepo: null,
         repoSkills: null,
@@ -96,6 +96,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         selectedRepo: action.payload,
+        selectedIndex: -1,
         repoPanelView: 'info',
         editingSkill: null
       }

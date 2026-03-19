@@ -36,9 +36,21 @@ export async function GET(req: NextRequest) {
             }],
           }),
         }).catch(err => console.warn('Realtime broadcast failed:', err))
+
+        // Electron flow: pass tokens to success page for deep-link fallback
+        const params = new URLSearchParams({
+          at: data.session.access_token,
+          rt: data.session.refresh_token,
+        })
+        return NextResponse.redirect(new URL(`/auth/success?${params}`, req.url))
       }
 
-      // Also pass tokens to the success page as a manual fallback
+      // Web flow (e.g. pricing page checkout): redirect to `next` if provided
+      if (next && next !== '/') {
+        return NextResponse.redirect(new URL(next, req.url))
+      }
+
+      // Default fallback: pass tokens to success page for deep-link
       const params = new URLSearchParams({
         at: data.session.access_token,
         rt: data.session.refresh_token,
